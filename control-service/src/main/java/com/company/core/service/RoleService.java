@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.company.core.domain.RoleBO;
+import com.company.core.entity.UcInstDo;
 import com.company.core.form.Pagination;
 
 /**
@@ -28,5 +29,5 @@ public interface RoleService {
     Map cancelRoleResouce(String sid, String rid) throws Exception;
 
     Map setAuthory(String roleId, List<String> list);
-
+    
 }

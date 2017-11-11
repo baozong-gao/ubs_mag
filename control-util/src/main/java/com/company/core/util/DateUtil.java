@@ -21,7 +21,9 @@ import org.apache.commons.lang.time.DateUtils;
  * Created by fireWorks on 2016/2/27.
  */
 public class DateUtil {
-
+    
+    public static final String PATTERN_DATE_TIME = "yyyyMMddHHmmss";
+    
     public static final String PATTERN_STANDARD = "yyyy-MM-dd HH:mm:ss";
 
     public static final String PATTERN_DATE = "yyyy-MM-dd";
@@ -241,6 +243,16 @@ public class DateUtil {
         date.setTimeZone(timezone);
         return DateFormatUtils.format(date, "HHmmss");
     }
-
+    
+    /**
+     *
+     * <h2>返回yyyyMMddHHmmss格式的系统当前时间格式字符串</h2>
+     */
+    public static String getCurrentDateTime() {
+        Calendar now = Calendar.getInstance();
+        SimpleDateFormat dateFormat = new SimpleDateFormat(PATTERN_DATE_TIME);
+        return dateFormat.format(now.getTime());
+    }
+    
 
 }

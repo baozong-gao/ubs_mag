@@ -97,7 +97,20 @@
 <link href="${pageContext.request.contextPath}/resources/BJUI/plugins/uploadify/css/uploadify.css" rel="stylesheet">
 <script src="${pageContext.request.contextPath}/resources/BJUI/plugins/uploadify/scripts/jquery.uploadify.min.js"></script>
 <script src="${pageContext.request.contextPath}/resources/BJUI/plugins/download/jquery.fileDownload.js"></script>
-<!-- init -->
+
+<!-- wwk -->
+    <%--<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/assets/css/style.css">--%>
+    <%--<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/assets/css/loader-style.css">--%>
+    <%--<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/assets/css/bootstrap.css">--%>
+    <%--<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/assets/js/progress-bar/number-pb.css">--%>
+    <%--<style type="text/css">--%>
+        <%--canvas#canvas4 {--%>
+            <%--position: relative;--%>
+            <%--top: 20px;--%>
+        <%--}--%>
+    <%--</style>--%>
+
+    <!-- init -->
 <script type="text/javascript">
 $(function() {
     BJUI.init({
@@ -192,7 +205,7 @@ function MainMenuClick(event, treeId, treeNode) {
         $(event.target).navtab({id:treeNode.tabid, url:treeNode.url, title:treeNode.name, fresh:treeNode.fresh, external:treeNode.external})
 }
 </script>
-<!-- for doc begin 
+<!-- for doc begin
 <link type="text/css" rel="stylesheet" href="${pageContext.request.contextPath}/resources/js/syntaxhighlighter-2.1.382/styles/shCore.css"/>
 <link type="text/css" rel="stylesheet" href="${pageContext.request.contextPath}/resources/js/syntaxhighlighter-2.1.382/styles/shThemeEclipse.css"/>
 <script type="text/javascript" src="${pageContext.request.contextPath}/resources/js/syntaxhighlighter-2.1.382/scripts/brush.js"></script>

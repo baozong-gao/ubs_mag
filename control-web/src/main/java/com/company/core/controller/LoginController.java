@@ -47,6 +47,7 @@ public class LoginController {
         return "login";
     }
 
+    
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     public String login(@ModelAttribute("loginForm") LoginForm loginForm, HttpSession session,
                         HttpServletRequest request) {

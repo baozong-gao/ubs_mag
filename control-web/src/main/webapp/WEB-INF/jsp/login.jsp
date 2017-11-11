@@ -14,7 +14,7 @@
   <style type="text/css">
     * {font-family: "Verdana", "Tahoma", "Lucida Grande", "Microsoft YaHei", "Hiragino Sans GB", sans-serif;}
     body {
-      background: url(${pageContext.request.contextPath}/resources/image/loginbg_01.jpg) no-repeat center center fixed;
+      background: url(${pageContext.request.contextPath}/resources/assets/img/bg.jpg) no-repeat center center fixed;
       -webkit-background-size: cover;
       -moz-background-size: cover;
       -o-background-size: cover;
@@ -96,9 +96,10 @@
     }
     function choose_bg() {
       var bg = Math.floor(Math.random() * 9 + 1);
-      $('body').css('background-image', 'url(${pageContext.request.contextPath}/resources/image/loginbg_0'+ bg +'.jpg)');
+      <%--$('body').css('background-image', 'url(${pageContext.request.contextPath}/resources/image/loginbg_0'+ bg +'.jpg)');--%>
+      <%--$('body').css('background-image', 'url(${pageContext.request.contextPath}/resources/assets/img/bg' + bg + '.jpg)');--%>
+      $('body').css('background-image', 'url(${pageContext.request.contextPath}/resources/assets/img/bg9.jpg)');
     }
-
 
     function getLoginName() {
       var loginName = $("#j_username").val();

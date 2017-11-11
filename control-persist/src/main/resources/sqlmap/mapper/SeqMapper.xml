@@ -18,4 +18,9 @@
     select TBL_BTS_INST_ID_SEQ.nextval from dual
   </select>
 
+  <select id="getSequenceNextVal" parameterType="map" resultType="long">
+    select ${seqName}.nextval as ID from dual
+  </select>
+
+
 </mapper>

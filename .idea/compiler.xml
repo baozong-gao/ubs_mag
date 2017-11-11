@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="control-domain" />
+        <module name="control-persist" />
+        <module name="control-service" />
+        <module name="control-util" />
+        <module name="control-web" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="control-domain" target="1.8" />
+      <module name="control-persist" target="1.8" />
+      <module name="control-service" target="1.8" />
+      <module name="control-util" target="1.8" />
+      <module name="control-web" target="1.8" />
+      <module name="ubs_mag" target="1.8" />
+    </bytecodeTargetLevel>
+  </component>
+</project>

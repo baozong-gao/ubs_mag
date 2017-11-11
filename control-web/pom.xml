@@ -119,10 +119,6 @@
 			<artifactId>activemq-all</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.shenxin.core</groupId>
-			<artifactId>bipi-facade</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>com.alibaba</groupId>
 			<artifactId>dubbo</artifactId>
 		</dependency>
