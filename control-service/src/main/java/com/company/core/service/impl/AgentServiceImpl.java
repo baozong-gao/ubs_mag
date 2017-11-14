@@ -2,12 +2,13 @@ package com.company.core.service.impl;
 
 import com.company.core.biz.SequenceBiz;
 import com.company.core.biz.UCAgentBiz;
+import com.company.core.biz.UCAgentLevelBiz;
 import com.company.core.constant.ErrorException;
-import com.company.core.constant.UserStatusConstant;
+import com.company.core.constant.StatusConstant;
 import com.company.core.domain.UserBO;
 import com.company.core.entity.UcAgentDo;
 import com.company.core.entity.UcAgentInfoDo;
-import com.company.core.entity.UcInstInfoDo;
+import com.company.core.entity.UcAgentLevelDo;
 import com.company.core.form.AgentForm;
 import com.company.core.service.AgentService;
 import com.company.core.util.ComcomUtils;
@@ -17,10 +18,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 
  * @Author: weiwankun
  * @Date: 2017/11/9
  */
@@ -31,10 +32,12 @@ public class AgentServiceImpl implements AgentService {
     UCAgentBiz ucAgentBiz;
     @Autowired
     SequenceBiz sequenceBiz;
+    @Autowired
+    UCAgentLevelBiz ucAgentLevelBiz;
     
     @Override
     public List<UcAgentDo> getAgentList() {
-    
+        
         return ucAgentBiz.selectAllAgents();
         
     }
@@ -45,6 +48,58 @@ public class AgentServiceImpl implements AgentService {
         return ucAgentBiz.selectAgentsByInstId(instId);
         
     }
+    
+    @Override
+    public List<UcAgentDo> getAgentList(String instId, String agentType, String status) {
+        
+        return ucAgentBiz.selectAllAgents(instId, agentType, status, "");
+        
+    }
+    
+    @Override
+    public List<String> getAgentIdList(String instId, String status) {
+        
+        List<String> agentIdList = new ArrayList<>();
+        List<UcAgentDo> ucAgentDos = ucAgentBiz.selectAgentsByInstId(instId);
+        if (ucAgentDos != null && ucAgentDos.size() > 0) {
+            for (UcAgentDo uc : ucAgentDos) {
+                if (StringUtils.isNotBlank(status)) {
+                    if (status.equals(uc.getStatus())) {
+                        agentIdList.add(uc.getAgentId());
+                    } else {
+                        continue;
+                    }
+                } else {
+                    agentIdList.add(uc.getAgentId());
+                }
+            }
+        }
+        return agentIdList;
+    }
+    
+    @Override
+    public List<UcAgentLevelDo> getAgentListOfAgentOwn(String agent) {
+        
+        return ucAgentLevelBiz.getAllDownAgentLevelList(agent);
+        
+    }
+    
+    ;
+    
+    
+    @Override
+    public List<String> getAgentIdListOfAgentOwn(String agentId) {
+        
+        List<String> agentIdList = new ArrayList<>();
+        List<UcAgentLevelDo> list = ucAgentLevelBiz.getAllDownAgentLevelList(agentId);
+        if (list != null && list.size() > 0) {
+            for (UcAgentLevelDo s : list) {
+                agentIdList.add(s.getAgentId());
+            }
+        }
+        return agentIdList;
+    }
+    
     
     @Override
     public String createNewAgent(AgentForm agentForm, UserBO userBO) {
@@ -59,15 +114,16 @@ public class AgentServiceImpl implements AgentService {
         
     }
     
-    public void createAgentBaseInfo(AgentForm agentForm, UserBO userBO){
+    public void createAgentBaseInfo(AgentForm agentForm, UserBO userBO) {
         
         //创建代理
         UcAgentDo ucAgentDo = new UcAgentDo();
         ucAgentDo.setInstId(agentForm.getInstId());
         ucAgentDo.setAgentId(sequenceBiz.genAgentId());
-        ucAgentDo.setAgentType(agentForm.getAgentType());
+        //ucAgentDo.setAgentType(agentForm.getAgentType());
+        ucAgentDo.setAgentType("1");   //机构发展的代理商类型为1,  机构自身的代理商号是0
         ucAgentDo.setAgentName(agentForm.getAgentName());
-        ucAgentDo.setStatus(UserStatusConstant.STATUS_NEW);
+        ucAgentDo.setStatus(StatusConstant.STATUS_NEW);
         ucAgentDo.setCategory(agentForm.getCategory());
         ucAgentDo.setCategoryId(agentForm.getCategoryId());
         ucAgentDo.setAgentOk(agentForm.getAgentOk());
@@ -84,7 +140,7 @@ public class AgentServiceImpl implements AgentService {
         ucAgentDo.setModifyTime(DateUtil.getCurrentDateTime());
         
         int i = ucAgentBiz.insertAgent(ucAgentDo);
-        if(i <= 0){
+        if (i <= 0) {
             throw new ErrorException("代理信息入库失败");
         }
         
@@ -92,7 +148,7 @@ public class AgentServiceImpl implements AgentService {
         
     }
     
-    public void createAgentDetailInfo(AgentForm agentForm, UserBO userBO){
+    public void createAgentDetailInfo(AgentForm agentForm, UserBO userBO) {
         
         //存入代理详细信息
         UcAgentInfoDo ucAgentInfoDo = new UcAgentInfoDo();
@@ -122,7 +178,7 @@ public class AgentServiceImpl implements AgentService {
         ucAgentInfoDo.setLockVersion(String.valueOf(0));
         
         int c = ucAgentBiz.insertAgentInfo(ucAgentInfoDo);
-        if(c <= 0){
+        if (c <= 0) {
             throw new ErrorException("代理详细信息入库失败");
         }
     }
@@ -132,23 +188,53 @@ public class AgentServiceImpl implements AgentService {
         return ucAgentBiz.selectAgent(agentId);
     }
     
+    
     @Override
-    public Boolean checkIfDupAgentByName(String agentName, String agentShortName ) {
+    public UcAgentLevelDo getAgentLevel(String agentId) {
         
-        if(StringUtils.isNotBlank(agentName)){
+        return ucAgentLevelBiz.getAgentLevel(agentId);
+        
+    }
+    
+    @Override
+    public String getAgentLevelName(String agentId) {
+        
+        String levelName = "";
+        UcAgentLevelDo ucAgentLevelDo = ucAgentLevelBiz.getAgentLevel(agentId);
+        if (ucAgentLevelDo == null) {
+            return "1级: ";
+        } else {
+            return ucAgentLevelDo.getAgentLevel() + "级: ";
+        }
+    }
+    
+    @Override
+    public Boolean checkIfDupAgentByName(String agentName, String agentShortName) {
+        
+        if (StringUtils.isNotBlank(agentName)) {
             List<UcAgentInfoDo> ucAgentInfoDos = ucAgentBiz.selectByName(agentName);
-            if(ucAgentInfoDos !=null && ucAgentInfoDos.size() >0){
+            if (ucAgentInfoDos != null && ucAgentInfoDos.size() > 0) {
                 return true;
             }
         }
         
-        if(StringUtils.isNotBlank(agentShortName)){
+        if (StringUtils.isNotBlank(agentShortName)) {
             List<UcAgentInfoDo> ucAgentInfoDos = ucAgentBiz.selectByShortName(agentName);
-            if(ucAgentInfoDos !=null && ucAgentInfoDos.size() >0){
+            if (ucAgentInfoDos != null && ucAgentInfoDos.size() > 0) {
                 return true;
             }
         }
         return false;
+    }
+    
+    @Override
+    public UcAgentDo getAgentOfInstOwn(String instId) {
+        
+        List<UcAgentDo> ucAgentDos = ucAgentBiz.selectAgentsByInstId(instId);
+        if (ucAgentDos == null || ucAgentDos.size() == 0) {
+            return null;
+        }
+        return ucAgentDos.get(0);
     }
     
 }

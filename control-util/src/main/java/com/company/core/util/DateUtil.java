@@ -254,5 +254,18 @@ public class DateUtil {
         return dateFormat.format(now.getTime());
     }
     
+    /**
+     *
+     * <h2>获取当前时间相差num时间段的时间串，格式为yyyyMMddHHmmss</h2>
+     * @param num 相差时间 可以为负数
+     * @param type 时间类型，为Calendar里的类型
+     * @return 时间串
+     */
+    public static String getAnotherDate(int num, int type) {
+        Calendar another = Calendar.getInstance();
+        another.add(type, num);
+        SimpleDateFormat dateFormat = new SimpleDateFormat(PATTERN_DATE_TIME);
+        return dateFormat.format(another.getTime());
+    }
 
 }

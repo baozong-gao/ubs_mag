@@ -26,24 +26,24 @@ public class SequenceBiz {
     @Autowired
     SeqMapper seqMapper;
     
-    /**
-     * 生成INST_ID
-     *
-     * @return
-     */
     public String genInstId() {
         String seq = String.valueOf(seqMapper.getSequenceNextVal("UBS_INST_SEQ"));
         return StringUtils.leftPad(seq, 8, "0");
     }
     
-    /**
-     * 生成AGENT_ID
-     *
-     * @return
-     */
     public String genAgentId() {
         String seq = String.valueOf(seqMapper.getSequenceNextVal("UBS_AGENT_SEQ"));
         return StringUtils.leftPad(seq, 8, "0");
     }
-
+    
+    public String genRecomCodeBatchId() {
+        String seq = String.valueOf(seqMapper.getSequenceNextVal("UBS_RECOM_CODE_BATCH"));
+        return StringUtils.leftPad(seq, 8, "0");
+    }
+    
+    public String genRecomCodeSeq() {
+        String seq = String.valueOf(seqMapper.getSequenceNextVal("UBS_RECOM_CODE_SEQ"));
+        return StringUtils.leftPad(seq, 8, "0");
+    }
+    
 }

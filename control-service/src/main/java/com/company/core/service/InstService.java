@@ -21,6 +21,8 @@ public interface InstService {
     
     public UcInstDo getInst(String instId);
     
+    UcInstDo getTheDefaultInst();
+    
     public Boolean checkIfDupInstByName(String instName, String instShortName );
     
 }

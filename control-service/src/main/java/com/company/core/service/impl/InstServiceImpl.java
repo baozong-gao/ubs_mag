@@ -3,7 +3,8 @@ package com.company.core.service.impl;
 import com.company.core.biz.SequenceBiz;
 import com.company.core.biz.UCInstBiz;
 import com.company.core.constant.ErrorException;
-import com.company.core.constant.UserStatusConstant;
+import com.company.core.constant.StatusConstant;
+import com.company.core.constant.UserConstant;
 import com.company.core.domain.UserBO;
 import com.company.core.entity.UcInstDo;
 import com.company.core.entity.UcInstInfoDo;
@@ -68,7 +69,7 @@ public class InstServiceImpl implements InstService {
         ucInstDo.setInstId(sequenceBiz.genInstId());
         ucInstDo.setInstType(instForm.getInstType());
         ucInstDo.setInstName(instForm.getInstName());
-        ucInstDo.setStatus(UserStatusConstant.STATUS_NEW);
+        ucInstDo.setStatus(StatusConstant.STATUS_NEW);
         ucInstDo.setCategory(instForm.getCategory());
         ucInstDo.setCategoryId(instForm.getCategoryId());
         ucInstDo.setAgentOk(instForm.getAgentOk());
@@ -136,6 +137,19 @@ public class InstServiceImpl implements InstService {
 
     }
     
+    @Override
+    public UcInstDo getTheDefaultInst() {
+        
+        List<UcInstDo> instDos = getInstListByStatus(StatusConstant.STATUS_ENABLE);
+        if(instDos != null && instDos.size() >0){
+            for(UcInstDo u: instDos){
+                if(UserConstant.USER_TYPE_DEFAULT.equals(u.getInstType())){
+                    return u;
+                }
+            }
+        }
+        return null;
+    }
     
     @Override
     public Boolean checkIfDupInstByName(String instName, String instShortName ) {

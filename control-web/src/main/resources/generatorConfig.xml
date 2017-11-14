@@ -36,14 +36,14 @@
         </javaClientGenerator>
 
         <!--<table tableName="UC_RECCOM_CODE_CNTL" domainObjectName="UcReccomCodeCntlDo"/>-->
-        <table tableName="UC_AGENT" domainObjectName="UcAgentDo"/>
-        <table tableName="UC_INST" domainObjectName="UcInstDo"/>
+        <!--<table tableName="UC_AGENT" domainObjectName="UcAgentDo"/>-->
+        <!--<table tableName="UC_INST" domainObjectName="UcInstDo"/>-->
         <!--<table tableName="UC_AGENT_INFO" domainObjectName="UcAgentInfoDo"/>-->
         <!--<table tableName="UC_INST_INFO" domainObjectName="UcInstInfoDo"/>-->
         <!--<table tableName="UC_AGENT_LEVEL" domainObjectName="UcAgentLevelDo"/>-->
         <!--<table tableName="UC_AGENT_USER_REL" domainObjectName="UcAgentUserRelDo"/>-->
         <!--<table tableName="UC_INST_PARAMS" domainObjectName="UcInstParamsDo"/>-->
-        <!--<table tableName="UC_RECOM_CODE_USER_REL" domainObjectName="UcRecomCodeUserRelDo"/>-->
+        <table tableName="UC_RECCOM_CODE_USER_REL" domainObjectName="UcRecomCodeUserRelDo"/>
         <!--<table tableName="UC_USER_AGENT" domainObjectName="UcUserAgentDo"/>-->
         <!--<table tableName="UC_USER_CAR" domainObjectName="UcUserCarDo"/>-->
         <!--<table tableName="UC_USER_INFO" domainObjectName="UcUserInfoDo"/>-->

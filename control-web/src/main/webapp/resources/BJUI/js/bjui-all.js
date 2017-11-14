@@ -8395,14 +8395,14 @@
             .add('<div class="bjui-datagrid">')
             .add(options.gridTitle ? '<div class="datagrid-title">'+ options.gridTitle +'</div>' : '')
             .add(options.showToolbar ? '<div class="datagrid-toolbar"></div>' : '')
-            .add('<div class="datagrid-box-h"><div class="datagrid-wrap-h"><table class="table table-bordered"><colgroup></colgroup></table></div></div>')
+            .add('<div class="datagrid-box-h"><div class="datagrid-wrap-h"><table class="table table-bordered table-user-width"><colgroup></colgroup></table></div></div>')
             .add('<div class="datagrid-box-b"><div class="datagrid-wrap-b"></div></div>')
             .add('<div class="datagrid-box-m"></div>')
             .add(options.paging ? '<div class="datagrid-paging-box"></div>' : '')
             .add('</div>')
         
         that.$grid    = $(gridHtml.toString()).insertAfter(that.$element).css('height', options.height)
-        that.$boxH    = that.$grid.find('> div.datagrid-box-h')
+        that.$boxH    = that.$grid.find('> div.datagrid-box-h').css('width', '100%')
         that.$boxB    = that.$boxH.next()
         that.$boxM    = that.$boxB.next().css('height', options.height)
         that.$boxP    = options.paging ? that.$boxM.next() : null
@@ -10012,7 +10012,7 @@
     
     //locking
     Datagrid.prototype.doLock = function() {
-        var that = this, options = that.options, tools = that.tools, columnModel = that.columnModel, tableW = that.$tableH.width(), width = 0, $trs, $lockTrs, lockedLen = 0
+        var that = this, options = that.options, tools = that.tools, columnModel = that.columnModel, tableW = that.$tableH.width(), width = '100%', $trs, $lockTrs, lockedLen = 0
         var hasFoot = that.$boxF && true, top = 0
         
         if (!that.$lockBox || !that.$lockBox.length) {
@@ -10021,7 +10021,7 @@
             that.$lockB   = $('<div class="datagrid-box-b"></div>')
             that.$lockF   = $('<div class="datagrid-box-f"></div>')
             
-            that.$lockTableH = $('<table class="table table-bordered"></table>')
+            that.$lockTableH = $('<table class="table table-bordered table-user-width"></table>')
             that.$lockTableB = $('<table></table>').addClass(that.$tableB.attr('class'))
             that.$lockTableF = $('<table class="table table-bordered"></table>')
             
@@ -10069,7 +10069,7 @@
         that.$lockColgroupH = that.$colgroupH.clone()
         that.$lockColgroupB = that.$colgroupB.clone()
         
-        that.$lockTableH.append(that.$lockColgroupH).append(that.$lockThead).css('width', width)
+        that.$lockTableH.append(that.$lockColgroupH).append(that.$lockThead).css('width', '100%')
         that.$lockTableB.append(that.$lockColgroupB).append(that.$lockTbody).css('width', width)
         
         if (hasFoot) {

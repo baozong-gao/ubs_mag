@@ -1,11 +1,10 @@
 package com.company.core.controller;
 
 import com.company.core.constant.ErrorException;
-import com.company.core.constant.UserStatusConstant;
+import com.company.core.constant.StatusConstant;
 import com.company.core.domain.UserBO;
 import com.company.core.entity.UcInstDo;
 import com.company.core.form.AgentForm;
-import com.company.core.form.InstForm;
 import com.company.core.service.AgentService;
 import com.company.core.service.InstService;
 import lombok.extern.slf4j.Slf4j;
@@ -37,7 +36,7 @@ public class AgentController extends BaseController {
     @RequestMapping(value = "/addPage", method = RequestMethod.GET)
     public ModelAndView toAddPage(HttpServletRequest request, HttpServletResponse response, ModelAndView modelAndView) {
         
-        List<UcInstDo> ucInstDoList = instService.getInstListByStatus(UserStatusConstant.STATUS_ENABLE);
+        List<UcInstDo> ucInstDoList = instService.getInstListByStatus(StatusConstant.STATUS_ENABLE);
         
         modelAndView.getModel().put("instList", ucInstDoList);
         modelAndView.setViewName("/agent/add_agent");

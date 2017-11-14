@@ -36,12 +36,15 @@ public class UCAgentBiz {
         
     }
     
-    public List<UcAgentDo> selectAllAgents(String instId, String status, String agentName){
+    public List<UcAgentDo> selectAllAgents(String instId, String type, String status, String agentName){
         
         UcAgentDoExample ucAgentDoExample = new UcAgentDoExample();
         UcAgentDoExample.Criteria criteria = ucAgentDoExample.createCriteria();
         if(StringUtils.isNotBlank(instId)){
             criteria.andInstIdEqualTo(instId);
+        }
+        if(StringUtils.isNotBlank(type)){
+            criteria.andAgentTypeEqualTo(type);
         }
         if(StringUtils.isNotBlank(status)){
             criteria.andStatusEqualTo(status);

@@ -19,5 +19,6 @@ public class SystemConstant extends ConfigurableContants {
     public static final String EMAIL_SANDER        = getProperty("email.sender");
     public static final String EMAIL_USER_NAME     = getProperty("email.userName");
     public static final String EMAIL_USER_PASSWORD = getProperty("email.userPassword");
-
+    
+    public static final String DEFAULT_SOURCE_CODE = getProperty("default.source.code");
 }
