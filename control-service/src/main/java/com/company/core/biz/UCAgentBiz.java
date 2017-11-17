@@ -1,5 +1,6 @@
 package com.company.core.biz;
 
+import com.company.core.constant.UserConstant;
 import com.company.core.entity.UcAgentDo;
 import com.company.core.entity.UcAgentDoExample;
 import com.company.core.entity.UcAgentInfoDo;
@@ -66,6 +67,26 @@ public class UCAgentBiz {
         } else {
             return null;
         }
+    }
+    
+    public UcAgentDo selectDefaultAgent(String inst){
+        
+        UcAgentDoExample ucAgentDoExample = new UcAgentDoExample();
+        ucAgentDoExample.createCriteria().andInstIdEqualTo(inst).andAgentTypeEqualTo(UserConstant.USER_TYPE_DEFAULT);
+        List<UcAgentDo> ucAgentDos = ucAgentDoMapper.selectByExample(ucAgentDoExample);
+        if(ucAgentDos != null && ucAgentDos.size() > 0){
+            return ucAgentDos.get(0);
+        } else {
+            return null;
+        }
+    }
+    
+    public int countByExample(UcAgentDoExample ucAgentDoExample){
+        return ucAgentDoMapper.countByExample(ucAgentDoExample);
+    }
+    
+    public List<UcAgentDo> selectByExample(UcAgentDoExample ucAgentDoExample){
+        return ucAgentDoMapper.selectByExample(ucAgentDoExample);
     }
     
     public List<UcAgentDo> selectAgentsByInstId(String instId){

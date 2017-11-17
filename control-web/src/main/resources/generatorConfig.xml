@@ -43,11 +43,11 @@
         <!--<table tableName="UC_AGENT_LEVEL" domainObjectName="UcAgentLevelDo"/>-->
         <!--<table tableName="UC_AGENT_USER_REL" domainObjectName="UcAgentUserRelDo"/>-->
         <!--<table tableName="UC_INST_PARAMS" domainObjectName="UcInstParamsDo"/>-->
-        <table tableName="UC_RECCOM_CODE_USER_REL" domainObjectName="UcRecomCodeUserRelDo"/>
+        <!--<table tableName="UC_RECCOM_CODE_USER_REL" domainObjectName="UcRecomCodeUserRelDo"/>-->
         <!--<table tableName="UC_USER_AGENT" domainObjectName="UcUserAgentDo"/>-->
         <!--<table tableName="UC_USER_CAR" domainObjectName="UcUserCarDo"/>-->
         <!--<table tableName="UC_USER_INFO" domainObjectName="UcUserInfoDo"/>-->
-
+        <table tableName="UC_FEE" domainObjectName="UcFee"/>
 
     </context>
 </generatorConfiguration>

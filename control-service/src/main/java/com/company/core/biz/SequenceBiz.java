@@ -28,7 +28,7 @@ public class SequenceBiz {
     
     public String genInstId() {
         String seq = String.valueOf(seqMapper.getSequenceNextVal("UBS_INST_SEQ"));
-        return StringUtils.leftPad(seq, 8, "0");
+        return StringUtils.leftPad(seq, 6, "0");
     }
     
     public String genAgentId() {

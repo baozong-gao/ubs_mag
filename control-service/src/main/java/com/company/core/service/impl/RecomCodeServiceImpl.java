@@ -237,7 +237,7 @@ public class RecomCodeServiceImpl implements RecomCodeService {
     
     
     /**
-     * 获取推荐码的个数
+     * 下发指定个数的推荐码到指定下级代理
      */
     @Override
     @Transactional
@@ -266,5 +266,39 @@ public class RecomCodeServiceImpl implements RecomCodeService {
         }
     }
     
+    
+    /**
+     * 下发指定推荐码到指定代理
+     */
+    @Override
+    @Transactional
+    public String dispatchRecomCodeSelected(List<String> recomCodeList, String toAgentId, String user) {
+        
+        List<String> sList = new ArrayList<>();
+        List<String> eList = new ArrayList<>();
+    
+        String recomP = "";
+        for(String recomCode: recomCodeList){
+            
+            UcReccomCodeCntlDo ucReccomCodeCntlDo = ucRecomCodeControlBiz.selectByPrimaryKey(recomP);
+            if(ucReccomCodeCntlDo == null || !StatusConstant.STATUS_ENABLE.equals(ucReccomCodeCntlDo.getStatus())){
+                eList.add(recomP);
+                continue;
+            }
+    
+            ucReccomCodeCntlDo.setModifySource(SystemConstant.DEFAULT_SOURCE_CODE);
+            ucReccomCodeCntlDo.setModifyTime(DateUtil.getCurrentDateTime());
+            ucReccomCodeCntlDo.setModifyUser(user);
+            ucReccomCodeCntlDo.setUserCode(toAgentId);
+            int d = ucRecomCodeControlBiz.updateSelective(ucReccomCodeCntlDo);
+            if (d <= 0) {
+                throw new ErrorException("下发注册时数据库更新异常");
+            }
+            sList.add(recomCode);
+        }
+        
+        return "下发成功个数:" + sList.size() + "个." + "下发失败个数:" + eList.size() + "个";
+        
+    }
     
 }

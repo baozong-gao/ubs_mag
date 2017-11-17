@@ -9,6 +9,7 @@ import com.company.core.service.AgentService;
 import com.company.core.service.InstService;
 import com.company.core.service.RecomCodeService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -20,9 +21,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Controller
 @Slf4j
@@ -94,7 +93,7 @@ public class RecomCodeController extends BaseController {
         UcInstDo ucInstDo = instService.getTheDefaultInst();
         
         RecomCodeForm recomCodeForm = new RecomCodeForm();
-        recomCodeForm.setInstId(ucInstDo.getInstId());
+        //recomCodeForm.setInstId(ucInstDo.getInstId());
         //获取该机构下的所有注册码信息
         Pagination page= recomCodeService.getAllRecomcodes(recomCodeForm);
         recomCodeForm.setPagination(page);
@@ -228,6 +227,9 @@ public class RecomCodeController extends BaseController {
     }
     
     
+    
+    
+    
     /**
      * 批量下发注册码 - 实现
      */
@@ -267,6 +269,73 @@ public class RecomCodeController extends BaseController {
             return returnError("系统异常");
         }
         return returnSuccess("下发成功");
+    }
+    
+    
+    /**
+     * 下发选中注册码 - 页面
+     */
+    @RequestMapping(value = "/dispatchSelectedPage", method = RequestMethod.GET)
+    public ModelAndView toDispatchSelectedPage(HttpServletRequest request, HttpServletResponse response, ModelAndView modelAndView) {
+
+        String recomParam = request.getParameter("recomCode");
+        String agentId = request.getParameter("agentId");
+        
+        RecomCodeForm recomCodeForm = new RecomCodeForm();
+        recomCodeForm.setToDispatchRecomCodes(recomParam);
+        recomCodeForm.setAgentId(agentId);
+        
+        //获取-激活状态下的机构列表
+        List<UcAgentDo> toAgentList = agentService.getAgentIdListOfAgentOwnEnabled(agentId);
+        modelAndView.getModel().put("recomCodeDispatchSelectedForm", recomCodeForm);
+        modelAndView.getModel().put("toAgentList", toAgentList);
+        modelAndView.setViewName("/recomCode/dispatch_recom_code_selected");
+        return modelAndView;
+        
+    }
+    
+    /**
+     * 批量下发选中注册码 - 实现
+     */
+    @RequestMapping(value = "/dispatch_recomCode_selected", method = RequestMethod.POST)
+    @ResponseBody
+    public Map toDispatchRemcodeSelected (HttpServletRequest request, HttpServletResponse response, ModelAndView modelAndView, @ModelAttribute("recomCodeDispatchSelectedForm") RecomCodeForm recomCodeForm) {
+        
+        UserBO userBO = getCurrentUser();
+        
+        UcAgentDo ucAgentDo = agentService.getAgent(recomCodeForm.getToAgentId());
+        if(ucAgentDo == null){
+            return returnError("下发代理不存在");
+        }
+        
+        if(!StatusConstant.STATUS_ENABLE.equals(ucAgentDo.getStatus())){
+            return returnError("下发代理状态不正确");
+        }
+        
+        log.info("下发到代理:" + recomCodeForm.getToAgentId());
+        log.info("下发到代理:" + recomCodeForm.getToAgentId());
+        String recomCodes = recomCodeForm.getToDispatchRecomCodes();
+        String recomP = "";
+        if(StringUtils.isNotBlank(recomCodes)){
+            recomP = recomCodes.replace("\\u005B", "").replace("\\u005C", "");
+        }
+        String[] recomArray = recomP.split("\\s");
+        log.info("下发到代理的注册码:" + recomArray);
+        
+        if(recomArray.length <=0){
+            return returnError("注册码选中列表为空");
+        }
+        List<String> recomList = Arrays.asList(recomArray);
+    
+        //下发选中注册码
+        String mesage = "";
+        try {
+            mesage = recomCodeService.dispatchRecomCodeSelected(recomList, recomCodeForm.getAgentId(), userBO.getUsrName());
+        } catch (Exception ex){
+            ex.printStackTrace();
+            return returnError("系统异常");
+        }
+        return returnSuccess(mesage);
     }
     
 }

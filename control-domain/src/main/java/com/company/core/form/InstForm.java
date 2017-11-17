@@ -25,6 +25,8 @@ public class InstForm extends BaseForm {
     private String agentCountLimit;
     private String limitArea;
     private String limitAreaCode;
+    
+    //法人信息
     private String legalPersonName;
     private String legalPersonPhone;
     private String legalPersonMail;
@@ -32,6 +34,7 @@ public class InstForm extends BaseForm {
     private String legalPersonId;
     private String legalPersonAddress;
     
+    //联系人信息
     private String contactName;
     private String contactPhone;
     private String contactMail;
@@ -39,5 +42,12 @@ public class InstForm extends BaseForm {
     private String contactCertId;
     private String contactAddress;
     
+    //费率信息
+    private String defaultFeeFixed; //默认单笔固定
+    private String defaultFeeRate;  //默认交易费率
+    private String EffectiveFeeFixed; //实收交易单笔
+    private String EffectiveFeeRate;  //实收费率
+    
+    private String status;
     
 }

@@ -4,8 +4,10 @@ import com.company.core.domain.UserBO;
 import com.company.core.entity.UcAgentDo;
 import com.company.core.entity.UcAgentLevelDo;
 import com.company.core.form.AgentForm;
+import com.company.core.form.Pagination;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Author: weiwankun
@@ -25,7 +27,15 @@ public interface AgentService {
     
     public List<String> getAgentIdList(String instId, String status);
     
+    List<UcAgentDo> getAgentIdListOfAgentOwnEnabled(String agentId);
+    
     public String createNewAgent(AgentForm agentForm, UserBO userBO);
+    
+    void createAgentBaseInfo(AgentForm agentForm, UserBO userBO);
+    
+    void createAgentDetailInfo(AgentForm agentForm, UserBO userBO);
+    
+    void createAgentFeeInfo(AgentForm agentForm, UserBO userBO);
     
     public UcAgentDo getAgent(String agentId);
     
@@ -38,4 +48,9 @@ public interface AgentService {
     public UcAgentDo getAgentOfInstOwn(String instId);
     
     
+    UcAgentDo getDefautlAgentOfInst(String instId);
+    
+    Pagination getAgentListPage(AgentForm agentForm);
+    
+    public Map<String , String> checkAgentBefore(AgentForm agentForm, UserBO userBO);
 }

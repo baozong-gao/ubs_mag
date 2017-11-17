@@ -3,10 +3,15 @@ package com.company.core.controller;
 import com.company.core.constant.ErrorException;
 import com.company.core.constant.StatusConstant;
 import com.company.core.domain.UserBO;
+import com.company.core.entity.UcAgentDo;
 import com.company.core.entity.UcInstDo;
+import com.company.core.entity.UcProdDo;
 import com.company.core.form.AgentForm;
+import com.company.core.form.InstForm;
+import com.company.core.form.Pagination;
 import com.company.core.service.AgentService;
 import com.company.core.service.InstService;
+import com.company.core.service.ProdCategoryService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
@@ -32,13 +37,18 @@ public class AgentController extends BaseController {
     AgentService agentService;
     @Autowired
     InstService instService;
+    @Autowired
+    ProdCategoryService prodCategoryService;
     
     @RequestMapping(value = "/addPage", method = RequestMethod.GET)
     public ModelAndView toAddPage(HttpServletRequest request, HttpServletResponse response, ModelAndView modelAndView) {
         
         List<UcInstDo> ucInstDoList = instService.getInstListByStatus(StatusConstant.STATUS_ENABLE);
-        
         modelAndView.getModel().put("instList", ucInstDoList);
+    
+        List<UcProdDo> ucProdDos = prodCategoryService.getProdList();
+        modelAndView.getModel().put("prodList", ucProdDos);
+        
         modelAndView.setViewName("/agent/add_agent");
         return modelAndView;
     }
@@ -72,9 +82,17 @@ public class AgentController extends BaseController {
             return returnSuccess("代理全称重复");
         }
     
+        
+    
         //新增代理
         String agent = "";
         try {
+            //检查一些代理信息, 比如费率问题 - 后续添加
+           Map<String, String> result = agentService.checkAgentBefore(agentForm, userBO);
+           if(result.containsKey("error")){
+               return returnError(result.get("error"));
+           }
+            
            agent = agentService.createNewAgent(agentForm, userBO);
         } catch (Exception e) {
             e.printStackTrace();
@@ -88,6 +106,67 @@ public class AgentController extends BaseController {
         return returnSuccess("新增代理成功, 代理号为:" + agent);
         
     }
+    
+    
+    @RequestMapping(value = "/listPage", method = RequestMethod.GET)
+    public ModelAndView toListPage(HttpServletRequest request, HttpServletResponse response, ModelAndView modelAndView) {
+        
+        AgentForm agentForm = new AgentForm();
+        agentForm.setPageCurrent("0");
+        agentForm.setPageNo("0");
+        agentForm.setPageSize("10");
+        
+        //获取-所以机构列表
+        List<UcInstDo> allInstList = instService.getInstList();
+        Pagination pagination = agentService.getAgentListPage(agentForm);
+        
+        agentForm.setPagination(pagination);
+        modelAndView.getModel().put("agentListForm", agentForm);
+        modelAndView.getModel().put("instList", allInstList);
+        modelAndView.setViewName("/agent/list_agent");
+        return modelAndView;
+    }
+    
+    @RequestMapping(value = "/query_agent_list", method = RequestMethod.GET)
+    @ResponseBody
+    public ModelAndView toQueryAgentList (HttpServletRequest request, HttpServletResponse response, ModelAndView modelAndView, @ModelAttribute("agentListForm") AgentForm agentForm) {
+    
+        //获取-所以机构列表
+        List<UcInstDo> allInstList = instService.getInstList();
+        modelAndView.getModel().put("instList", allInstList);
+    
+        Pagination pagination = agentService.getAgentListPage(agentForm);
+        
+        agentForm.setPagination(pagination);
+        modelAndView.getModel().put("agentForm", agentForm);
+        modelAndView.setViewName("/agent/list_agent");
+        return modelAndView;
+    }
+    
+    
+    @RequestMapping(value = "/detailPage", method = RequestMethod.GET)
+    public ModelAndView toDetailPage(HttpServletRequest request, HttpServletResponse response, ModelAndView modelAndView) {
+        
+        String agentId = request.getParameter("agentId");
+        log.info("查询代理号=" + agentId);
+        
+        
+        InstForm instForm = new InstForm();
+        instForm.setInstId(agentId);
+        
+        instService.formatInstFormFromInst(instForm);  // 基本信息
+        instService.formatInstFormFromInstInfo(instForm); //附加信息
+        instService.formatInstFormFromFee(instForm); //费率信息
+        
+        List<UcProdDo> ucProdDos = prodCategoryService.getProdList();
+        modelAndView.getModel().put("prodList", ucProdDos);
+        
+        modelAndView.getModel().put("instDetailForm", instForm);
+        modelAndView.setViewName("/inst/detail_inst");
+        return modelAndView;
+    }
+    
+    
     
     
 }

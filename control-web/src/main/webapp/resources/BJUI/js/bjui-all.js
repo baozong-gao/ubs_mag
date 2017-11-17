@@ -310,6 +310,9 @@
             clear     : '清除',
             lock      : '锁定列',
             unlock    : '解除锁定',
+            enable    : '激活',  //wwk
+            disable   : '禁用', //wwk
+            dispatch  : '下发',  //wwk
             add       : '添加',
             edit      : '编辑',
             save      : '保存',
@@ -331,6 +334,9 @@
             selectMsg : '未选中任何行！',
             editMsg   : '请先保存编辑行！',
             saveMsg   : '没有需要保存的行！',
+            enableMsg : '没有激活的行',
+            disableMsg : '没有禁用的行',
+            dispatchMsg : '没有下发的行',
             delMsg    : '确定要删除该行吗？',
             delMsgM   : '确定要删除选中行？'
         })
@@ -6989,6 +6995,9 @@
             tr_child      : 'datagrid-child-tr',
             tr_edit       : 'datagrid-edit-tr',
             tr_add        : 'datagrid-add-tr',
+            tr_enable        : 'datagrid-enable-tr',
+            tr_disable        : 'datagrid-disable-tr',
+            tr_dispatch        : 'datagrid-dispatch-tr',
             tr_selected   : 'datagrid-selected-tr',
             td_edit       : 'datagrid-edit-td',
             td_changed    : 'datagrid-changed',
@@ -7063,7 +7072,7 @@
         contextMenuH    : true,     // Right-click on the thead, display the context menu
         contextMenuB    : false,    // Right-click on the tbody tr, display the context menu
         hScrollbar      : false,    // Allowed horizontal scroll bar
-        fullGrid        : false,    // If the table width below gridbox width, stretching table width
+        fullGrid        : true,    // If the table width below gridbox width, stretching table width
         importOption    : null,     // Import btn options
         exportOption    : null,     // Export btn options
         beforeEdit      : null,     // Function - before edit method, return true execute edit method
@@ -8395,14 +8404,14 @@
             .add('<div class="bjui-datagrid">')
             .add(options.gridTitle ? '<div class="datagrid-title">'+ options.gridTitle +'</div>' : '')
             .add(options.showToolbar ? '<div class="datagrid-toolbar"></div>' : '')
-            .add('<div class="datagrid-box-h"><div class="datagrid-wrap-h"><table class="table table-bordered table-user-width"><colgroup></colgroup></table></div></div>')
+            .add('<div class="datagrid-box-h"><div class="datagrid-wrap-h"><table class="table table-bordered"><colgroup></colgroup></table></div></div>')
             .add('<div class="datagrid-box-b"><div class="datagrid-wrap-b"></div></div>')
             .add('<div class="datagrid-box-m"></div>')
             .add(options.paging ? '<div class="datagrid-paging-box"></div>' : '')
             .add('</div>')
         
         that.$grid    = $(gridHtml.toString()).insertAfter(that.$element).css('height', options.height)
-        that.$boxH    = that.$grid.find('> div.datagrid-box-h').css('width', '100%')
+        that.$boxH    = that.$grid.find('> div.datagrid-box-h')
         that.$boxB    = that.$boxH.next()
         that.$boxM    = that.$boxB.next().css('height', options.height)
         that.$boxP    = options.paging ? that.$boxM.next() : null
@@ -9079,16 +9088,35 @@
                     }
                     
                     hastoolbaritem = true
-                    if (options.toolbarItem.indexOf('all') >= 0) options.toolbarItem = 'add, edit, cancel, save, |, del, |, refresh, |, import, export'
+                    if (options.toolbarItem.indexOf('all') >= 0) options.toolbarItem = 'enable, disable, dispatch, add, edit, cancel, save, |, del, |, refresh, |, import, export'
                     $.each(options.toolbarItem.split(','), function(i, n) {
                         n = n.trim().toLocaleLowerCase()
                         if (!$group || n === '|') {
                             $group = $(groupHtml).appendTo(that.$toolbar)
                             if (n === '|') return true
                         }
-                        
-                        if (n === 'add') {
-                            that.$toolbar_add = $(btnHtml).attr('data-icon', 'plus').addClass('btn-blue').text(BJUI.getRegional('datagrid.add'))
+
+                        //wwk
+                        if (n === 'enable') {
+                            that.$toolbar_enable = $(btnHtml).attr('data-icon', 'plus').addClass('btn-green').text(BJUI.getRegional('datagrid.enable'))
+                                .appendTo($group)
+                                .on('click', function(e) {
+                                    that.doEnable()
+                                })
+                        }else   if (n === 'disable') {
+                            that.$toolbar_disable = $(btnHtml).attr('data-icon', 'undo').addClass('btn-red').text(BJUI.getRegional('datagrid.disable'))
+                                .appendTo($group)
+                                .on('click', function(e) {
+                                    that.doDisable()
+                                })
+                        } else   if (n === 'dispatch') {
+                            that.$toolbar_dispatch = $(btnHtml).attr('data-icon', 'plus').addClass('btn-yellow').text(BJUI.getRegional('datagrid.dispatch'))
+                                .appendTo($group)
+                                .on('click', function(e) {
+                                    that.doDispatch()
+                                })
+                        }  else if (n === 'add') {
+                            that.$toolbar_add = $(btnHtml).attr('data-icon', 'undo').addClass('btn-blue').text(BJUI.getRegional('datagrid.add'))
                                 .appendTo($group)
                                 .on('click', function(e) {
                                     that.add()
@@ -10012,7 +10040,7 @@
     
     //locking
     Datagrid.prototype.doLock = function() {
-        var that = this, options = that.options, tools = that.tools, columnModel = that.columnModel, tableW = that.$tableH.width(), width = '100%', $trs, $lockTrs, lockedLen = 0
+        var that = this, options = that.options, tools = that.tools, columnModel = that.columnModel, tableW = that.$tableH.width(), width = 0, $trs, $lockTrs, lockedLen = 0
         var hasFoot = that.$boxF && true, top = 0
         
         if (!that.$lockBox || !that.$lockBox.length) {
@@ -10021,7 +10049,7 @@
             that.$lockB   = $('<div class="datagrid-box-b"></div>')
             that.$lockF   = $('<div class="datagrid-box-f"></div>')
             
-            that.$lockTableH = $('<table class="table table-bordered table-user-width"></table>')
+            that.$lockTableH = $('<table class="table table-bordered"></table>')
             that.$lockTableB = $('<table></table>').addClass(that.$tableB.attr('class'))
             that.$lockTableF = $('<table class="table table-bordered"></table>')
             
@@ -10069,7 +10097,7 @@
         that.$lockColgroupH = that.$colgroupH.clone()
         that.$lockColgroupB = that.$colgroupB.clone()
         
-        that.$lockTableH.append(that.$lockColgroupH).append(that.$lockThead).css('width', '100%')
+        that.$lockTableH.append(that.$lockColgroupH).append(that.$lockThead).css('width', width)
         that.$lockTableB.append(that.$lockColgroupB).append(that.$lockTbody).css('width', width)
         
         if (hasFoot) {
@@ -11561,7 +11589,48 @@
             }
         })
     }
-    
+
+    //wwk
+    // Api - save edit tr
+    Datagrid.prototype.doEnable = function(row) {
+        var that = this, options = that.options, $tr
+
+        alert("1");
+        alert("row=" + row);
+
+        if ($.type(row) === 'number') {
+            $tr = this.$tbody.find('> tr').eq(row)
+        } else if (row) {
+            $tr = row
+        } else {
+            $tr = that.$tbody.find('> tr.'+ that.classnames.tr_enable)
+        }
+        alert("that.$tbody=" + that.$tbody);
+
+
+        if (!$tr.length) {
+            that.$grid.alertmsg('info', BJUI.getRegional('datagrid.enableMsg'))
+            return
+        }
+
+        if ($tr.length == 1) {
+            if ($tr.hasClass(that.classnames.tr_edit))
+                this.updateEdit($tr)
+        } else {
+            if (options.saveAll) {
+                that.saveAll($tr)
+            } else {
+                $tr.each(function() {
+                    that.updateEdit($(this))
+                })
+            }
+        }
+    }
+
+
+
+
+
     // Api - save edit tr
     Datagrid.prototype.doSaveEditRow = function(row) {
         var that = this, options = that.options, $tr

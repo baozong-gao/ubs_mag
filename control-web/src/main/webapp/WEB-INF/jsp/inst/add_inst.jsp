@@ -9,6 +9,8 @@
 <body>
 <div class="bjui-pageHeader"></div>
 <div class="bjui-pageContent tableContent">
+
+
     <form id="pagerForm" name="instForm" data-toggle="validate"
           novalidate="novalidate"
           action="${pageContext.request.contextPath}/inst/add_new_inst"
@@ -52,8 +54,8 @@
                                             name="instType" id="instType" data-rule="机构类型:required;"
                                             data-toggle="selectpicker">
                                         <option value="0">默认-类型-</option>
-                                        <option value="1">预留类型1</option>
-                                        <option value="2">预留类型2</option>
+                                        <%--<option value="1">预留类型1</option>--%>
+                                        <%--<option value="2">预留类型2</option>--%>
                                     </select>&nbsp;
                                 </div>
 
@@ -62,20 +64,27 @@
                                     <select
                                             name="category" id="category" data-rule="机构类型:required;"
                                             data-toggle="selectpicker">
-                                        <option value="0">默认-类型</option>
-                                        <option value="1">预留类别1</option>
-                                        <option value="2">预留类型2</option>
+                                        <option value="0">默认-类别</option>
                                     </select>&nbsp;
                                 </div>
                                 <div class="form-group col-md-4">
                                     <label class="control-label">类别ID&nbsp;：</label>
-                                    <select
-                                            name="categoryId" id="categoryId" data-rule="机构类型ID:required;"
-                                            data-toggle="selectpicker">
-                                        <option value="0">请选择</option>
-                                        <option value="1">服务</option>
-                                        <option value="2">接口</option>
-                                    </select>&nbsp;
+                                    <%--<select--%>
+                                            <%--name="categoryId" id="categoryId" data-rule="机构类型ID:required;"--%>
+                                            <%--data-toggle="selectpicker">--%>
+                                        <%--<option value="0">请选择</option>--%>
+                                        <%--<option value="1">服务</option>--%>
+                                        <%--<option value="2">接口</option>--%>
+                                    <%--</select>&nbsp;--%>
+                                    <select name="categoryId" id="categoryId" data-toggle="selectpicker"  data-live-search="true" data-rule="机构类别ID:required;">
+                                        <option style="width: 60px; display: inline-block" value="">-请选择-</option>
+                                        <c:forEach var="record" items="${prodList}"
+                                                   varStatus="status">
+                                            <option value="${record.prodId}"
+                                                    <c:if test="${record.prodId == instListForm.categoryId}">selected</c:if> >${record.prodName}</option>
+                                        </c:forEach>
+                                    </select>
+
                                 </div>
                             </div>
 
@@ -231,6 +240,38 @@
                     <div class="panel panel-default">
                         <div class="panel-heading"><h3 class="panel-title">机构费率</h3></div>
                         <div class="panel-body">
+                            <div class="row-input" style="margin: 20px 0 20px; width: 100%">
+                                <div class="row-input" style="margin: 20px 0 20px; width: 100%">
+                                    <div class="form-group col-md-6">
+                                        <label class="control-label">成本固定单笔费用：</label>
+                                        <input type="text"
+                                               name="defaultFeeFixed" size="15" data-rule="成本固定费用:required;"
+                                               placeholder="单位笔/元"/>&nbsp;
+                                    </div>
+
+                                    <div class="form-group col-md-6">
+                                        <label class="control-label">成本交易比例费率：</label>
+                                        <input type="text"
+                                               name="defaultFeeRate" size="15" data-rule="成本固定费用:required;"
+                                               placeholder="如:千5, 请输入0.5"/>%&nbsp;
+                                    </div>
+                                </div>
+                                <div class="row-input" style="margin: 20px 0 20px; width: 100%">
+                                    <div class="form-group col-md-6">
+                                        <label class="control-label">实收固定单笔费用：</label>
+                                        <input type="text"
+                                               name="EffectiveFeeFixed" size="15" data-rule="成本固定费用:required;"
+                                               placeholder="单位笔/元"/>&nbsp;
+                                    </div>
+
+                                    <div class="form-group col-md-6">
+                                        <label class="control-label">实收交易比例费率：</label>
+                                        <input type="text"
+                                               name="EffectiveFeeRate" size="15" data-rule="成本固定费用:required;"
+                                               placeholder="如:千5, 请输入0.5"/>%&nbsp;
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

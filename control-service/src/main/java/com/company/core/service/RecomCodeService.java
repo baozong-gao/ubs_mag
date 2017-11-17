@@ -28,4 +28,7 @@ public interface RecomCodeService {
     
     @Transactional
     void dispatchRecomCode(String agentId, String toAgentId, int dispatchCount, String user);
+    
+    @Transactional
+    String dispatchRecomCodeSelected(List<String> recomCodeList, String toAgentId, String user);
 }

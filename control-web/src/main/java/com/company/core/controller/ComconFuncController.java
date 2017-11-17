@@ -61,7 +61,7 @@ public class ComconFuncController {
             if("1".equals(level)){
                 type = UserConstant.USER_TYPE_DEFAULT;   //默认在代理表里- 0 代理是机构本身自己的代理号
             } else {
-                type = UserConstant.USER_TYPE_OTHER;   //默认在代理表里- 1 代理机构为发展的代理
+                type = UserConstant.USER_TYPE_AGENT;   //默认在代理表里- 1 代理机构为发展的代理
             }
         }
         

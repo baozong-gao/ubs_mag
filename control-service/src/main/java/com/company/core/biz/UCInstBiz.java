@@ -36,7 +36,20 @@ public class UCInstBiz {
         
     }
     
-    public List<UcInstDo> selectByExample(String status){
+    public int countByExample(UcInstDoExample ucInstDoExample){
+        
+        return ucInstDoMapper.countByExample(ucInstDoExample);
+        
+    }
+    
+    
+    public List<UcInstDo>  selectByExample(UcInstDoExample ucInstDoExample){
+        
+        return ucInstDoMapper.selectByExample(ucInstDoExample);
+        
+    }
+    
+    public List<UcInstDo> selectByStatus(String status){
         
         UcInstDoExample ucInstDoExample = new UcInstDoExample();
         ucInstDoExample.createCriteria().andStatusEqualTo(status);
@@ -65,10 +78,17 @@ public class UCInstBiz {
         return ucInstInfoDoMapper.selectByExample(ucInstInfoDoExample);
         
     }
-    
+
     public int insertInst(UcInstDo ucInstDo){
         
         return ucInstDoMapper.insertSelective(ucInstDo);
+        
+    }
+    
+    
+    public int updateInst(UcInstDo ucInstDo){
+        
+        return ucInstDoMapper.updateByPrimaryKey(ucInstDo);
         
     }
     
@@ -78,8 +98,17 @@ public class UCInstBiz {
         
     }
     
+    public int updateInstInfo(UcInstInfoDo ucInstInfoDo){
+        
+        return ucInstInfoDoMapper.updateByPrimaryKey(ucInstInfoDo);
+        
+    }
     
-    
+    public UcInstInfoDo getInstInfo(String instId){
+        
+        return ucInstInfoDoMapper.selectByPrimaryKey(instId);
+        
+    }
     
     
 

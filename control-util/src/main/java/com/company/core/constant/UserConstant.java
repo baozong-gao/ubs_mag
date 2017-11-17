@@ -9,6 +9,7 @@ public class UserConstant {
     public final static String USER_SUPPER_ADMIN = "9";
     
     public final static String USER_TYPE_DEFAULT = "0";  //系统默认
-    public final static String USER_TYPE_OTHER = "1";    //发展的机构,或者发展的代理
+    public final static String USER_TYPE_AGENT = "1";    //发展的代理
+    public final static String USER_TYPE_MER = "2";    //商户发展的代理
     
 }

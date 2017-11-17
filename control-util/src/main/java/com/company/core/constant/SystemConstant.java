@@ -21,4 +21,7 @@ public class SystemConstant extends ConfigurableContants {
     public static final String EMAIL_USER_PASSWORD = getProperty("email.userPassword");
     
     public static final String DEFAULT_SOURCE_CODE = getProperty("default.source.code");
+    public static final String DEFAULT_CATEGORY = getProperty("default.category");
+    public static final String DEFAULT_CATEGORY_ID = getProperty("default.category.id");
+
 }

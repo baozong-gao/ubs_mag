@@ -282,14 +282,10 @@ table {
   }
   .table {
     border-collapse: collapse !important;
-    width: 100%;
   }
   .table-bordered th,
   .table-bordered td {
     border: 1px solid #ddd !important;
-  }
-  .table .table-user-width{
-    width: 100%;
   }
 }
 
@@ -1684,7 +1680,6 @@ th {
 
 .table .table {
   background-color: #ffffff;
-  width: 100%;
 }
 
 .table-condensed > thead > tr > th,
@@ -1698,10 +1693,6 @@ th {
 
 .table-bordered {
   border: 1px solid #dddddd;
-}
-
-.table-user-width {
-  width: 100%;
 }
 
 .table-bordered > thead > tr > th,

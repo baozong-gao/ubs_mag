@@ -3,6 +3,8 @@ package com.company.core.form;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.util.List;
+
 /**
  * 
  * @Author: weiwankun
@@ -35,5 +37,9 @@ public class RecomCodeForm  extends BaseForm {
     private String agentName;
     private String toAgentId;
     private String dispatchCount;
+    
+    //
+    private List<String> toDispatchList;
+    private String toDispatchRecomCodes;
     
 }
