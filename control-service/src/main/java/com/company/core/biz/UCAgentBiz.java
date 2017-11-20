@@ -69,6 +69,11 @@ public class UCAgentBiz {
         }
     }
     
+    public UcAgentInfoDo selectAgentInfo(String agent){
+
+        return ucAgentInfoDoMapper.selectByPrimaryKey(agent);
+    }
+    
     public UcAgentDo selectDefaultAgent(String inst){
         
         UcAgentDoExample ucAgentDoExample = new UcAgentDoExample();
@@ -125,7 +130,17 @@ public class UCAgentBiz {
         
     }
     
+    public int updateAgent(UcAgentDo ucAgentDo){
+        
+        return ucAgentDoMapper.updateByPrimaryKeySelective(ucAgentDo);
+        
+    }
     
+    public int updateAgentInfo(UcAgentInfoDo ucAgentInfoDo){
+        
+        return ucAgentInfoDoMapper.updateByPrimaryKeySelective(ucAgentInfoDo);
+        
+    }
     
     
     

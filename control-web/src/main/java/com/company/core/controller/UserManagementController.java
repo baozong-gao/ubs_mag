@@ -5,6 +5,12 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.company.core.constant.UserConstant;
+import com.company.core.entity.UcAgentDo;
+import com.company.core.entity.UcInstDo;
+import com.company.core.service.AgentService;
+import com.company.core.service.InstService;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.apache.shiro.subject.Subject;
@@ -39,12 +45,14 @@ import com.company.core.shiro.MonitorRealm;
 public class UserManagementController {
     @Autowired
     UserService                 userService;
-
     @Autowired
     RoleService                 roleService;
-
     @Autowired
     SeqMapper                   seqMapper;
+    @Autowired
+    AgentService  agentService;
+    @Autowired
+    InstService instService;
 
     private static final Logger logger = LoggerFactory.getLogger(UserManagementController.class);
 
@@ -102,8 +110,41 @@ public class UserManagementController {
         Map resultMap = new HashMap();
         String userName = userManageForm.getUsername();
         String userPass = userManageForm.getPass();
-
+    
         UserBO userBO = new UserBO();
+        userBO.setUsrType(UserConstant.USER_ADMIN);  //wwk
+    
+        //wwk 具体看绑定哪个用户
+        String instId = userManageForm.getInstId();
+        String agentId = userManageForm.getAgentId();
+        int i = 0;
+        Map<String, String> ifMerCorrect = new HashMap<String, String>();
+        if (StringUtils.isNotBlank(instId)) {
+            i ++ ;
+            UcInstDo ucInstDo = instService.getInst(instId);
+            if(ucInstDo == null){
+                resultMap.put("statusCode", 300);
+                resultMap.put("message", "关联机构不存在");
+                return resultMap;
+            }
+            userBO.setUsrType(UserConstant.USER_INST);  //wwk
+        }
+        if (StringUtils.isNotBlank(agentId)) {
+            i ++;
+            UcAgentDo ucAgentDo = agentService.getAgent(agentId);
+            if(ucAgentDo == null){
+                resultMap.put("statusCode", 300);
+                resultMap.put("message", "关联代理商不存在");
+                return resultMap;
+            }
+            userBO.setUsrType(UserConstant.USER_AGENT);  //wwk
+        }
+        if (i > 1) {
+            resultMap.put("statusCode", 300);
+            resultMap.put("message", "只能关联一个用户");
+            return resultMap;
+        }
+        
         userBO.setUsrId(String.valueOf(seqMapper.getTblBTSSysUsrIdSeq()));
         userBO.setUsrName(userName);
         userBO.setUsrEmail(userManageForm.getUsrEmail());

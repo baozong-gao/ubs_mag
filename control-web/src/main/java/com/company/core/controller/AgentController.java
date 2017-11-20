@@ -4,6 +4,7 @@ import com.company.core.constant.ErrorException;
 import com.company.core.constant.StatusConstant;
 import com.company.core.domain.UserBO;
 import com.company.core.entity.UcAgentDo;
+import com.company.core.entity.UcAgentLevelDo;
 import com.company.core.entity.UcInstDo;
 import com.company.core.entity.UcProdDo;
 import com.company.core.form.AgentForm;
@@ -150,23 +151,164 @@ public class AgentController extends BaseController {
         String agentId = request.getParameter("agentId");
         log.info("查询代理号=" + agentId);
         
+        AgentForm agentForm = new AgentForm();
+        agentForm.setAgentId(agentId);
         
-        InstForm instForm = new InstForm();
-        instForm.setInstId(agentId);
-        
-        instService.formatInstFormFromInst(instForm);  // 基本信息
-        instService.formatInstFormFromInstInfo(instForm); //附加信息
-        instService.formatInstFormFromFee(instForm); //费率信息
+        agentService.formatAgentFormFromAgent(agentForm);  // 基本信息
+        agentService.formatAgentFormFromAgentInfo(agentForm); //附加信息
+        agentService.formatAgentFormFromFee(agentForm); //费率信息
         
         List<UcProdDo> ucProdDos = prodCategoryService.getProdList();
         modelAndView.getModel().put("prodList", ucProdDos);
         
-        modelAndView.getModel().put("instDetailForm", instForm);
-        modelAndView.setViewName("/inst/detail_inst");
+        modelAndView.getModel().put("agentDetailForm", agentForm);
+        modelAndView.setViewName("/agent/detail_agent");
         return modelAndView;
     }
     
+    @RequestMapping(value = "/update_agent", method = RequestMethod.POST)
+    public Map<String, Object> toUpdateAgent (HttpServletRequest request, HttpServletResponse response, ModelAndView modelAndView, @ModelAttribute("agentUpdateForm") AgentForm agentForm) {
+        
+        try {
+            UserBO userBO = getCurrentUser();
+            
+            //这里应该对页面的信息进行检验
+            
+            agentService.updateAgent(agentForm, userBO);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            return returnError("数据更新失败");
+        }
+        
+        return returnError("数据更新成功");
+        
+    }
     
     
+    @RequestMapping(value = "/activate_agent", method = RequestMethod.POST)
+    @ResponseBody
+    public Map<String, Object> toActivateAgent (HttpServletRequest request, HttpServletResponse response) {
+        
+        try {
+            
+            String agentId = request.getParameter("agentId");
+            if(StringUtils.isBlank(agentId)){
+            
+            }
+            UcAgentDo ucAgentDo = agentService.getAgent(agentId);
+            if(ucAgentDo == null){
+                return returnError("代理不存在");
+            }
+            if(StatusConstant.STATUS_CANNEL.equals(ucAgentDo.getStatus())){
+                return returnError("代理已注销");
+            }
+            if(StatusConstant.STATUS_ENABLE.equals(ucAgentDo.getStatus())){
+                return returnError("代理已经激活,不需要重复激活");
+            }
+            
+            UcAgentLevelDo ucAgentLevelDo = agentService.getAgentLevel(agentId);
+            if(ucAgentLevelDo == null){
+                return returnError("代理等级未知");
+            }
+            if(!"1".equals(ucAgentLevelDo)){
+                return returnError("只能激活一级代理");
+            }
+            
+            UserBO userBO = getCurrentUser();
+            
+            //激活
+            agentService.activateAgent(agentId, userBO);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            return returnError("数据更新失败");
+        }
+        
+        return returnError("代理激活成功");
+        
+    }
+    
+    @RequestMapping(value = "/disable_agent", method = RequestMethod.POST)
+    @ResponseBody
+    public Map<String, Object> toDisableAgent (HttpServletRequest request, HttpServletResponse response) {
+        
+        try {
+    
+            String agentId = request.getParameter("agentId");
+            if(StringUtils.isBlank(agentId)){
+        
+            }
+            UcAgentDo ucAgentDo = agentService.getAgent(agentId);
+            if(ucAgentDo == null){
+                return returnError("代理不存在");
+            }
+            if(StatusConstant.STATUS_CANNEL.equals(ucAgentDo.getStatus())){
+                return returnError("代理已注销, 无法禁用");
+            }
+            if(StatusConstant.STATUS_DISABLE.equals(ucAgentDo.getStatus())){
+                return returnError("代理已经挂起,不需要重复挂起");
+            }
+    
+            UcAgentLevelDo ucAgentLevelDo = agentService.getAgentLevel(agentId);
+            if(ucAgentLevelDo == null){
+                return returnError("代理等级未知");
+            }
+            if(!"1".equals(ucAgentLevelDo)){
+                return returnError("只能挂起一级代理");
+            }
+            
+            UserBO userBO = getCurrentUser();
+            
+            agentService.disableAgent(agentId, userBO);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            return returnError("数据更新失败");
+        }
+        
+        return returnError("代理挂起成功");
+        
+    }
+    
+    
+    @RequestMapping(value = "/cancel_agent", method = RequestMethod.POST)
+    @ResponseBody
+    public Map<String, Object> toCancelAgent (HttpServletRequest request, HttpServletResponse response) {
+        
+        try {
+    
+            String agentId = request.getParameter("agentId");
+            if(StringUtils.isBlank(agentId)){
+        
+            }
+            UcAgentDo ucAgentDo = agentService.getAgent(agentId);
+            if(ucAgentDo == null){
+                return returnError("代理不存在");
+            }
+            if(StatusConstant.STATUS_CANNEL.equals(ucAgentDo.getStatus())){
+                return returnError("代理已注销, 不需要重复注销");
+            }
+            
+            UcAgentLevelDo ucAgentLevelDo = agentService.getAgentLevel(agentId);
+            if(ucAgentLevelDo == null){
+                return returnError("代理等级未知");
+            }
+            if(!"1".equals(ucAgentLevelDo)){
+                return returnError("只能注销一级代理");
+            }
+            
+            UserBO userBO = getCurrentUser();
+    
+            agentService.cancelAgent(agentId,  userBO);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            return returnError("数据更新失败");
+        }
+        
+        return returnError("代理注销成功");
+        
+    }
     
 }

@@ -2,9 +2,11 @@ package com.company.core.service;
 
 import com.company.core.domain.UserBO;
 import com.company.core.entity.UcAgentDo;
+import com.company.core.entity.UcAgentInfoDo;
 import com.company.core.entity.UcAgentLevelDo;
 import com.company.core.form.AgentForm;
 import com.company.core.form.Pagination;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
@@ -37,7 +39,15 @@ public interface AgentService {
     
     void createAgentFeeInfo(AgentForm agentForm, UserBO userBO);
     
+    void formatAgentFormFromAgent(AgentForm agentForm);
+    
+    void formatAgentFormFromAgentInfo(AgentForm agentForm);
+    
+    void formatAgentFormFromFee(AgentForm agentForm);
+    
     public UcAgentDo getAgent(String agentId);
+    
+    UcAgentInfoDo getAgentInfo(String agentId);
     
     UcAgentLevelDo getAgentLevel(String agentId);
     
@@ -53,4 +63,21 @@ public interface AgentService {
     Pagination getAgentListPage(AgentForm agentForm);
     
     public Map<String , String> checkAgentBefore(AgentForm agentForm, UserBO userBO);
+    
+    void updateAgent(AgentForm agentForm, UserBO userBO);
+    
+    void updateAgentBaseInfo(AgentForm agentForm, UserBO userBO);
+    
+    void updateAgentDetailInfo(AgentForm agentForm, UserBO userBO);
+    
+    void updateAgentFeeInfo(AgentForm agentForm, UserBO userBO);
+    
+    @Transactional
+    void activateAgent(String agentId, UserBO userBO) throws Exception;
+    
+    @Transactional
+    void cancelAgent(String agentId, UserBO userBO) throws Exception;
+    
+    @Transactional
+    void disableAgent(String agentId, UserBO userBO) throws Exception;
 }

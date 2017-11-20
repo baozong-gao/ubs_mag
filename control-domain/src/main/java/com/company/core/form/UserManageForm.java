@@ -1,8 +1,11 @@
 package com.company.core.form;
 
+import lombok.Data;
+
 /**
  * Created by fireWorks on 2016/2/1.
  */
+@Data
 public class UserManageForm extends BaseForm {
     private String usrId;
 
@@ -17,6 +20,16 @@ public class UserManageForm extends BaseForm {
     private String usrDisableTag;
 
     private String usrEmail;
+    
+    private String instId;
+    
+    private String agentId;
+    
+    private String merId;
+    
+    private String bindMer;
+    
+    private String bindUser;
 
     public String getUsrid() {
         return usrId;

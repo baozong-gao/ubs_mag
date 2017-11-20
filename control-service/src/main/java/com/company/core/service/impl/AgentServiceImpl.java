@@ -15,6 +15,7 @@ import com.github.pagehelper.PageHelper;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -348,10 +349,96 @@ public class AgentServiceImpl implements AgentService {
     
     
     @Override
+    public void formatAgentFormFromAgent(AgentForm agentForm) {
+        
+        UcAgentDo ucAgentDo = getAgent(agentForm.getAgentId());
+        if(ucAgentDo == null){
+            return;
+        }
+        agentForm.setInstId(ucAgentDo.getInstId());
+        agentForm.setAgentName(ucAgentDo.getAgentName());
+        agentForm.setAgentType(ucAgentDo.getAgentType());
+        agentForm.setStatus(ucAgentDo.getStatus());
+        agentForm.setCategory(ucAgentDo.getCategory());
+        agentForm.setCategoryId(ucAgentDo.getCategoryId());
+        agentForm.setAgentOk(ucAgentDo.getAgentOk());
+        agentForm.setAgentCountLimit(String.valueOf(ucAgentDo.getAgentCountLimit()));
+        agentForm.setLimitArea(ucAgentDo.getLimitArea());
+        agentForm.setLimitAreaCode(ucAgentDo.getLimitAreaCode());
+    }
+    
+    @Override
+    public void formatAgentFormFromAgentInfo(AgentForm agentForm) {
+        
+        UcAgentInfoDo ucAgentInfoDo = getAgentInfo(agentForm.getInstId());
+        if(ucAgentInfoDo == null){
+            return;
+        }
+        agentForm.setAgentShortName(ucAgentInfoDo.getAgentShortName());
+        agentForm.setBusinessLicense(ucAgentInfoDo.getBusinessLicense());
+        agentForm.setLegalPersonName(ucAgentInfoDo.getLegalPersonName());
+        agentForm.setLegalPersonIdType(ucAgentInfoDo.getLegalPersonIdType());
+        agentForm.setLegalPersonId(ucAgentInfoDo.getLegalPersonCertId());
+        agentForm.setLegalPersonAddress(ucAgentInfoDo.getLegalPersonAddress());
+        agentForm.setLegalPersonPhone(ucAgentInfoDo.getLegalPersonPhone());
+        agentForm.setLegalPersonAddress(ucAgentInfoDo.getLegalPersonAddress());
+        agentForm.setLegalPersonMail(ucAgentInfoDo.getLegalPersonMail());
+    
+        agentForm.setContactName(ucAgentInfoDo.getContactName());
+        agentForm.setContactCertId(ucAgentInfoDo.getContactCertId());
+        agentForm.setContactIdType(ucAgentInfoDo.getContactIdType());
+        agentForm.setContactPhone(ucAgentInfoDo.getContactPhone());
+        agentForm.setContactMail(ucAgentInfoDo.getContactMail());
+        agentForm.setContactAddress(ucAgentInfoDo.getContactAddress());
+        
+    }
+    
+    @Override
+    public void formatAgentFormFromFee(AgentForm agentForm) {
+        
+        UcFeeDo ucFeeDo = new UcFeeDo();
+        ucFeeDo.setUserType(UserConstant.USER_AGENT);
+        ucFeeDo.setUserCode(agentForm.getAgentId());
+        
+        //之后扩充时, 需要替换掉
+        ucFeeDo.setCategory("1");
+        ucFeeDo.setCategoryId("P001");
+        ucFeeDo.setFeeType("DF");
+        UcFeeDo df = ucFeeBiz.getFee(ucFeeDo);
+        if(df != null){
+            agentForm.setDefaultFeeFixed(df.getFeeMode());
+        }
+        
+        ucFeeDo.setFeeType("DR");
+        UcFeeDo dr = ucFeeBiz.getFee(ucFeeDo);
+        if(dr != null){
+            agentForm.setDefaultFeeRate(dr.getFeeMode());
+        }
+        
+        ucFeeDo.setFeeType("EF");
+        UcFeeDo ef = ucFeeBiz.getFee(ucFeeDo);
+        if(ef != null){
+            agentForm.setEffectiveFeeFixed(ef.getFeeMode());
+        }
+        
+        ucFeeDo.setFeeType("ER");
+        UcFeeDo er = ucFeeBiz.getFee(ucFeeDo);
+        if(er != null){
+            agentForm.setEffectiveFeeRate(er.getFeeMode());
+        }
+        
+    }
+    
+    @Override
     public UcAgentDo getAgent(String agentId) {
         return ucAgentBiz.selectAgent(agentId);
     }
     
+    
+    @Override
+    public UcAgentInfoDo getAgentInfo(String agentId) {
+        return ucAgentBiz.selectAgentInfo(agentId);
+    }
     
     @Override
     public UcAgentLevelDo getAgentLevel(String agentId) {
@@ -460,5 +547,239 @@ public class AgentServiceImpl implements AgentService {
         }
         return ucAgentDoExample;
     }
+    
+    
+    @Override
+    public void updateAgent(AgentForm agentForm, UserBO userBO){
+    
+        //更新代理基础信息
+        this.updateAgentBaseInfo(agentForm, userBO);
+    
+        //更新代理详细信息
+        this.updateAgentDetailInfo(agentForm, userBO);
+    
+        //更新代理费率信息
+        this.updateAgentFeeInfo(agentForm, userBO);
+        
+    }
+    
+    @Override
+    public void updateAgentBaseInfo(AgentForm agentForm, UserBO userBO) {
+        
+        //代理信息
+        UcAgentDo ucAgentDo = new UcAgentDo();
+        ucAgentDo.setInstId(agentForm.getInstId());
+        ucAgentDo.setAgentId(agentForm.getAgentId());
+        //代理类型不允许修改
+        //代理状态不允许修改
+        
+//        //机构发展的代理商类型为1,  机构自身的代理商号是0,
+//        if(UserConstant.USER_TYPE_DEFAULT.equals(agentForm.getAgentType()) || UserConstant.USER_TYPE_AGENT.equals(agentForm.getAgentType())){
+//            //机构默认代理, 直接激活
+//            ucAgentDo.setAgentType(UserConstant.USER_TYPE_DEFAULT);
+//            ucAgentDo.setStatus(StatusConstant.STATUS_ENABLE);
+//        }else if(UserConstant.USER_TYPE_AGENT.equals(agentForm.getAgentType())) {
+//            ucAgentDo.setAgentType(UserConstant.USER_TYPE_AGENT);
+//            ucAgentDo.setStatus(StatusConstant.STATUS_NEW);
+//        }
+        
+        ucAgentDo.setAgentName(agentForm.getAgentName());
+        ucAgentDo.setCategory(agentForm.getCategory());
+        ucAgentDo.setCategoryId(agentForm.getCategoryId());
+        ucAgentDo.setAgentOk(agentForm.getAgentOk());
+        BigDecimal bigDecimal = new BigDecimal(agentForm.getAgentCountLimit());
+        ucAgentDo.setAgentCountLimit(bigDecimal);
+        ucAgentDo.setLimitArea(agentForm.getLimitArea());
+        ucAgentDo.setLimitAreaCode(agentForm.getLimitAreaCode());
+        
+//        ucAgentDo.setCreateUser(userBO.getUsrName());
+//        ucAgentDo.setCreateSource(SystemConstant.DEFAULT_SOURCE_CODE);
+//        ucAgentDo.setCreateTime(DateUtil.getCurrentDateTime());
+//        ucAgentDo.setLockVersion(String.valueOf(0));
+        ucAgentDo.setModifyUser(userBO.getUsrName());
+        ucAgentDo.setModifySource(SystemConstant.DEFAULT_SOURCE_CODE);
+        ucAgentDo.setModifyTime(DateUtil.getCurrentDateTime());
+        
+        int i = ucAgentBiz.updateAgent(ucAgentDo);
+        if (i <= 0) {
+            throw new ErrorException("代理信息更新失败");
+        }
+    }
+    
+    @Override
+    public void updateAgentDetailInfo(AgentForm agentForm, UserBO userBO) {
+        
+        //更新代理详细信息
+        UcAgentInfoDo ucAgentInfoDo = new UcAgentInfoDo();
+        ucAgentInfoDo.setAgentId(agentForm.getAgentId());
+        ucAgentInfoDo.setAgentName(agentForm.getAgentName());
+        ucAgentInfoDo.setAgentShortName(agentForm.getAgentShortName());
+        ucAgentInfoDo.setBusinessLicense(agentForm.getBusinessLicense());
+        ucAgentInfoDo.setLegalPersonName(agentForm.getLegalPersonName());
+        ucAgentInfoDo.setLegalPersonIdType(agentForm.getLegalPersonIdType());
+        ucAgentInfoDo.setLegalPersonCertId(agentForm.getLegalPersonId());
+        ucAgentInfoDo.setLegalPersonPhone(agentForm.getLegalPersonPhone());
+        ucAgentInfoDo.setLegalPersonMail(agentForm.getLegalPersonMail());
+        ucAgentInfoDo.setLegalPersonAddress(agentForm.getLegalPersonAddress());
+        ucAgentInfoDo.setContactName(agentForm.getContactName());
+        ucAgentInfoDo.setContactIdType(agentForm.getContactIdType());
+        ucAgentInfoDo.setContactCertId(agentForm.getContactCertId());
+        ucAgentInfoDo.setContactPhone(agentForm.getContactPhone());
+        ucAgentInfoDo.setContactMail(agentForm.getContactMail());
+        ucAgentInfoDo.setContactAddress(agentForm.getContactAddress());
+        
+//        ucAgentInfoDo.setCreateUser(userBO.getUsrName());
+//        ucAgentInfoDo.setCreateSource(SystemConstant.DEFAULT_SOURCE_CODE);
+//        ucAgentInfoDo.setCreateTime(DateUtil.getCurrentDateTime());
+        ucAgentInfoDo.setModifyUser(userBO.getUsrName());
+        ucAgentInfoDo.setModifySource(SystemConstant.DEFAULT_SOURCE_CODE);
+        ucAgentInfoDo.setModifyTime(DateUtil.getCurrentDateTime());
+//        ucAgentInfoDo.setLockVersion(String.valueOf(0));
+        
+        int c = ucAgentBiz.updateAgentInfo(ucAgentInfoDo);
+        if (c <= 0) {
+            throw new ErrorException("代理详细信息更新失败");
+        }
+    }
+    
+    @Override
+    public void updateAgentFeeInfo(AgentForm agentForm, UserBO userBO) {
+        
+        //存入机构费率
+        UcFeeDo ucFeeDo = new UcFeeDo();
+        ucFeeDo.setUserType(UserConstant.USER_AGENT);
+        ucFeeDo.setUserCode(agentForm.getInstId());
+        
+//        if(StringUtils.isNotBlank(agentForm.getCategory())){
+//            ucFeeDo.setCategory(agentForm.getCategory());
+//        } else {
+//            ucFeeDo.setCategory(SystemConstant.DEFAULT_CATEGORY);  //默认是1
+//        }
+//        if(StringUtils.isNotBlank(agentForm.getCategoryId())){
+//            ucFeeDo.setCategoryId(agentForm.getCategoryId());
+//        } else {
+//            ucFeeDo.setCategoryId(SystemConstant.DEFAULT_CATEGORY_ID);  //默认是P001
+//        }
+//        ucFeeDo.setStatus(StatusConstant.STATUS_ENABLE);
+//        ucFeeDo.setPercentFlag("N");
+        
+//        ucFeeDo.setCreateUser(userBO.getUsrName());
+//        ucFeeDo.setCreateSource(SystemConstant.DEFAULT_SOURCE_CODE);
+//        ucFeeDo.setCreateTime(DateUtil.getCurrentDateTime());
+        ucFeeDo.setModifyUser(userBO.getUsrName());
+        ucFeeDo.setModifySource(SystemConstant.DEFAULT_SOURCE_CODE);
+        ucFeeDo.setModifyTime(DateUtil.getCurrentDateTime());
+//        ucFeeDo.setLockedVersion(String.valueOf(0));
+        
+        //默认固定单笔
+        if(StringUtils.isNotBlank(agentForm.getDefaultFeeFixed())){
+            ucFeeDo.setFeeType(Constant.FEE_DEFAULT_FIXED);
+            ucFeeDo.setFeeDesc(Constant.FEE_DEFAULT_FIXED_DESC);
+            ucFeeDo.setFeeMode(agentForm.getDefaultFeeFixed());
+            int i = ucFeeBiz.updateFee(ucFeeDo);
+            if(i <=0 ){
+                throw new ErrorException("数据更新失败");
+            }
+        }
+        //默认固定比例
+        if(StringUtils.isNotBlank(agentForm.getDefaultFeeRate())){
+            ucFeeDo.setFeeType(Constant.FEE_DEFAULT_RATE);
+            ucFeeDo.setFeeDesc(Constant.FEE_DEFAULT_RATE_DESC);
+            ucFeeDo.setFeeMode(agentForm.getDefaultFeeRate());
+            int c = ucFeeBiz.updateFee(ucFeeDo);
+            if(c <=0 ){
+                throw new ErrorException("数据更新失败");
+            }
+        }
+        //实收固定单笔
+        if(StringUtils.isNotBlank(agentForm.getEffectiveFeeFixed())){
+            ucFeeDo.setFeeType(Constant.FEE_EFFECTIVE_FIXED);
+            ucFeeDo.setFeeDesc(Constant.FEE_EFFECTIVE_FIXED_DESC);
+            ucFeeDo.setFeeMode(agentForm.getEffectiveFeeFixed());
+            int d = ucFeeBiz.updateFee(ucFeeDo);
+            if(d <=0 ){
+                throw new ErrorException("数据更新失败");
+            }
+        }
+        //实收固定比例
+        if(StringUtils.isNotBlank(agentForm.getEffectiveFeeRate())){
+            ucFeeDo.setFeeType(Constant.FEE_EFFECTIVE_RATE);
+            ucFeeDo.setFeeDesc(Constant.FEE_EFFECTIVE_RATE_DESC);
+            ucFeeDo.setFeeMode(agentForm.getEffectiveFeeRate());
+            int f = ucFeeBiz.updateFee(ucFeeDo);
+            if(f <=0 ){
+                throw new ErrorException("数据更新失败");
+            }
+        }
+    }
+    
+    
+    @Override
+    @Transactional
+    public void activateAgent(String agentId, UserBO userBO) throws Exception {
+        UcAgentDo ucAgentDo = null;
+        
+        try {
+            //激活
+            ucAgentDo = ucAgentBiz.selectAgent(agentId);
+            ucAgentDo.setStatus(StatusConstant.STATUS_ENABLE);
+    
+            ucAgentDo.setModifyUser(userBO.getUsrName());
+            ucAgentDo.setModifySource(SystemConstant.DEFAULT_SOURCE_CODE);
+            ucAgentDo.setModifyTime(DateUtil.getCurrentDateTime());
+            
+            int a = ucAgentBiz.updateAgent(ucAgentDo);
+            if(a <= 0){
+                throw new ErrorException("代理激活失败");
+            }
+            
+        } catch (ErrorException e) {
+            e.printStackTrace();
+            throw new ErrorException("代理激活异常");
+        }
+        
+     
+    }
+    
+    @Override
+    @Transactional
+    public void cancelAgent(String agentId, UserBO userBO) throws Exception {
+    
+        UcAgentDo ucAgentDo = null;
+    
+        //激活
+        ucAgentDo = ucAgentBiz.selectAgent(agentId);
+        ucAgentDo.setStatus(StatusConstant.STATUS_CANNEL);
+    
+        ucAgentDo.setModifyUser(userBO.getUsrName());
+        ucAgentDo.setModifySource(SystemConstant.DEFAULT_SOURCE_CODE);
+        ucAgentDo.setModifyTime(DateUtil.getCurrentDateTime());
+    
+        int a = ucAgentBiz.updateAgent(ucAgentDo);
+        if(a <= 0){
+            throw new ErrorException("代理注销失败");
+        }
+    }
+    
+    @Override
+    @Transactional
+    public void disableAgent(String agentId, UserBO userBO) throws Exception {
+    
+        UcAgentDo ucAgentDo = null;
+    
+        //激活
+        ucAgentDo = ucAgentBiz.selectAgent(agentId);
+        ucAgentDo.setStatus(StatusConstant.STATUS_DISABLE);
+    
+        ucAgentDo.setModifyUser(userBO.getUsrName());
+        ucAgentDo.setModifySource(SystemConstant.DEFAULT_SOURCE_CODE);
+        ucAgentDo.setModifyTime(DateUtil.getCurrentDateTime());
+    
+        int a = ucAgentBiz.updateAgent(ucAgentDo);
+        if(a <= 0){
+            throw new ErrorException("代理挂起失败");
+        }
+    }
+    
     
 }
