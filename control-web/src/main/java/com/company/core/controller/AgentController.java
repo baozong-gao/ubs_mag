@@ -83,7 +83,11 @@ public class AgentController extends BaseController {
             return returnSuccess("代理全称重复");
         }
     
-        
+        //检查费率
+        String error = agentService.checkFees(agentForm);
+        if(StringUtils.isNotBlank(error)){
+            return returnError(error);
+        }
     
         //新增代理
         String agent = "";
@@ -171,8 +175,12 @@ public class AgentController extends BaseController {
         
         try {
             UserBO userBO = getCurrentUser();
-            
-            //这里应该对页面的信息进行检验
+    
+            //检查费率
+            String error = agentService.checkFees(agentForm);
+            if(StringUtils.isNotBlank(error)){
+                return returnError(error);
+            }
             
             agentService.updateAgent(agentForm, userBO);
             

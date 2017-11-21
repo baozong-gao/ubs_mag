@@ -42,7 +42,7 @@ import com.company.core.shiro.MonitorRealm;
  */
 @Controller
 @RequestMapping("userManagement")
-public class UserManagementController {
+public class UserManagementController extends BaseController{
     @Autowired
     UserService                 userService;
     @Autowired
@@ -128,6 +128,7 @@ public class UserManagementController {
                 return resultMap;
             }
             userBO.setUsrType(UserConstant.USER_INST);  //wwk
+            userBO.setUsrCode(instId);
         }
         if (StringUtils.isNotBlank(agentId)) {
             i ++;
@@ -138,6 +139,7 @@ public class UserManagementController {
                 return resultMap;
             }
             userBO.setUsrType(UserConstant.USER_AGENT);  //wwk
+            userBO.setUsrCode(agentId);
         }
         if (i > 1) {
             resultMap.put("statusCode", 300);
@@ -156,7 +158,7 @@ public class UserManagementController {
         MonitorRealm.ShiroUser shiroUser = (MonitorRealm.ShiroUser) currentUser.getPrincipal();
         userBO.setUsrCreateBy(shiroUser.getLoginName());
         userBO.setUsrUpdateBy(shiroUser.getLoginName());
-
+    
         resultMap = userService.addNewUsr(userBO);
 
         return resultMap;
@@ -205,6 +207,7 @@ public class UserManagementController {
 
     }
 
+    //获取用户角色列表  wwk
     @RequiresPermissions(ShiroPermissionsConstant.USER_AUTHORITY)
     @RequestMapping(value = "modifyacctoauth", method = RequestMethod.GET)
     public String modifyAcctDetails(HttpServletRequest request,
@@ -261,6 +264,8 @@ public class UserManagementController {
 
     }
 
+    
+    //分配用户权限角色 wwk
     @ResponseBody
     @RequiresPermissions(ShiroPermissionsConstant.USER_AUTHORITY)
     @RequestMapping(value = "addauthority", method = RequestMethod.POST)

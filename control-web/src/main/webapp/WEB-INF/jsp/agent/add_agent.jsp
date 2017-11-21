@@ -259,14 +259,16 @@
                                     <div class="form-group col-md-6">
                                         <label class="control-label">成本固定单笔费用：</label>
                                         <input type="text"
-                                               name="defaultFeeFixed" size="15" data-rule="成本固定费用:required;"
+                                               <%--name="defaultFeeFixed" size="15" data-rule="成本固定费用:required;"--%>
+                                               name="defaultFeeFixed" size="15" data-rule="number;range[1~200] "
                                                placeholder="单位笔/元"/>&nbsp;
                                     </div>
 
                                     <div class="form-group col-md-6">
                                         <label class="control-label">成本交易比例费率：</label>
                                         <input type="text"
-                                               name="defaultFeeRate" size="15" data-rule="成本固定费用:required;"
+                                               <%--name="defaultFeeRate" size="15" data-rule="成本固定费用:required;"--%>
+                                               name="defaultFeeRate" size="15" data-rule="number;range[0~1] "
                                                placeholder="如:千5, 请输入0.5"/>%&nbsp;
                                     </div>
                                 </div>
@@ -274,14 +276,16 @@
                                     <div class="form-group col-md-6">
                                         <label class="control-label">实收固定单笔费用：</label>
                                         <input type="text"
-                                               name="EffectiveFeeFixed" size="15" data-rule="成本固定费用:required;"
+                                               <%--name="EffectiveFeeFixed" size="15" data-rule="成本固定费用:required;"--%>
+                                               name="EffectiveFeeFixed" size="15" data-rule="number;range[1~200] "
                                                placeholder="单位笔/元"/>&nbsp;
                                     </div>
 
                                     <div class="form-group col-md-6">
                                         <label class="control-label">实收交易比例费率：</label>
                                         <input type="text"
-                                               name="EffectiveFeeRate" size="15" data-rule="成本固定费用:required;"
+                                               <%--name="EffectiveFeeRate" size="15" data-rule="成本固定费用:required;"--%>
+                                               name="EffectiveFeeRate" size="15" data-rule="number;range[0~1] "
                                                placeholder="如:千5, 请输入0.5"/>%&nbsp;
                                     </div>
                                 </div>

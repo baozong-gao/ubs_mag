@@ -1,8 +1,6 @@
 package com.company.core.service.impl;
 
-import com.company.core.biz.SequenceBiz;
-import com.company.core.biz.UCFeeBiz;
-import com.company.core.biz.UCInstBiz;
+import com.company.core.biz.*;
 import com.company.core.constant.*;
 import com.company.core.domain.InstBO;
 import com.company.core.domain.RecomCodeBO;
@@ -14,15 +12,18 @@ import com.company.core.form.Pagination;
 import com.company.core.form.RecomCodeForm;
 import com.company.core.service.AgentService;
 import com.company.core.service.InstService;
+import com.company.core.service.UserService;
 import com.company.core.util.ComcomUtils;
 import com.company.core.util.DateUtil;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.security.auth.Subject;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -46,6 +47,12 @@ public class InstServiceImpl implements InstService {
     UCFeeBiz  ucFeeBiz;
     @Autowired
     AgentService agentService;
+    @Autowired
+    CustomCredentialsMatcherBiz customCredentialsMatcherBiz;
+    @Autowired
+    UserService userService;
+    @Autowired
+    TblBtsUserMapBiz tblBtsUserMapBiz;
     
     
     @Override
@@ -206,6 +213,20 @@ public class InstServiceImpl implements InstService {
                 throw new ErrorException("机构激活失败");
             }
         
+            //查看机构默认登录用户
+            List<String> idList = tblBtsUserMapBiz.getLoginList(UserConstant.USER_INST, instId);
+            if(idList != null && idList.size() >0){
+                //已经创建 - 就去激活
+                if(idList != null && idList.size()> 0){
+                    for (String i : idList) {
+                        userService.setAcctEnable(i);
+                    }
+                }
+            } else {
+                //未创建
+                this.createInstAcct(ucInstDo, userBO);
+            }
+            
             //查看默认的机构代理是否开出, 如果没有继续, 如果已经开了, 则跳出
             UcAgentDo ucAgentDo = agentService.getDefautlAgentOfInst(instId);
             if(ucAgentDo != null){
@@ -306,13 +327,21 @@ public class InstServiceImpl implements InstService {
         if(a <= 0){
             throw new ErrorException("机构注销失败");
         }
+    
+        //禁用机构用户登录信息
+        List<String> idList = tblBtsUserMapBiz.getLoginList(UserConstant.USER_INST, instId);
+        if(idList != null && idList.size()> 0){
+            for (String i : idList) {
+                userService.setAcctDisable(i);
+            }
+        }
     }
     
     @Override
     @Transactional
     public void disableInst(String instId, UserBO userBO) throws Exception {
         
-        //激活
+        //禁用
         UcInstDo ucInstDo = ucInstBiz.selectByPrimaryKey(instId);
         ucInstDo.setStatus(StatusConstant.STATUS_DISABLE);
         
@@ -324,6 +353,16 @@ public class InstServiceImpl implements InstService {
         if(a <= 0){
             throw new ErrorException("机构禁用失败");
         }
+        
+        //禁用机构用户登录信息
+        List<String> idList = tblBtsUserMapBiz.getLoginList(UserConstant.USER_INST, instId);
+        if(idList != null && idList.size()> 0){
+            for (String i : idList) {
+                userService.setAcctDisable(i);
+            }
+        }
+        
+        
     }
     
     
@@ -423,7 +462,7 @@ public class InstServiceImpl implements InstService {
         ucFeeDo.setLockedVersion(String.valueOf(0));
         
         //默认固定单笔
-        if(StringUtils.isNotBlank(instForm.getDefaultFeeFixed())){
+        if(StringUtils.isNotBlank(instForm.getDefaultFeeFixed()) && !ucFeeBiz.zeroFee(instForm.getDefaultFeeFixed())){
             ucFeeDo.setFeeType(Constant.FEE_DEFAULT_FIXED);
             ucFeeDo.setFeeDesc(Constant.FEE_DEFAULT_FIXED_DESC);
             ucFeeDo.setFeeMode(instForm.getDefaultFeeFixed());
@@ -433,7 +472,7 @@ public class InstServiceImpl implements InstService {
             }
         }
         //默认固定比例
-        if(StringUtils.isNotBlank(instForm.getDefaultFeeRate())){
+        if(StringUtils.isNotBlank(instForm.getDefaultFeeRate()) && !ucFeeBiz.zeroFee(instForm.getDefaultFeeRate())){
             ucFeeDo.setFeeType(Constant.FEE_DEFAULT_RATE);
             ucFeeDo.setFeeDesc(Constant.FEE_DEFAULT_RATE_DESC);
             ucFeeDo.setFeeMode(instForm.getDefaultFeeRate());
@@ -443,7 +482,7 @@ public class InstServiceImpl implements InstService {
             }
         }
         //实收固定单笔
-        if(StringUtils.isNotBlank(instForm.getEffectiveFeeFixed())){
+        if(StringUtils.isNotBlank(instForm.getEffectiveFeeFixed()) && !ucFeeBiz.zeroFee(instForm.getEffectiveFeeFixed())){
             ucFeeDo.setFeeType(Constant.FEE_EFFECTIVE_FIXED);
             ucFeeDo.setFeeDesc(Constant.FEE_EFFECTIVE_FIXED_DESC);
             ucFeeDo.setFeeMode(instForm.getEffectiveFeeFixed());
@@ -453,7 +492,7 @@ public class InstServiceImpl implements InstService {
             }
         }
         //实收固定比例
-        if(StringUtils.isNotBlank(instForm.getEffectiveFeeRate())){
+        if(StringUtils.isNotBlank(instForm.getEffectiveFeeRate()) && !ucFeeBiz.zeroFee(instForm.getEffectiveFeeRate())){
             ucFeeDo.setFeeType(Constant.FEE_EFFECTIVE_RATE);
             ucFeeDo.setFeeDesc(Constant.FEE_EFFECTIVE_RATE_DESC);
             ucFeeDo.setFeeMode(instForm.getEffectiveFeeRate());
@@ -561,7 +600,7 @@ public class InstServiceImpl implements InstService {
 //        ucFeeDo.setLockedVersion(String.valueOf(0));
         
         //默认固定单笔
-        if(StringUtils.isNotBlank(instForm.getDefaultFeeFixed())){
+        if(StringUtils.isNotBlank(instForm.getDefaultFeeFixed()) && !ucFeeBiz.zeroFee(instForm.getDefaultFeeFixed())){
             ucFeeDo.setFeeType(Constant.FEE_DEFAULT_FIXED);
             ucFeeDo.setFeeDesc(Constant.FEE_DEFAULT_FIXED_DESC);
             ucFeeDo.setFeeMode(instForm.getDefaultFeeFixed());
@@ -571,7 +610,7 @@ public class InstServiceImpl implements InstService {
             }
         }
         //默认固定比例
-        if(StringUtils.isNotBlank(instForm.getDefaultFeeRate())){
+        if(StringUtils.isNotBlank(instForm.getDefaultFeeRate()) && !ucFeeBiz.zeroFee(instForm.getDefaultFeeRate())){
             ucFeeDo.setFeeType(Constant.FEE_DEFAULT_RATE);
             ucFeeDo.setFeeDesc(Constant.FEE_DEFAULT_RATE_DESC);
             ucFeeDo.setFeeMode(instForm.getDefaultFeeRate());
@@ -581,7 +620,7 @@ public class InstServiceImpl implements InstService {
             }
         }
         //实收固定单笔
-        if(StringUtils.isNotBlank(instForm.getEffectiveFeeFixed())){
+        if(StringUtils.isNotBlank(instForm.getEffectiveFeeFixed()) && !ucFeeBiz.zeroFee(instForm.getEffectiveFeeFixed())){
             ucFeeDo.setFeeType(Constant.FEE_EFFECTIVE_FIXED);
             ucFeeDo.setFeeDesc(Constant.FEE_EFFECTIVE_FIXED_DESC);
             ucFeeDo.setFeeMode(instForm.getEffectiveFeeFixed());
@@ -591,7 +630,7 @@ public class InstServiceImpl implements InstService {
             }
         }
         //实收固定比例
-        if(StringUtils.isNotBlank(instForm.getEffectiveFeeRate())){
+        if(StringUtils.isNotBlank(instForm.getEffectiveFeeRate()) && !ucFeeBiz.zeroFee(instForm.getEffectiveFeeRate())){
             ucFeeDo.setFeeType(Constant.FEE_EFFECTIVE_RATE);
             ucFeeDo.setFeeDesc(Constant.FEE_EFFECTIVE_RATE_DESC);
             ucFeeDo.setFeeMode(instForm.getEffectiveFeeRate());
@@ -650,6 +689,43 @@ public class InstServiceImpl implements InstService {
     
 
         return false;
+    }
+    
+    @Override
+    public String checkFees(InstForm instForm) {
+        
+        String error = "";
+        
+        //默认费率 必须配置一个非0费率
+        if(StringUtils.isBlank(instForm.getDefaultFeeFixed())){
+            instForm.setDefaultFeeFixed("0");
+        }
+        if(StringUtils.isBlank(instForm.getDefaultFeeRate())){
+            instForm.setDefaultFeeRate("0");
+        }
+        BigDecimal zero = new BigDecimal("0");
+        BigDecimal df = new BigDecimal(instForm.getDefaultFeeFixed());
+        BigDecimal dr = new BigDecimal(instForm.getDefaultFeeRate());
+        if(zero.compareTo(df) == 0 && zero.compareTo(dr) == 0){
+            error = "默认费率不能同时为0和空";
+            return error;
+        }
+    
+        //默认费率 必须配置一个非0费率
+        if(StringUtils.isBlank(instForm.getEffectiveFeeFixed())){
+            instForm.setEffectiveFeeFixed("0");
+        }
+        if(StringUtils.isBlank(instForm.getEffectiveFeeRate())){
+            instForm.setEffectiveFeeRate("0");
+        }
+        BigDecimal ef = new BigDecimal(instForm.getEffectiveFeeFixed());
+        BigDecimal er = new BigDecimal(instForm.getEffectiveFeeRate());
+        if(zero.compareTo(ef) == 0 && zero.compareTo(er) == 0){
+            error = "实行费率不能同时为0和空";
+            return error;
+        }
+        
+        return null;
     }
     
     
@@ -733,6 +809,57 @@ public class InstServiceImpl implements InstService {
         
     }
     
+    
+    /**
+     * 创建机构用户
+     * @param ucInstDo
+     * @param shiroUserBo
+     */
+    @Transactional
+    @Override
+    public void createInstAcct(UcInstDo ucInstDo, UserBO shiroUserBo){
+    
+        UserBO userBo = new UserBO();
+        userBo.setUsrId(String.valueOf(sequenceBiz.genUserIdSeq()));
+        userBo.setUsrName("I" + ucInstDo.getInstId());  //默认登录号  I0000001
+        
+        //获取机构详细信息 - 邮箱, 简称等
+        String mail = "";
+        UcInstInfoDo ucInstInfoDo = ucInstBiz.getInstInfo(ucInstDo.getInstId());
+        if(ucInstInfoDo == null || StringUtils.isBlank(ucInstInfoDo.getContactPhone())){
+            mail = ucInstInfoDo.getContactPhone();
+        } else {
+            mail = ucInstDo.getInstId() + DateUtil.getCurrentDate() + "@163.com";
+        }
+        userBo.setUsrEmail(mail);
+  
+        //默认密码用手机号的后6位, 如果手机号为空, 或者不足11位, 用机构号替代
+        userBo.setUsrPwd(customCredentialsMatcherBiz.encrypt(getPassword(ucInstDo.getInstId(), ucInstInfoDo.getContactPhone())));
+        userBo.setUsrDisableTag("1");
+        userBo.setUsrCreateBy(shiroUserBo.getUsrName());
+        userBo.setUsrUpdateBy(shiroUserBo.getUsrName());
+    
+        userBo.setUsrType(UserConstant.USER_INST);
+        userBo.setUsrCode(ucInstDo.getInstId());
+        userBo.setUsrCodeName(ucInstInfoDo.getInstShortName());
+    
+        userService.addNewUsr(userBo);
+    
+    }
+    
+    private String getPassword(String instId, String phone){
+        
+        if(StringUtils.isBlank(phone) || phone.length() < 11){
+            if(instId.length() >=6){
+                return instId.substring(instId.length() - 6);
+            } else {
+                return instId;
+            }
+        } else {
+            return instId.substring(phone.length() - 6);
+        }
+    }
+
     
     
 }

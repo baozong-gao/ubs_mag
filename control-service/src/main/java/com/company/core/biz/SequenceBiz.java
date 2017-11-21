@@ -46,4 +46,8 @@ public class SequenceBiz {
         return StringUtils.leftPad(seq, 8, "0");
     }
     
+    public String genUserIdSeq() {
+        return String.valueOf(seqMapper.getSequenceNextVal("TBL_BTS_SYS_USR_ID_SEQ"));
+    }
+    
 }

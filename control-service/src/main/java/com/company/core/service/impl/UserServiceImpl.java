@@ -1,31 +1,30 @@
 package com.company.core.service.impl;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.collections.map.HashedMap;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.stereotype.Service;
-
-import com.github.pagehelper.PageHelper;
+import com.company.core.biz.TblBtsUserMapBiz;
+import com.company.core.constant.Constant;
+import com.company.core.constant.SystemConstant;
+import com.company.core.constant.UserConstant;
 import com.company.core.domain.UserBO;
-import com.company.core.entity.TblBTSSysRoleDO;
-import com.company.core.entity.TblBTSSysRoleDOExample;
-import com.company.core.entity.TblBTSSysUsrDO;
-import com.company.core.entity.TblBTSSysUsrDOExample;
-import com.company.core.entity.TblBTSSysUsrRoleDO;
-import com.company.core.entity.TblBTSSysUsrRoleDOKey;
+import com.company.core.entity.*;
 import com.company.core.form.Pagination;
 import com.company.core.mapper.TblBTSSysRoleDOMapper;
 import com.company.core.mapper.TblBTSSysUsrDOMapper;
 import com.company.core.mapper.TblBTSSysUsrRoleDOMapper;
 import com.company.core.service.UserService;
 import com.company.core.util.DateUtil;
+import com.github.pagehelper.PageHelper;
+import org.apache.commons.collections.map.HashedMap;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by APPLE on 15/12/27.
@@ -41,6 +40,10 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     TblBTSSysRoleDOMapper       tblBTSSysRoleDOMapper;
+    @Autowired
+    TblBtsUserMapBiz tblBtsUserMapBiz;
+
+    
 
     private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
 
@@ -132,9 +135,51 @@ public class UserServiceImpl implements UserService {
         } else {
             resultMap.put("statusCode", 300);
             resultMap.put("message", "操作失败!");
+            return resultMap;
         }
+    
+        //绑定登录ID跟用户  wwk
+        if (StringUtils.isNotBlank(userBO.getUsrCode())) {
+            logger.info("进行商户关联绑定");
+            // 添加角色关联
+            TblBtsUsrMapDoKey tblBtsUsrMapDoKey = new TblBtsUsrMapDoKey();
+            tblBtsUsrMapDoKey.setLoginSeq(userBO.getUsrId());
+            tblBtsUsrMapDoKey.setLoginId(userBO.getUsrName());
+            TblBtsUsrMapDo tblBtsUsrMapDo = tblBtsUserMapBiz.selectByPrimaryKey(tblBtsUsrMapDoKey);
+            if(tblBtsUsrMapDo != null){
+                return resultMap;
+            }
+            tblBtsUsrMapDo = new TblBtsUsrMapDo();
+            tblBtsUsrMapDo.setLoginSeq(userBO.getUsrId());
+            tblBtsUsrMapDo.setLoginId(userBO.getUsrName());
+            tblBtsUsrMapDo.setUsrType(userBO.getUsrType());
+            tblBtsUsrMapDo.setUserCode(userBO.getUsrCode());
+            tblBtsUsrMapDo.setUserName(userBO.getUsrCodeName());
+    
+            tblBtsUsrMapDo.setCreateUser(userBO.getUsrName());
+            tblBtsUsrMapDo.setCreateSource(SystemConstant.DEFAULT_SOURCE_CODE);
+            tblBtsUsrMapDo.setCreateTime(DateUtil.getCurrentDateTime());
+            tblBtsUsrMapDo.setModifyUser(userBO.getUsrName());
+            tblBtsUsrMapDo.setModifySource(SystemConstant.DEFAULT_SOURCE_CODE);
+            tblBtsUsrMapDo.setModifyTime(DateUtil.getCurrentDateTime());
+            tblBtsUsrMapDo.setLockVersion(String.valueOf(0));
+            int a = tblBtsUserMapBiz.insert(tblBtsUsrMapDo);
+            if (a <= 0) {
+                resultMap.remove("statusCode");
+                resultMap.remove("message");
+                resultMap.put("statusCode", 300);
+                resultMap.put("message", "添加用户失败-绑定用户");
+            }
+    
+            //分配对应的权限
+            if (UserConstant.USER_INST.equals(userBO.getUsrType())) {
+                addAcctAuthority(userBO.getUsrId(), Constant.INST_ROLE_AUTH_ID);
+            } else if (UserConstant.USER_AGENT.equals(userBO.getUsrType())) {
+                addAcctAuthority(userBO.getUsrId(), Constant.AGENT_ROLE_AUTH_ID);
+            }
+        }
+        
         return resultMap;
-
     }
 
     public Pagination<UserBO> getAllUsr(UserBO userBO) {
@@ -211,6 +256,7 @@ public class UserServiceImpl implements UserService {
         userBO.setUsrName(tblBTSSysUsrDO.getUsrName());
         userBO.setUsrPwd(tblBTSSysUsrDO.getUsrPwd());
         userBO.setUsrDisableTag(tblBTSSysUsrDO.getUsrDisableTag());
+        userBO.setUsrType(tblBTSSysUsrDO.getUsrType());   //wwk
         return userBO;
     }
 

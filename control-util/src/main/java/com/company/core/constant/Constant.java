@@ -15,4 +15,13 @@ public class Constant {
     public final static String FEE_EFFECTIVE_RATE = "ER";
     public final static String FEE_EFFECTIVE_RATE_DESC = "实收比例费率";
     
+    
+    //用户角色选线
+    public final static String INST_ROLE_AUTH_ID = "5";
+    public final static String AGENT_ROLE_AUTH_ID = "6";
+    public final static String TEST_ROLE_AUTH_ID = "7";
+    public final static String MAINTAIN_ROLE_AUTH_ID = "8";
+    
+    
+    
 }

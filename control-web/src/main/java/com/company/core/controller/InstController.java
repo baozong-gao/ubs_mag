@@ -110,7 +110,11 @@ public class InstController extends BaseController {
         try {
             UserBO userBO = getCurrentUser();
 
-            //这里应该对页面的信息进行检验
+            //检查费率
+            String error = instService.checkFees(instForm);
+            if(StringUtils.isNotBlank(error)){
+                return returnError(error);
+            }
             
             instService.updateInst(instForm, userBO);
             
@@ -247,6 +251,12 @@ public class InstController extends BaseController {
             return returnSuccess("机构全称重复");
         }
     
+        //检查费率
+        String error = instService.checkFees(instForm);
+        if(StringUtils.isNotBlank(error)){
+            return returnError(error);
+        }
+        
         //新增机构
         String inst = "";
         try {

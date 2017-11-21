@@ -47,9 +47,14 @@ public interface InstService {
     
     public Boolean checkIfDupInstByName(String instName, String instShortName );
     
+    String checkFees(InstForm instForm);
+    
     void formatInstFormFromInst(InstForm instForm);
     
     void formatInstFormFromInstInfo(InstForm instForm);
     
     void formatInstFormFromFee(InstForm instForm);
+    
+    @Transactional
+    void createInstAcct(UcInstDo ucInstDo, UserBO shiroUserBo);
 }

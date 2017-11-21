@@ -80,4 +80,9 @@ public interface AgentService {
     
     @Transactional
     void disableAgent(String agentId, UserBO userBO) throws Exception;
+    
+    String checkFees(AgentForm agentForm);
+    
+    @Transactional
+    void createAgentAcct(UcAgentDo ucAgentDo, UserBO shiroUserBo);
 }

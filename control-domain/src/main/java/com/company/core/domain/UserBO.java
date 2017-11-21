@@ -1,5 +1,7 @@
 package com.company.core.domain;
 
+import lombok.Data;
+
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -7,6 +9,7 @@ import java.util.List;
 /**
  * Created by fireWorks on 2016/2/26.
  */
+@Data
 public class UserBO extends BaseBO implements Serializable {
     private static final long serialVersionUID = -5368343038685225231L;
 
@@ -21,6 +24,10 @@ public class UserBO extends BaseBO implements Serializable {
     private String            usrRemark;
 
     private String            usrType;
+    
+    private String            usrCode;   //wwk
+    
+    private String            usrCodeName;   //wwk
 
     private String            usrDisableTag;
 
