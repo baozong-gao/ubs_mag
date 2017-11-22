@@ -46,6 +46,11 @@
 				<artifactId>control-web</artifactId>
 				<version>1.0.0</version>
 			</dependency>
+			<dependency>
+				<groupId>com.company.core</groupId>
+				<artifactId>control-web-agent</artifactId>
+				<version>1.0.0</version>
+			</dependency>
 
 			<!--shiro ??? -->
 			<dependency>
@@ -426,5 +431,6 @@
     <module>control-service</module>
     <module>control-util</module>
     <module>control-web</module>
+    <module>control-web-agent</module>
   </modules>
 </project>

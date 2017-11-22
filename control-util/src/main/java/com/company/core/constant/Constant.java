@@ -23,5 +23,9 @@ public class Constant {
     public final static String MAINTAIN_ROLE_AUTH_ID = "8";
     
     
+    //类别category 默认
+    public final static String CATEGORY_DEFAULT = "0";
+    
+    
     
 }

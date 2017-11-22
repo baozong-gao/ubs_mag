@@ -87,17 +87,17 @@ public class LoginController {
             loginForm.getCaptcha());
         try {
             currentUser.login(captchaUsernamePasswordToken);
-            
+    
             log.info("判断用户类型");  //不是机构, 代理, 商户类型, 都可以登录控台  wwk
             UserBO userBO = userService.get(loginForm.getUsername());
             if(StringUtils.isNotBlank(userBO.getUsrType()) && !UserConstant.USER_INST.equals(userBO.getUsrType()) &&
                     !UserConstant.USER_AGENT.equals(userBO.getUsrType()) && !UserConstant.USER_USER.equals(userBO.getUsrType())){
-                resultMap.put("statusCode", "200");
-                resultMap.put("message", "登录成功!");
-            } else {
                 currentUser.logout();
                 resultMap.put("statusCode", "300");
                 resultMap.put("message", "请前往机构代理平台登录!");
+            } else {
+                resultMap.put("statusCode", "200");
+                resultMap.put("message", "登录成功!");
             }
         } catch (UnknownAccountException uae) {
             resultMap.put("statusCode", "300");

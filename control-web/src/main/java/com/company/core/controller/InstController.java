@@ -1,8 +1,10 @@
 package com.company.core.controller;
 
+import com.company.core.constant.Constant;
 import com.company.core.constant.ErrorException;
 import com.company.core.constant.StatusConstant;
 import com.company.core.domain.UserBO;
+import com.company.core.entity.UcCategoryDo;
 import com.company.core.entity.UcInstDo;
 import com.company.core.entity.UcProdDo;
 import com.company.core.form.InstForm;
@@ -41,9 +43,12 @@ public class InstController extends BaseController {
     @RequestMapping(value = "/addPage", method = RequestMethod.GET)
     public ModelAndView toAddPage(HttpServletRequest request, HttpServletResponse response, ModelAndView modelAndView) {
         
-        List<UcProdDo> ucProdDos = prodCategoryService.getProdList();
+//        List<UcProdDo> ucProdDos = prodCategoryService.getProdList();
+//        modelAndView.getModel().put("prodList", ucProdDos);
+    
+        List<UcCategoryDo> ucCategoryDoList = prodCategoryService.getCategoryIdList(Constant.CATEGORY_DEFAULT, StatusConstant.STATUS_ENABLE);
         
-        modelAndView.getModel().put("prodList", ucProdDos);
+        modelAndView.getModel().put("categoryList", ucCategoryDoList);
         modelAndView.setViewName("/inst/add_inst");
         return modelAndView;
     }

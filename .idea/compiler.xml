@@ -11,6 +11,7 @@
         <module name="control-service" />
         <module name="control-util" />
         <module name="control-web" />
+        <module name="control-web-agent" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
@@ -19,6 +20,7 @@
       <module name="control-service" target="1.8" />
       <module name="control-util" target="1.8" />
       <module name="control-web" target="1.8" />
+      <module name="control-web-agent" target="1.8" />
       <module name="ubs_mag" target="1.8" />
     </bytecodeTargetLevel>
   </component>

@@ -108,6 +108,7 @@ public class RecomCodeController extends BaseController {
      * 查询注册码列表
      */
     @RequestMapping(value = "/query_recomCode_list", method = RequestMethod.GET)
+    @ResponseBody
     public ModelAndView toQueryRecomCodeList (HttpServletRequest request, HttpServletResponse response, ModelAndView modelAndView, @ModelAttribute("recomCodeListForm") RecomCodeForm recomCodeForm) {
         
         //获取-激活状态下的机构列表
@@ -128,20 +129,19 @@ public class RecomCodeController extends BaseController {
      */
     @RequestMapping(value = "/query_recomCode_list", method = RequestMethod.POST)
     @ResponseBody
-    public Map<String, Object> toQueryRecomCodeListPost (HttpServletRequest request, HttpServletResponse response, ModelAndView modelAndView, @ModelAttribute("recomCodeListForm") RecomCodeForm recomCodeForm) {
+    public ModelAndView toQueryRecomCodeListPost (HttpServletRequest request, HttpServletResponse response, ModelAndView modelAndView, @ModelAttribute("recomCodeListForm") RecomCodeForm recomCodeForm) {
     
-        Map<String, Object> resultmap = new HashMap<String, Object>();
-        
         //获取-激活状态下的机构列表
         List<UcInstDo> ucInstDoList = instService.getInstListByStatus(StatusConstant.STATUS_ENABLE);
         
         //获取该机构下的所有注册码信息
         Pagination page= recomCodeService.getAllRecomcodes(recomCodeForm);
+        recomCodeForm.setPagination(page);
         
-        resultmap.put("list", page.getList());
-        resultmap.put("totalRow", page.getItemCount());
-        resultmap.put("pageCurrent", page.getPageIndex());
-        return resultmap;
+        modelAndView.getModel().put("recomCodeListForm", recomCodeForm);
+        modelAndView.getModel().put("instList", ucInstDoList);
+        modelAndView.setViewName("/recomCode/list_recom_code");
+        return modelAndView;
         
     }
     
