@@ -24,13 +24,13 @@
     <form id="pagerForm" name="recomCodeListForm" data-toggle="ajaxsearch" action="${pageContext.request.contextPath}/recomCode/query_recomCode_list" method="post" modelAttribute="recomCodeListForm">
         <input type="hidden" id="pageSize" name="pageSize" value="${recomCodeListForm.pageSize}">
         <input type="hidden" id="pageCurrent" name="pageCurrent" value="${recomCodeListForm.pageCurrent}">
+        <input type="hidden" id="lastSearchAgentId" name="lastSearchAgentId" value="${recomCodeListForm.lastSearchAgentId}">
         <div class="bjui-searchBar">
             <div class="row-inut">
                 <label class="labelblock">机构号:</label>
                 <select name="instId" id="instId" data-toggle="selectpicker"  data-live-search="true"
                         data-nextselect="#agentIdL"
-                        data-refurl="${pageContext.request.contextPath}/comcon/select_agent_active?instId={value}"
-                        >
+                        data-refurl="${pageContext.request.contextPath}/comcon/select_agent_active?instId={value}&level=1">
                     <option style="width: 60px; display: inline-block" value="">-请选择-</option>
                     <c:forEach var="record" items="${instList}"
                                varStatus="status">
@@ -39,8 +39,7 @@
                     </c:forEach>
                 </select>
                 <label class="labelblock">代理号:</label>
-                <select name="agentId" id="agentIdL" data-toggle="selectpicker" data-live-search="true"
-                        >
+                <select name="agentId" id="agentIdL" data-toggle="selectpicker" data-live-search="true">
                     <option value="">-请选择-</option>
                 </select>
 
@@ -65,19 +64,19 @@
             </div>
 
             <div class="row-input">
-                <button type="submit" class="btn-default" data-icon="search">查询</button>
-                <button type="button" class="btn-default" data-icon="home" data-toggle="navtab" data-id="navtab-recomCode-generate" data-title="生成注册码" href="${pageContext.request.contextPath}/recomCode/addPage">生成</button>
+                <button type="submit" class="btn-default" data-icon="search" style="width: 91px">查询</button>
+                <button type="button" class="btn-default" data-icon="home" style="width: 91px" data-toggle="navtab" data-id="navtab-recomCode-generate" data-title="生成注册码" href="${pageContext.request.contextPath}/recomCode/addPage">生成</button>
             </div>
 
             <div class="row-input">
-                <%--<button type="button" class="btn-default" data-icon="home" data-toggle="navtab" data-id="navtab-recomCode-dispatch-batch" data-title="批量下拨注册码" href="${pageContext.request.contextPath}/recomCode/addDispatchBatchPage">批量下拨</button>--%>
-                    <a data-icon="save" class="btn btn-default" id="dispatch_selected" name='dispatch_selected' data-toggle="dialog" data-width="300" data-height="200" data-id="dialog-normal" data-title="下拨注册码">下拨</a>
+                    <a data-icon="save" class="btn btn-default" id="dispatch_selected" name='dispatch_selected' data-toggle="dialog" data-width="300" data-height="200" data-id="dialog-normal" data-title="下拨注册码">下拨选中</a>
 
-                    <a href="${pageContext.request.contextPath}/recomCode/dispatchBatchPage" data-icon="home" class="btn btn-primary" data-id="navtab-recomCode-dispatch-batch" data-toggle="dialog" data-width="600" data-height="400" data-id="dialog-normal" data-title="批量下拨注册码">批量下拨</a>
+                    <a href="${pageContext.request.contextPath}/recomCode/dispatchBatchPage" data-icon="home" class="btn btn-default" data-id="navtab-recomCode-dispatch-batch" data-toggle="dialog" data-width="600" data-height="400" data-id="dialog-normal" data-title="批量下拨注册码">批量下拨</a>
             </div>
         </div>
     </form>
 </div>
+
 <div class="bjui-pageContent tableContent">
     <table  class="table table-bordered table-hover table-striped table-top" data-toggle="tablefixed" data-width="100%" data-nowrap="true">
         <thead>
@@ -116,7 +115,7 @@
             <td align="center"><c:out value="${record.createUser}"/></td>
             <td align="center"><c:out value="${record.createTime}"/></td>
             <td align="center">
-                <%--<a href="${pageContext.request.contextPath}/recomCode/activate?recomCode=<c:out value="${record.recomCode}"/>" class="btn btn-green" data-toggle="doajax" <c:if test="${record.status=='E'} || ${record.status=='M'} || ${record.status=='U'}"> disabled=true </c:if>>激活</a>--%>
+                    <%--<a href="${pageContext.request.contextPath}/recomCode/activate?recomCode=<c:out value="${record.recomCode}"/>" class="btn btn-green" data-toggle="doajax" <c:if test="${record.status=='E'} || ${record.status=='M'} || ${record.status=='U'}"> disabled=true </c:if>>激活</a>--%>
                 <a href="${pageContext.request.contextPath}/recomCode/activate?recomCode=<c:out value="${record.recomCode}"/>" class="btn btn-green" data-toggle="doajax" <c:if test="${record.status=='E' || record.status=='M' || record.status=='U'}"> disabled=true </c:if>>激活</a>
                 <a href="${pageContext.request.contextPath}/recomCode/disabled?recomCode=<c:out value="${record.recomCode}"/>" class="btn btn-blue" data-toggle="doajax" data-confirm-msg="确定？" <c:if test="${record.status=='D' || record.status=='U' }"> disabled=true </c:if>>禁用</a>
                 <a href="${pageContext.request.contextPath}/recomCode/modifyPage?recomCode=<c:out value="${record.recomCode}"/>" class="btn btn-refresh" data-toggle="dialog" data-width="600" data-height="400" data-id="dialog-normal" data-title="注册码修改" <c:if test="${record.status=='U'}"> disabled=true </c:if>>修改</a>
@@ -127,6 +126,7 @@
         </tbody>
     </table>
 </div>
+
 <div class="bjui-pageFooter" id="pageFooter">
     <div class="pages">
         <span>每页 </span>

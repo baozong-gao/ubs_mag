@@ -130,20 +130,37 @@ public class RecomCodeController extends BaseController {
     @RequestMapping(value = "/query_recomCode_list", method = RequestMethod.POST)
     @ResponseBody
     public ModelAndView toQueryRecomCodeListPost (HttpServletRequest request, HttpServletResponse response, ModelAndView modelAndView, @ModelAttribute("recomCodeListForm") RecomCodeForm recomCodeForm) {
-    
+
         //获取-激活状态下的机构列表
         List<UcInstDo> ucInstDoList = instService.getInstListByStatus(StatusConstant.STATUS_ENABLE);
+
+//        if(StringUtils.isBlank(recomCodeForm.getLastSearchAgentId())){
+//            recomCodeForm.setLastSearchAgentId(recomCodeForm.getAgentId());
+//        } else if (StringUtils.isBlank(recomCodeForm.getAgentId())){
+//            int pageCurrent = Integer.parseInt(recomCodeForm.getPageCurrent());
+//            if(pageCurrent > 1){
+//                recomCodeForm.setAgentId(recomCodeForm.getLastSearchAgentId());
+//            }
+//        }
+    
+        int pageCurrent = Integer.parseInt(recomCodeForm.getPageCurrent());
+        if(pageCurrent > 1){
+            recomCodeForm.setAgentId(recomCodeForm.getLastSearchAgentId());
+        } else {
+            recomCodeForm.setLastSearchAgentId(recomCodeForm.getAgentId());
+        }
         
         //获取该机构下的所有注册码信息
         Pagination page= recomCodeService.getAllRecomcodes(recomCodeForm);
         recomCodeForm.setPagination(page);
-        
+        recomCodeForm.setLastSearchAgentId(recomCodeForm.getAgentId());
         modelAndView.getModel().put("recomCodeListForm", recomCodeForm);
         modelAndView.getModel().put("instList", ucInstDoList);
         modelAndView.setViewName("/recomCode/list_recom_code");
         return modelAndView;
-        
+
     }
+
     
     /**
      * 下发注册码 页面

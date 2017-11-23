@@ -185,24 +185,28 @@ public class RecomCodeServiceImpl implements RecomCodeService {
         UcReccomCodeCntlDoExample ucReccomCodeCntlDoExample = new UcReccomCodeCntlDoExample();
         UcReccomCodeCntlDoExample.Criteria criteria = ucReccomCodeCntlDoExample.createCriteria();
         
-        if(StringUtils.isNotBlank(recomCodeForm.getInstId())){
+//        if(StringUtils.isNotBlank(recomCodeForm.getInstId())){
+//            List<String> agentIdList = agentService.getAgentIdList(recomCodeForm.getInstId(), "");
+//            criteria.andUserTypeEqualTo(UserConstant.USER_AGENT);
+//            criteria.andUserCodeIn(agentIdList);
+//        }
+//        if(StringUtils.isNotBlank(recomCodeForm.getAgentId())){
+//            criteria.andUserTypeEqualTo(UserConstant.USER_AGENT);
+//            criteria.andUserCodeEqualTo(recomCodeForm.getAgentId());
+//        }
+        
+        if(StringUtils.isNotBlank(recomCodeForm.getUserId())){
+            criteria.andUserTypeEqualTo(UserConstant.USER_USER);
+            criteria.andUserCodeEqualTo(recomCodeForm.getAgentId());
+        } else if(StringUtils.isNotBlank(recomCodeForm.getAgentId())){
+            criteria.andUserTypeEqualTo(UserConstant.USER_AGENT);
+            criteria.andUserCodeEqualTo(recomCodeForm.getAgentId());
+        } else if(StringUtils.isNotBlank(recomCodeForm.getInstId())){
             List<String> agentIdList = agentService.getAgentIdList(recomCodeForm.getInstId(), "");
             criteria.andUserTypeEqualTo(UserConstant.USER_AGENT);
             criteria.andUserCodeIn(agentIdList);
         }
-        if(StringUtils.isNotBlank(recomCodeForm.getAgentId())){
-            criteria.andUserTypeEqualTo(UserConstant.USER_AGENT);
-            criteria.andUserCodeEqualTo(recomCodeForm.getAgentId());
-        }
-        if(StringUtils.isNotBlank(recomCodeForm.getUserId())){
-            criteria.andUserTypeEqualTo(UserConstant.USER_AGENT);
-            criteria.andUserCodeEqualTo(recomCodeForm.getAgentId());
-        }
         
-//        if(StringUtils.isNotBlank(recomCodeForm.getUserId())){
-//            criteria.andUserTypeEqualTo(UserConstant.USER_USER);
-//            criteria.andUserCodeEqualTo(recomCodeForm.getUserId());
-//        }
         if(StringUtils.isNotBlank(recomCodeForm.getStatus())){
             criteria.andStatusEqualTo(recomCodeForm.getStatus());
         }

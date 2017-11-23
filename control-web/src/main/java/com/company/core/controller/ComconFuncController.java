@@ -4,7 +4,9 @@ import com.company.core.constant.StatusConstant;
 import com.company.core.constant.UserConstant;
 import com.company.core.domain.SelectBO;
 import com.company.core.entity.UcAgentDo;
+import com.company.core.entity.UcCategoryDo;
 import com.company.core.service.AgentService;
+import com.company.core.service.ProdCategoryService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +28,8 @@ public class ComconFuncController {
     
     @Autowired
     AgentService agentService;
+    @Autowired
+    ProdCategoryService prodCategoryService;
     
     /**
      * 查询机构下的所有代理
@@ -106,6 +110,35 @@ public class ComconFuncController {
         }
         return resp;
     }
+    
+    @RequestMapping(value = "/select_catagory_ids", method = RequestMethod.POST)
+    @ResponseBody
+    public Object selectCatagoryIds(HttpServletRequest request, HttpServletResponse response) {
+        
+        String catagory = request.getParameter("catagory");
+        String status = request.getParameter("status");
+    
+        //空
+        List<SelectBO> resp = new ArrayList<>();
+        if(StringUtils.isBlank(catagory) || "&".equals(catagory) || "all".equals(catagory)){
+            SelectBO selectBO = initialSelectBo();
+            resp.add(selectBO);
+            return resp;
+        }
+        
+        //选择
+        List<UcCategoryDo> catagoryIds = prodCategoryService.getCategoryIdList(catagory, status);
+        SelectBO selectBO = initialSelectBo();
+        resp.add(selectBO);
+        for(UcCategoryDo categoryDo: catagoryIds){
+            selectBO = new SelectBO();
+            selectBO.setLabel(categoryDo.getCategoryIdName());
+            selectBO.setValue(categoryDo.getCategoryId());
+            resp.add(selectBO);
+        }
+        return resp;
+    }
+    
     
     /**
      * 初始化 代理级联查询

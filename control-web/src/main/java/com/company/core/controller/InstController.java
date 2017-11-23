@@ -42,13 +42,10 @@ public class InstController extends BaseController {
     
     @RequestMapping(value = "/addPage", method = RequestMethod.GET)
     public ModelAndView toAddPage(HttpServletRequest request, HttpServletResponse response, ModelAndView modelAndView) {
-        
-//        List<UcProdDo> ucProdDos = prodCategoryService.getProdList();
-//        modelAndView.getModel().put("prodList", ucProdDos);
     
-        List<UcCategoryDo> ucCategoryDoList = prodCategoryService.getCategoryIdList(Constant.CATEGORY_DEFAULT, StatusConstant.STATUS_ENABLE);
+//        List<UcCategoryDo> ucCategoryDoList = prodCategoryService.getCategoryIdList(Constant.CATEGORY_DEFAULT, StatusConstant.STATUS_ENABLE);
+//        modelAndView.getModel().put("categoryList", ucCategoryDoList);
         
-        modelAndView.getModel().put("categoryList", ucCategoryDoList);
         modelAndView.setViewName("/inst/add_inst");
         return modelAndView;
     }
@@ -107,6 +104,51 @@ public class InstController extends BaseController {
         modelAndView.getModel().put("instDetailForm", instForm);
         modelAndView.setViewName("/inst/detail_inst");
         return modelAndView;
+    }
+    
+    @RequestMapping(value = "/add_new_inst", method = RequestMethod.POST)
+    @ResponseBody
+    @RequiresAuthentication
+    public Map toAddNewInst(HttpServletRequest request, HttpServletResponse response, ModelAndView modelAndView, @ModelAttribute("instForm") InstForm instForm) {
+        
+        UserBO userBO = getCurrentUser();
+        
+        log.info("机构开户");
+        Boolean dupshortname = instService.checkIfDupInstByName("", instForm.getInstShortName());
+        if(dupshortname){
+            return returnSuccess("机构简称重复");
+        }
+        Boolean dupname = instService.checkIfDupInstByName(instForm.getInstName(), "");
+        if(dupname){
+            return returnSuccess("机构全称重复");
+        }
+        
+        //检查费率
+        String error = instService.checkFees(instForm);
+        if(StringUtils.isNotBlank(error)){
+            return returnError(error);
+        }
+        
+        //如果category == all, 则默认为0
+        if("all".equals(instForm.getCategory())){
+            instForm.setCategory(Constant.CATEGORY_DEFAULT);
+        }
+        
+        //新增机构
+        String inst = "";
+        try {
+            inst = instService.createNewInst(instForm, userBO);
+        } catch (Exception e) {
+            e.printStackTrace();
+            if(e instanceof ErrorException){
+                return returnError(e.getMessage());
+            }else {
+                return returnError("系统异常");
+            }
+        }
+        
+        return returnSuccess("新增机构成功, 机构号为:" + inst);
+        
     }
     
     @RequestMapping(value = "/update_inst", method = RequestMethod.POST)
@@ -239,45 +281,7 @@ public class InstController extends BaseController {
         
     }
     
-    @RequestMapping(value = "/add_new_inst", method = RequestMethod.POST)
-    @ResponseBody
-    @RequiresAuthentication
-    public Map toAddNewInst(HttpServletRequest request, HttpServletResponse response, ModelAndView modelAndView, @ModelAttribute("instForm") InstForm instForm) {
-        
-        UserBO userBO = getCurrentUser();
-        
-        log.info("机构开户");
-        Boolean dupshortname = instService.checkIfDupInstByName("", instForm.getInstShortName());
-        if(dupshortname){
-            return returnSuccess("机构简称重复");
-        }
-        Boolean dupname = instService.checkIfDupInstByName(instForm.getInstName(), "");
-        if(dupname){
-            return returnSuccess("机构全称重复");
-        }
-    
-        //检查费率
-        String error = instService.checkFees(instForm);
-        if(StringUtils.isNotBlank(error)){
-            return returnError(error);
-        }
-        
-        //新增机构
-        String inst = "";
-        try {
-           inst = instService.createNewInst(instForm, userBO);
-        } catch (Exception e) {
-            e.printStackTrace();
-            if(e instanceof ErrorException){
-                return returnError(e.getMessage());
-            }else {
-                return returnError("系统异常");
-            }
-        }
-    
-        return returnSuccess("新增机构成功, 机构号为:" + inst);
-        
-    }
+ 
     
     
     @RequestMapping(value = "/toInstFeePage", method = RequestMethod.GET)

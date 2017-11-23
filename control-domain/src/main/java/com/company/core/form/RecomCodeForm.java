@@ -42,4 +42,7 @@ public class RecomCodeForm  extends BaseForm {
     private List<String> toDispatchList;
     private String toDispatchRecomCodes;
     
+    //上次查询agentId
+    private String lastSearchAgentId;
+    
 }
