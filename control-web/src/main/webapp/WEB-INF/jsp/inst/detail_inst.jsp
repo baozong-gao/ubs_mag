@@ -27,6 +27,8 @@
           action="${pageContext.request.contextPath}/inst/update_inst"
           method="post">
 
+        <input type="hidden" id="instId" name="instId" value="${instDetailForm.instId}">
+
         <div style="margin:15px auto 0; width:96%;">
             <div class="row" style="padding: 0 8px;">
 

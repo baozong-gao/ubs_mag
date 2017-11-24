@@ -152,6 +152,7 @@ public class InstController extends BaseController {
     }
     
     @RequestMapping(value = "/update_inst", method = RequestMethod.POST)
+    @ResponseBody
     public Map<String, Object> toUpdateInst (HttpServletRequest request, HttpServletResponse response, ModelAndView modelAndView, @ModelAttribute("instUpdateForm") InstForm instForm) {
     
         try {
@@ -170,7 +171,7 @@ public class InstController extends BaseController {
             return returnError("数据更新失败");
         }
     
-        return returnError("数据更新成功");
+        return returnSuccess("数据更新成功");
 
     }
     
@@ -211,7 +212,7 @@ public class InstController extends BaseController {
             return returnError("数据更新失败");
         }
         
-        return returnError("机构激活成功");
+        return returnSuccess("机构激活成功");
         
     }
     
@@ -245,7 +246,7 @@ public class InstController extends BaseController {
             return returnError("数据更新失败");
         }
         
-        return returnError("机构挂起成功");
+        return returnSuccess("机构挂起成功");
         
     }
     
@@ -277,7 +278,7 @@ public class InstController extends BaseController {
             return returnError("数据更新失败");
         }
         
-        return returnError("机构挂起成功");
+        return returnSuccess("机构挂起成功");
         
     }
     

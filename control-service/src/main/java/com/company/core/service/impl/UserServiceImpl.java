@@ -173,9 +173,9 @@ public class UserServiceImpl implements UserService {
     
             //分配对应的权限
             if (UserConstant.USER_INST.equals(userBO.getUsrType())) {
-                addAcctAuthority(userBO.getUsrId(), Constant.INST_ROLE_AUTH_ID);
+                addAcctAuthority(Constant.INST_ROLE_AUTH_ID, userBO.getUsrId());
             } else if (UserConstant.USER_AGENT.equals(userBO.getUsrType())) {
-                addAcctAuthority(userBO.getUsrId(), Constant.AGENT_ROLE_AUTH_ID);
+                addAcctAuthority(Constant.AGENT_ROLE_AUTH_ID, userBO.getUsrId());
             }
         }
         
@@ -301,15 +301,15 @@ public class UserServiceImpl implements UserService {
         return resultMap;
     }
 
-    public Map addAcctAuthority(String id, String uid) {
+    public Map addAcctAuthority(String roleId, String userId) {
         Map resultMap = new HashMap();
 
         TblBTSSysRoleDOExample roleDOExample = new TblBTSSysRoleDOExample();
-        TblBTSSysRoleDO roleDO = tblBTSSysRoleDOMapper.selectByPrimaryKey(id);
+        TblBTSSysRoleDO roleDO = tblBTSSysRoleDOMapper.selectByPrimaryKey(roleId);
 
         TblBTSSysUsrRoleDO usrRoleDO = new TblBTSSysUsrRoleDO();
-        usrRoleDO.setUsrId(uid);
-        usrRoleDO.setRoleId(id);
+        usrRoleDO.setUsrId(userId);
+        usrRoleDO.setRoleId(roleId);
         usrRoleDO.setUsrRoleRemark(roleDO.getRoleName());
         tblBTSSysUsrRoleDOMapper.insert(usrRoleDO);
         resultMap.put("statusCode", 200);

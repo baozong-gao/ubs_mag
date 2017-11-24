@@ -147,7 +147,7 @@ public class ComconFuncController {
     private SelectBO initialSelectBo(){
         SelectBO selectBO = new SelectBO();
         selectBO.setValue("all");
-        selectBO.setLabel("所有代理");
+        selectBO.setLabel("-请选择-");
         return selectBO;
     }
     

@@ -88,7 +88,7 @@ public class UCInstBiz {
     
     public int updateInst(UcInstDo ucInstDo){
         
-        return ucInstDoMapper.updateByPrimaryKey(ucInstDo);
+        return ucInstDoMapper.updateByPrimaryKeySelective(ucInstDo);
         
     }
     
@@ -100,7 +100,7 @@ public class UCInstBiz {
     
     public int updateInstInfo(UcInstInfoDo ucInstInfoDo){
         
-        return ucInstInfoDoMapper.updateByPrimaryKey(ucInstInfoDo);
+        return ucInstInfoDoMapper.updateByPrimaryKeySelective(ucInstInfoDo);
         
     }
     

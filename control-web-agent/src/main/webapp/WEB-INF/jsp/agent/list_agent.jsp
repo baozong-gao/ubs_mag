@@ -98,7 +98,7 @@
                 <a href="${pageContext.request.contextPath}/agent/activate_agent?agentId=<c:out value="${record.agentId}"/>" class="btn btn-green" data-toggle="doajax" <c:if test="${record.status=='E'}"> disabled=true </c:if>>激活</a>
                 <a href="${pageContext.request.contextPath}/agent/disable_agent?agentId=<c:out value="${record.agentId}"/>" class="btn btn-blue" data-toggle="doajax" data-confirm-msg="确定？" <c:if test="${record.status=='D'}"> disabled=true </c:if>>禁用</a>
                 <a href="${pageContext.request.contextPath}/agent/cancel_agent?agentId=<c:out value="${record.agentId}"/>" class="btn btn-red" data-toggle="doajax" data-confirm-msg="确定？" <c:if test="${record.status=='C'}"> disabled=true </c:if>>注销</a>
-                <a href="${pageContext.request.contextPath}/agent/detailPage?agentId=<c:out value="${record.agentId}"/>" class="btn btn-primary" data-toggle="navtab" data-id="navtab-agent-detail" data-title="代理信息查询">详细</a>
+                <a href="${pageContext.request.contextPath}/agent/detailPage?agentId=<c:out value="${record.agentId}"/>" class="btn btn-primary" data-toggle="navtab" data-id="navtab-agent-detail" data-title="代理详细信息">详细</a>
             </td>
             </tr>
         </c:forEach>

@@ -46,6 +46,7 @@
                     <option value="N">新申请</option>
                     <option value="E">已激活</option>
                     <option  value="D">被禁用</option>
+                    <option  value="C">已注销</option>
                 </select>&nbsp;
             </div>
 

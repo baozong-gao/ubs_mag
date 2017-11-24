@@ -67,8 +67,6 @@ public class RecomCodeController extends BaseController {
                 return returnError("机构状态不允许生成注册码");
             }
             
-            
-            //如果代理商号为空, 未进行选择,  则默认使用机构自身的代理
             recomCodeService.createRecomCodes(recomCodeForm, userBO);
             
         } catch (Exception e) {
@@ -89,17 +87,18 @@ public class RecomCodeController extends BaseController {
         List<UcInstDo> ucInstDoList = instService.getInstListByStatus(StatusConstant.STATUS_ENABLE);
         modelAndView.getModel().put("instList", ucInstDoList);
     
-        //获取系统默认的机构
-        UcInstDo ucInstDo = instService.getTheDefaultInst();
+        //获取-激活状态下的代理列表
+        List<UcAgentDo> ucAgentDoList = agentService.getAgentListForDropDown("","", StatusConstant.STATUS_ENABLE);
         
         RecomCodeForm recomCodeForm = new RecomCodeForm();
-        //recomCodeForm.setInstId(ucInstDo.getInstId());
+        
         //获取该机构下的所有注册码信息
         Pagination page= recomCodeService.getAllRecomcodes(recomCodeForm);
         recomCodeForm.setPagination(page);
         
         modelAndView.getModel().put("recomCodeListForm", recomCodeForm);
         modelAndView.getModel().put("instList", ucInstDoList);
+        modelAndView.getModel().put("agentList", ucAgentDoList);
         modelAndView.setViewName("/recomCode/list_recom_code");
         return modelAndView;
     }
@@ -114,12 +113,16 @@ public class RecomCodeController extends BaseController {
         //获取-激活状态下的机构列表
         List<UcInstDo> ucInstDoList = instService.getInstListByStatus(StatusConstant.STATUS_ENABLE);
     
+        //获取-激活状态下的代理列表
+        List<UcAgentDo> ucAgentDoList = agentService.getAgentListForDropDown("","", StatusConstant.STATUS_ENABLE);
+    
         //获取该机构下的所有注册码信息
         Pagination page= recomCodeService.getAllRecomcodes(recomCodeForm);
         recomCodeForm.setPagination(page);
     
         modelAndView.getModel().put("recomCodeListForm", recomCodeForm);
         modelAndView.getModel().put("instList", ucInstDoList);
+        modelAndView.getModel().put("agentList", ucAgentDoList);
         modelAndView.setViewName("/recomCode/list_recom_code");
         return modelAndView;
     }
@@ -133,29 +136,16 @@ public class RecomCodeController extends BaseController {
 
         //获取-激活状态下的机构列表
         List<UcInstDo> ucInstDoList = instService.getInstListByStatus(StatusConstant.STATUS_ENABLE);
-
-//        if(StringUtils.isBlank(recomCodeForm.getLastSearchAgentId())){
-//            recomCodeForm.setLastSearchAgentId(recomCodeForm.getAgentId());
-//        } else if (StringUtils.isBlank(recomCodeForm.getAgentId())){
-//            int pageCurrent = Integer.parseInt(recomCodeForm.getPageCurrent());
-//            if(pageCurrent > 1){
-//                recomCodeForm.setAgentId(recomCodeForm.getLastSearchAgentId());
-//            }
-//        }
     
-        int pageCurrent = Integer.parseInt(recomCodeForm.getPageCurrent());
-        if(pageCurrent > 1){
-            recomCodeForm.setAgentId(recomCodeForm.getLastSearchAgentId());
-        } else {
-            recomCodeForm.setLastSearchAgentId(recomCodeForm.getAgentId());
-        }
-        
+        //获取-激活状态下的代理列表
+        List<UcAgentDo> ucAgentDoList = agentService.getAgentListForDropDown("","", StatusConstant.STATUS_ENABLE);
+    
         //获取该机构下的所有注册码信息
         Pagination page= recomCodeService.getAllRecomcodes(recomCodeForm);
         recomCodeForm.setPagination(page);
-        recomCodeForm.setLastSearchAgentId(recomCodeForm.getAgentId());
         modelAndView.getModel().put("recomCodeListForm", recomCodeForm);
         modelAndView.getModel().put("instList", ucInstDoList);
+        modelAndView.getModel().put("agentList", ucAgentDoList);
         modelAndView.setViewName("/recomCode/list_recom_code");
         return modelAndView;
 
@@ -354,5 +344,67 @@ public class RecomCodeController extends BaseController {
         }
         return returnSuccess(mesage);
     }
+    
+    
+    /**
+     * 注册码激活
+     */
+    @RequestMapping(value = "/activate", method = RequestMethod.GET)
+    @ResponseBody
+    public Map toActivate (HttpServletRequest request, HttpServletResponse response, ModelAndView modelAndView) {
+        
+        UserBO userBO = getCurrentUser();
+        String recomCode = request.getParameter("recomCode");
+        if(StringUtils.isBlank(recomCode)){
+            returnError("注册码为空无法激活");
+        }
+        
+        UcReccomCodeCntlDo ucReccomCodeCntlDo = recomCodeService.getRecomCode(recomCode);
+        if(ucReccomCodeCntlDo == null){
+            returnError("注册码非法无法激活");
+        }
+        if(StatusConstant.RECOMCODE_STATUS_ENABLE.equals(ucReccomCodeCntlDo.getStatus())){
+            returnError("注册码已经激活无法再次激活");
+        }
+        
+        return returnSuccess("下发成功");
+    }
+    
+    /**
+     * 注册码激活
+     */
+    @RequestMapping(value = "/disable", method = RequestMethod.GET)
+    @ResponseBody
+    public Map toDisable (HttpServletRequest request, HttpServletResponse response, ModelAndView modelAndView) {
+        
+        UserBO userBO = getCurrentUser();
+        String recomCode = request.getParameter("recomCode");
+        if(StringUtils.isBlank(recomCode)){
+            returnError("注册码为空无法挂起");
+        }
+        
+        UcReccomCodeCntlDo ucReccomCodeCntlDo = recomCodeService.getRecomCode(recomCode);
+        if(ucReccomCodeCntlDo == null){
+            returnError("注册码非法无法挂起");
+        }
+        if(StatusConstant.RECOMCODE_STATUS_ENABLE.equals(ucReccomCodeCntlDo.getStatus())){
+            returnError("注册码已经激活无法挂起");
+        }
+        if(StatusConstant.RECOMCODE_STATUS_DISABLE.equals(ucReccomCodeCntlDo.getStatus())){
+            returnError("注册码已经挂起无法再次挂起");
+        }
+        if(StatusConstant.RECOMCODE_STATUS_USED.equals(ucReccomCodeCntlDo.getStatus())){
+            returnError("注册码已经被注册无法挂起");
+        }
+        if(StatusConstant.RECOMCODE_STATUS_MATURED.equals(ucReccomCodeCntlDo.getStatus())){
+            returnError("注册码已经过期无法挂起");
+        }
+    
+        //挂起
+        recomCodeService.disableRecomCode(recomCode);
+        
+        return returnSuccess("注册码挂起成功");
+    }
+    
     
 }

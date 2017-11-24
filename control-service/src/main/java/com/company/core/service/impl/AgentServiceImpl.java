@@ -1,5 +1,6 @@
 package com.company.core.service.impl;
 
+import com.alibaba.druid.sql.visitor.functions.Ucase;
 import com.company.core.biz.*;
 import com.company.core.constant.*;
 import com.company.core.domain.AgentBO;
@@ -17,10 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @Author: weiwankun
@@ -66,6 +64,42 @@ public class AgentServiceImpl implements AgentService {
         return ucAgentBiz.selectAllAgents(instId, agentType, status, "");
         
     }
+    
+    
+    //为下拉框重新定义返回
+    @Override
+    public List<UcAgentDo> getAgentListForDropDown(String instId, String agentType, String status) {
+    
+        List<UcAgentDo> list = new ArrayList<>();
+        UcAgentLevelDo ucAgentLevelDo = null;
+        String agentName = "";
+        String agentSortedKey = "";
+        TreeMap treeMap = new TreeMap();
+        List<UcAgentDo> ucAgentDoList =  ucAgentBiz.selectAllAgents(instId, agentType, status, "");
+        for(UcAgentDo ucAgentDo: ucAgentDoList){
+            ucAgentLevelDo = new UcAgentLevelDo();
+            agentName = "";
+            ucAgentLevelDo = getAgentLevel(ucAgentDo.getAgentId());
+            if(ucAgentLevelDo == null){
+                agentName = "1级:" + ucAgentDo.getAgentName();
+                agentSortedKey = "1级:" + ucAgentDo.getAgentId();
+            } else {
+                agentName = ucAgentLevelDo.getAgentLevel() + "级:" + ucAgentDo.getAgentName();
+                agentSortedKey = ucAgentLevelDo.getAgentLevel() + "级:" + ucAgentDo.getAgentId();
+            }
+            ucAgentDo.setAgentName(agentName);
+            treeMap.put(agentSortedKey, ucAgentDo);
+        }
+        Set set = treeMap.keySet();
+        for(Iterator<String> it = set.iterator(); it.hasNext();){
+            String key = it.next();
+            UcAgentDo value = (UcAgentDo) treeMap.get(key);
+            list.add(value);
+        }
+
+        return list;
+    }
+    
     
     @Override
     public List<String> getAgentIdList(String instId, String status) {

@@ -8,7 +8,6 @@ import com.company.core.entity.UcAgentLevelDo;
 import com.company.core.entity.UcInstDo;
 import com.company.core.entity.UcProdDo;
 import com.company.core.form.AgentForm;
-import com.company.core.form.InstForm;
 import com.company.core.form.Pagination;
 import com.company.core.service.AgentService;
 import com.company.core.service.InstService;
@@ -47,8 +46,8 @@ public class AgentController extends BaseController {
         List<UcInstDo> ucInstDoList = instService.getInstListByStatus(StatusConstant.STATUS_ENABLE);
         modelAndView.getModel().put("instList", ucInstDoList);
     
-        List<UcProdDo> ucProdDos = prodCategoryService.getProdList();
-        modelAndView.getModel().put("prodList", ucProdDos);
+//        List<UcProdDo> ucProdDos = prodCategoryService.getProdList();
+//        modelAndView.getModel().put("prodList", ucProdDos);
         
         modelAndView.setViewName("/agent/add_agent");
         return modelAndView;

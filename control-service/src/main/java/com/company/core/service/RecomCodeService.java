@@ -30,5 +30,8 @@ public interface RecomCodeService {
     void dispatchRecomCode(String agentId, String toAgentId, int dispatchCount, String user);
     
     @Transactional
+    void disableRecomCode(String recomCode);
+    
+    @Transactional
     String dispatchRecomCodeSelected(List<String> recomCodeList, String toAgentId, String user);
 }

@@ -169,28 +169,64 @@ public class InstServiceImpl implements InstService {
         ucFeeDo.setCategory(ucInstDo.getCategory());
         ucFeeDo.setCategoryId(ucInstDo.getCategoryId());
         ucFeeDo.setFeeType("DF");
+        int dCount = 0;
+        int eCount = 0;
         UcFeeDo df = ucFeeBiz.getFee(ucFeeDo);
-        if(df == null){
-            result.put("error", "默认固定费用未配置");
+//        if(df == null){
+//            result.put("error", "默认固定费用未配置");
+//        } else {
+//            dCount ++;
+//        }
+//
+//        ucFeeDo.setFeeType("DR");
+//        UcFeeDo dr = ucFeeBiz.getFee(ucFeeDo);
+//        if(dr == null){
+//            result.put("error", "默认费率未配置");
+//            dCount ++;
+//        }
+//
+//        ucFeeDo.setFeeType("EF");
+//        UcFeeDo ef = ucFeeBiz.getFee(ucFeeDo);
+//        if(ef == null){
+//            result.put("error", "实收固定费用未配置");
+//            eCount ++;
+//        }
+//
+//        ucFeeDo.setFeeType("ER");
+//        UcFeeDo er = ucFeeBiz.getFee(ucFeeDo);
+//        if(er == null){
+//            result.put("error", "实收费率未配置");
+//            eCount ++;
+//        }
+        if(df != null){
+            dCount ++;
         }
     
         ucFeeDo.setFeeType("DR");
         UcFeeDo dr = ucFeeBiz.getFee(ucFeeDo);
         if(dr != null){
-            result.put("error", "默认费率未配置");
+            dCount ++;
         }
     
         ucFeeDo.setFeeType("EF");
         UcFeeDo ef = ucFeeBiz.getFee(ucFeeDo);
         if(ef != null){
-            result.put("error", "实收固定费用未配置");
+            eCount ++;
         }
     
         ucFeeDo.setFeeType("ER");
         UcFeeDo er = ucFeeBiz.getFee(ucFeeDo);
         if(er != null){
-            result.put("error", "实收费率未配置");
+            eCount ++;
         }
+        
+        if(dCount == 0){
+            result.put("error", "至少设置一种默认费率");
+        }
+        if(eCount == 0){
+            result.put("error", "至少设置一种实收费率");
+        }
+        
         return result;
     }
     
@@ -781,7 +817,7 @@ public class InstServiceImpl implements InstService {
         ucFeeDo.setUserCode(instForm.getInstId());
         
         //之后扩充时, 需要替换掉
-        ucFeeDo.setCategory("1");
+        ucFeeDo.setCategory(Constant.CATEGORY_DEFAULT);
         ucFeeDo.setCategoryId("P001");
         ucFeeDo.setFeeType("DF");
         UcFeeDo df = ucFeeBiz.getFee(ucFeeDo);
@@ -856,10 +892,13 @@ public class InstServiceImpl implements InstService {
                 return instId;
             }
         } else {
-            return instId.substring(phone.length() - 6);
+            return phone.substring(phone.length() - 6);
         }
     }
 
-    
-    
+//    public static void main(String arg[]){
+//        String pd = getPassword("000082", "1838731");
+//        System.out.println("pd=" + pd);
+//    }
+//
 }

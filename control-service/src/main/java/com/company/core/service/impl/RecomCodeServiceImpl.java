@@ -53,27 +53,44 @@ public class RecomCodeServiceImpl implements RecomCodeService {
 
         int totalCount = Integer.parseInt(recomCodeForm.getRecomCodeCount());
         log.info("生成注册码的个数:" + totalCount + "个");
-        String batchId = sequenceBiz.genRecomCodeBatchId();
+        String batchId = sequenceBiz.genRecomCodeBatchId(); //批次号
         String expireDate = "20991231";
         if(StringUtils.isNotBlank(recomCodeForm.getExpireDays())){
             expireDate = DateUtil.getAnotherDate(180, 5); //半年之后
         }
     
-        //获取机构本身的代理
+        //如果没有选择下发的一级代理, 则默认下发给机构自己的默认代理
         String agentId = "";
         if(StringUtils.isBlank(recomCodeForm.getAgentId())){
             UcAgentDo ucAgentDo = agentService.getAgentOfInstOwn(recomCodeForm.getInstId());
             if(ucAgentDo == null){
-                throw new ErrorException("机构代理没有开户");
+                throw new ErrorException("机构默认目标代理没有开通, 请确认");
             }
             agentId = ucAgentDo.getAgentId();
         }else {
             agentId = recomCodeForm.getAgentId();
         }
+        
+        //检查代理的状态
+        UcAgentDo ucAgentDo = agentService.getAgent(agentId);
+        if(ucAgentDo == null){
+            throw new ErrorException("下发目标代理未找到, 请核实");
+        }
+        if(!StatusConstant.STATUS_ENABLE.equals(ucAgentDo.getStatus())){
+            throw new ErrorException("下发目标代理未激活");
+        }
+        
+        //生成注册码
+        String catagoryId = "";
+        if(StringUtils.isBlank(recomCodeForm.getCategoryId()) || "all".equals(recomCodeForm.getCategoryId())){
+            catagoryId = "";
+        } else {
+            catagoryId = recomCodeForm.getCategoryId();
+        }
         String userType = UserConstant.USER_AGENT;
-    
         for(int i = 1; i <= totalCount; i++){
             ucReccomCodeCntlDo = new UcReccomCodeCntlDo();
+            
             String newRecom = RandomCodesUtils.genRecomCode(Constant.RECOM_CODE_LENGTH_6);
             while(checkIfRecomCodeExisted(newRecom)){
                 newRecom = RandomCodesUtils.genRecomCode(Constant.RECOM_CODE_LENGTH_6);
@@ -81,15 +98,14 @@ public class RecomCodeServiceImpl implements RecomCodeService {
             ucReccomCodeCntlDo.setReccomCode(newRecom);
             ucReccomCodeCntlDo.setType(recomCodeForm.getRecomCodeType());
             ucReccomCodeCntlDo.setCategory(recomCodeForm.getCategory());
-            ucReccomCodeCntlDo.setCategoryId(recomCodeForm.getCategoryId());
+            ucReccomCodeCntlDo.setCategoryId(catagoryId);
+            
             ucReccomCodeCntlDo.setBatchId(batchId);
             ucReccomCodeCntlDo.setReccomCodeSeq(sequenceBiz.genRecomCodeSeq());
             ucReccomCodeCntlDo.setReccomCodePath("");
-//            ucReccomCodeCntlDo.setStatus(StatusConstant.RECOMCODE_STATUS_NEW);
-            ucReccomCodeCntlDo.setStatus(StatusConstant.RECOMCODE_STATUS_ENABLE);
-//            ucReccomCodeCntlDo.setMaxUstingTimes(recomCodeForm.);
+            ucReccomCodeCntlDo.setStatus(StatusConstant.RECOMCODE_STATUS_NEW);
             ucReccomCodeCntlDo.setPwdRequired(recomCodeForm.getPwdRequired());
-            ucReccomCodeCntlDo.setReccomCodePwd(RandomCodesUtils.genRandomNumber(6));
+            ucReccomCodeCntlDo.setReccomCodePwd("");  //密码
             ucReccomCodeCntlDo.setUserType(userType);
             ucReccomCodeCntlDo.setUserCode(agentId);
             ucReccomCodeCntlDo.setExpireDate(expireDate);
@@ -270,6 +286,18 @@ public class RecomCodeServiceImpl implements RecomCodeService {
         }
     }
     
+    /**
+     * 挂起某一个注册码
+     */
+    @Override
+    @Transactional
+    public void disableRecomCode(String recomCode) {
+        
+        UcReccomCodeCntlDo ucReccomCodeCntlDo = ucRecomCodeControlBiz.selectByPrimaryKey(recomCode);
+        ucReccomCodeCntlDo.setStatus(StatusConstant.RECOMCODE_STATUS_DISABLE);
+        ucRecomCodeControlBiz.updateSelective(ucReccomCodeCntlDo);
+        
+    }
     
     /**
      * 下发指定推荐码到指定代理

@@ -27,6 +27,9 @@ public interface AgentService {
     
     List<UcAgentDo> getAgentList(String instId, String agentType, String status);
     
+    //为下拉框重新定义返回
+    List<UcAgentDo> getAgentListForDropDown(String instId, String agentType, String status);
+    
     public List<String> getAgentIdList(String instId, String status);
     
     List<UcAgentDo> getAgentIdListOfAgentOwnEnabled(String agentId);

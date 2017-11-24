@@ -6,7 +6,15 @@
             src="http://static.runoob.com/assets/jquery-validation-1.14.0/dist/jquery.validate.min.js"></script>
     <title>新增注册码</title>
 </head>
+<style>
 
+    .labelblock{
+        display: inline-block;
+        width: 7rem;
+        text-align: left;
+    }
+
+</style>
 
 <body>
 <div class="bjui-pageHeader"></div>
@@ -26,7 +34,7 @@
                         <div class="panel-body">
                             <div class="row-input" style="margin: 20px 0 20px; width: 100%">
                                 <div class="form-group col-md-6">
-                                    <label class="control-label">选择机构：</label>
+                                    <label class="control-label labelblock">选择机构：</label>
                                     <select name="instId" id="instId" data-toggle="selectpicker"    data-live-search="true"
                                             data-nextselect="#agentIdA"
                                             <%--<!-- status = E 代表enable 激活的状态-->--%>
@@ -42,7 +50,7 @@
                                 </div>
 
                                 <div class="form-group col-md-6">
-                                    <label class="control-label">选择代理：</label>
+                                    <label class="control-label labelblock">选择代理：</label>
                                     <select name="agentId" id="agentIdA" data-toggle="selectpicker" data-live-search="true"
                                             style="width: 134px">
                                         <option value="">--代理--</option>
@@ -51,8 +59,8 @@
                             </div>
 
                             <div class="row-input" style="margin: 20px 0 20px;">
-                                <div class="form-group col-md-4">
-                                    <label class="control-label">注册码类型：</label>
+                                <div class="form-group col-md-4" style="display: none">
+                                    <label class="control-label labelblock">注册码类型：</label>
                                     <select
                                             name="recomCodeType" id="recomCodeType"
                                             data-toggle="selectpicker">
@@ -62,45 +70,43 @@
                                     </select>&nbsp;
                                 </div>
 
-                                <div class="form-group col-md-4">
-                                    <label class="control-label">机构类别：</label>
-                                    <select
-                                            name="category" id="category" data-rule="机构类型:required;"
-                                            data-toggle="selectpicker">
-                                        <option value="0">默认-类型</option>
-                                        <option value="1">预留类别1</option>
-                                        <option value="2">预留类型2</option>
+                                <div class="form-group col-md-6">
+                                    <label class="control-label labelblock">类别：</label>
+                                    <select name="category" id="category" data-rule="机构类型:required;"
+                                            data-toggle="selectpicker" data-live-search="true"
+                                            data-nextselect="#categoryIdA"
+                                            data-refurl="${pageContext.request.contextPath}/comcon/select_catagory_ids?catagory={value}">
+                                        <option value="all">-请选择-</option>
+                                        <option value="0">基础业务</option>
                                     </select>&nbsp;
                                 </div>
-                                <div class="form-group col-md-4">
-                                    <label class="control-label">类别ID&nbsp;：</label>
+                                <div class="form-group col-md-6">
+                                    <label class="control-label labelblock">类别ID&nbsp;：</label>
                                     <select
-                                            name="categoryId" id="categoryId" data-rule="机构类型ID:required;"
+                                            name="categoryId" id="categoryIdA" data-rule="类型ID:required;"
                                             data-toggle="selectpicker">
-                                        <option value="0">请选择</option>
-                                        <option value="1">服务</option>
-                                        <option value="2">接口</option>
+                                        <option style="width: 60px; display: inline-block" value="">-请选择-</option>
                                     </select>&nbsp;
                                 </div>
                             </div>
 
                             <div class="row-input" style="margin: 20px 0 20px;">
-                                <div class="form-group col-md-4" style="padding-left: 15px">
-                                    <label class="control-label">是否加密</label>
+                                <div class="form-group col-md-6" style="padding-left: 15px">
+                                    <label class="control-label labelblock">是否加密</label>
                                     <input name="pwdRequired" id="pwdRequired" value="Y" data-toggle="icheck"
                                            checked="" type="checkbox" onclick="clickCheckBox()">
-                                    <%--<input type="text"--%>
-                                           <%--name="recomCodePwd" id="recomCodePwd" size="10"--%>
-                                           <%--placeholder="注册码密码"/>&nbsp;--%>
                                 </div>
-                                <div class="form-group col-md-4" style="padding-left: 15px">
-                                    <label class="control-label">过期天数:</label>
+                                <div class="form-group col-md-6" style="padding-left: 15px">
+                                    <label class="control-label labelblock">过期天数:</label>
                                     <input type="text"
                                            name="expireDays" id="expireDays" size="10"
                                            placeholder="180"/>天&nbsp;
                                 </div>
-                                <div class="form-group col-md-4" style="padding-left: 15px">
-                                    <label class="control-label">单价</label>
+                            </div>
+
+                            <div class="row-input" style="margin: 20px 0 20px;">
+                                <div class="form-group" style="padding-left: 15px">
+                                    <label class="control-label labelblock">单价</label>
                                     <input type="text"
                                            name="price" id="price" size="10"
                                            placeholder="单位:元"/>&nbsp;
@@ -109,7 +115,7 @@
 
                             <div class="row-input" style="margin: 20px 0 20px;">
                                 <div class="form-group" style="padding-left: 15px">
-                                    <label class="control-label">生成个数:</label>
+                                    <label class="control-label labelblock">生成个数:</label>
                                     <input type="text"
                                            name="recomCodeCount" id="recomCodeCount" size="10"
                                            placeholder="注册码个数"/>&nbsp;
@@ -131,12 +137,6 @@
 </body>
 
 <script type="text/javascript">
-
-//    $("#pwdRequired").onclick();
-
-    function clickCheckBox() {
-        alert("0");
-    }
 
 </script>
 
