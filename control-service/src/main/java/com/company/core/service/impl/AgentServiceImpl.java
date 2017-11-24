@@ -916,8 +916,8 @@ public class AgentServiceImpl implements AgentService {
         userBo.setUsrUpdateBy(shiroUserBo.getUsrName());
         
         userBo.setUsrType(UserConstant.USER_AGENT);
-        userBo.setUsrCode(ucAgentDo.getAgentId());
-        userBo.setUsrCodeName(ucAgentInfoDo.getAgentShortName());
+        userBo.setUserCode(ucAgentDo.getAgentId());
+        userBo.setUserCodeName(ucAgentInfoDo.getAgentShortName());
         
         userService.addNewUsr(userBo);
         

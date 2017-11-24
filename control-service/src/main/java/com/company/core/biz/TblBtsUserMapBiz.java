@@ -34,6 +34,10 @@ public class TblBtsUserMapBiz {
         return tblBtsUsrMapDoMapper.selectByExample(tblBtsUsrMapDoExample);
     }
     
+    public long countByExample(TblBtsUsrMapDoExample tblBtsUsrMapDoExample){
+        return tblBtsUsrMapDoMapper.countByExample(tblBtsUsrMapDoExample);
+    }
+    
     public List<String> getLoginList(String userType, String userCode){
         
         List<String> idList = new ArrayList<>();

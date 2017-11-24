@@ -25,9 +25,11 @@ public class UserBO extends BaseBO implements Serializable {
 
     private String            usrType;
     
-    private String            usrCode;   //wwk
+    private String            userCodeType; //wwk
     
-    private String            usrCodeName;   //wwk
+    private String            userCode;   //wwk
+    
+    private String            userCodeName;   //wwk
 
     private String            usrDisableTag;
 

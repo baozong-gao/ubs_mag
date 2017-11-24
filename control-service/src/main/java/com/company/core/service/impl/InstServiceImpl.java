@@ -876,8 +876,8 @@ public class InstServiceImpl implements InstService {
         userBo.setUsrUpdateBy(shiroUserBo.getUsrName());
     
         userBo.setUsrType(UserConstant.USER_INST);
-        userBo.setUsrCode(ucInstDo.getInstId());
-        userBo.setUsrCodeName(ucInstInfoDo.getInstShortName());
+        userBo.setUserCode(ucInstDo.getInstId());
+        userBo.setUserCodeName(ucInstInfoDo.getInstShortName());
     
         userService.addNewUsr(userBo);
     

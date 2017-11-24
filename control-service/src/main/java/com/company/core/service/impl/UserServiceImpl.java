@@ -139,7 +139,7 @@ public class UserServiceImpl implements UserService {
         }
     
         //绑定登录ID跟用户  wwk
-        if (StringUtils.isNotBlank(userBO.getUsrCode())) {
+        if (StringUtils.isNotBlank(userBO.getUserCode())) {
             logger.info("进行商户关联绑定");
             // 添加角色关联
             TblBtsUsrMapDoKey tblBtsUsrMapDoKey = new TblBtsUsrMapDoKey();
@@ -153,8 +153,8 @@ public class UserServiceImpl implements UserService {
             tblBtsUsrMapDo.setLoginSeq(userBO.getUsrId());
             tblBtsUsrMapDo.setLoginId(userBO.getUsrName());
             tblBtsUsrMapDo.setUsrType(userBO.getUsrType());
-            tblBtsUsrMapDo.setUserCode(userBO.getUsrCode());
-            tblBtsUsrMapDo.setUserName(userBO.getUsrCodeName());
+            tblBtsUsrMapDo.setUserCode(userBO.getUserCode());
+            tblBtsUsrMapDo.setUserName(userBO.getUserCodeName());
     
             tblBtsUsrMapDo.setCreateUser(userBO.getUsrName());
             tblBtsUsrMapDo.setCreateSource(SystemConstant.DEFAULT_SOURCE_CODE);
@@ -192,8 +192,14 @@ public class UserServiceImpl implements UserService {
         PageHelper.startPage(userBO.getPageCurrent(), userBO.getPageSize());
         List<TblBTSSysUsrDO> usrDOList = tblBTSSysUsrDOMapper
             .selectByExample(tblBTSSysUsrDOExample);
+    
+        UserBO user = new UserBO();
+        TblBtsUsrMapDo userMapDo = new TblBtsUsrMapDo();
+        TblBtsUsrMapDoKey userMapKey = new TblBtsUsrMapDoKey();
         for (TblBTSSysUsrDO usrDO : usrDOList) {
-            UserBO user = new UserBO();
+            user = new UserBO();
+            userMapDo = new TblBtsUsrMapDo();
+            userMapKey = new TblBtsUsrMapDoKey();
             user.setUsrId(usrDO.getUsrId());
             user.setUsrName(usrDO.getUsrName());
             user.setUsrPwd(usrDO.getUsrPwd());
@@ -205,29 +211,41 @@ public class UserServiceImpl implements UserService {
                 user.setUsrDisableTag("禁用");
             }
             user.setUsrEmail(usrDO.getUsrEmail());
+    
+            userMapKey.setLoginSeq(usrDO.getUsrId());
+            userMapKey.setLoginId(usrDO.getUsrName());
+            userMapDo = tblBtsUserMapBiz.selectByPrimaryKey(userMapKey);
+            if(userMapDo != null){
+                user.setUserCodeType(userMapDo.getUsrType());
+                user.setUserCode(userMapDo.getUserCode());
+                user.setUserCodeName(userMapDo.getUserName());
+            }
+            
             userList.add(user);
         }
         pagination.addResult(userList);
         return pagination;
-
     }
 
     public Pagination<UserBO> getTheUsr(UserBO userBO) {
-
+    
+        //按照账户查询
         TblBTSSysUsrDOExample tblBTSSysUsrDOExample = new TblBTSSysUsrDOExample();
         TblBTSSysUsrDOExample.Criteria cri = tblBTSSysUsrDOExample.createCriteria();
         if (!(userBO.getUsrName() == null || userBO.getUsrName().trim().equals(""))) {
-            cri.andUsrNameEqualTo(userBO.getUsrName());
+//            cri.andUsrNameEqualTo(userBO.getUsrName());
+            cri.andUsrNameLike("%" + userBO.getUsrName() + "%");
         }
-
         int count = tblBTSSysUsrDOMapper.countByExample(tblBTSSysUsrDOExample);
         Pagination pagination = new Pagination(count, userBO.getPageCurrent(),
             userBO.getPageSize());
         PageHelper.startPage(userBO.getPageCurrent(), userBO.getPageSize());
         List<TblBTSSysUsrDO> usrDOList = tblBTSSysUsrDOMapper
             .selectByExample(tblBTSSysUsrDOExample);
-
+        
         List<UserBO> userBOList = new ArrayList<UserBO>();
+        TblBtsUsrMapDo userMapDo = new TblBtsUsrMapDo();
+        TblBtsUsrMapDoKey userMapKey = new TblBtsUsrMapDoKey();
         for (TblBTSSysUsrDO usrDO : usrDOList) {
             UserBO user = new UserBO();
             user.setUsrId(usrDO.getUsrId());
@@ -240,7 +258,16 @@ public class UserServiceImpl implements UserService {
             } else {
                 user.setUsrDisableTag("禁用");
             }
-            //            user.setUsrDisableTag(usrDO.getUsrDisableTag());
+    
+            userMapKey.setLoginSeq(usrDO.getUsrId());
+            userMapKey.setLoginId(usrDO.getUsrName());
+            userMapDo = tblBtsUserMapBiz.selectByPrimaryKey(userMapKey);
+            if(userMapDo != null){
+                user.setUserCodeType(userMapDo.getUsrType());
+                user.setUserCode(userMapDo.getUserCode());
+                user.setUserCodeName(userMapDo.getUserName());
+            }
+            
             user.setUsrEmail(usrDO.getUsrEmail());
             userBOList.add(user);
         }
@@ -249,6 +276,65 @@ public class UserServiceImpl implements UserService {
         return pagination;
 
     }
+    
+    
+    /**
+     *
+     * @param userBO
+     * @return
+     */
+    public Pagination<UserBO> getUsrsByUserInfo(UserBO userBO) {
+        
+        //按照用户查
+        TblBtsUsrMapDoExample tblBtsUsrMapDoExample = new TblBtsUsrMapDoExample();
+        TblBtsUsrMapDoExample.Criteria criteria = tblBtsUsrMapDoExample.createCriteria();
+        if(StringUtils.isNotBlank(userBO.getUserCode()) && StringUtils.isNotBlank(userBO.getUserCode().trim())){
+            criteria.andUserCodeEqualTo(userBO.getUserCode().trim());
+        }
+        if(StringUtils.isNotBlank(userBO.getUserCodeName()) && StringUtils.isNotBlank(userBO.getUserCodeName().trim())){
+            criteria.andUserNameLike("%" + userBO.getUserCodeName().trim() + "%");
+        }
+        long c = tblBtsUserMapBiz.countByExample(tblBtsUsrMapDoExample);
+        Pagination pagination = new Pagination((int) c, userBO.getPageCurrent(),
+                userBO.getPageSize());
+        PageHelper.startPage(userBO.getPageCurrent(), userBO.getPageSize());
+        
+        List<TblBtsUsrMapDo> tblBtsUsrMapDoList = tblBtsUserMapBiz.selectByExample(tblBtsUsrMapDoExample);
+        
+        List<UserBO> userBOList = new ArrayList<UserBO>();
+        UserBO user = new UserBO();
+        TblBTSSysUsrDO tblBTSSysUsrDO = new TblBTSSysUsrDO();
+        for (TblBtsUsrMapDo usermapdo : tblBtsUsrMapDoList) {
+            user = new UserBO();
+            tblBTSSysUsrDO = new TblBTSSysUsrDO();
+            tblBTSSysUsrDO = tblBTSSysUsrDOMapper.selectByPrimaryKey(usermapdo.getLoginSeq());
+            if(tblBTSSysUsrDO == null){
+                continue;
+            }
+            user.setUsrId(tblBTSSysUsrDO.getUsrId());
+            user.setUsrName(tblBTSSysUsrDO.getUsrName());
+            user.setUsrPwd(tblBTSSysUsrDO.getUsrPwd());
+            user.setUsrRemark(tblBTSSysUsrDO.getUsrRemark());
+            if (tblBTSSysUsrDO.getUsrDisableTag().trim().equals("1")) {
+                user.setUsrDisableTag("启用");
+                
+            } else {
+                user.setUsrDisableTag("禁用");
+            }
+            user.setUsrEmail(tblBTSSysUsrDO.getUsrEmail());
+    
+            user.setUserCodeType(usermapdo.getUsrType());
+            user.setUserCode(usermapdo.getUserCode());
+            user.setUserCodeName(usermapdo.getUserName());
+            
+            userBOList.add(user);
+        }
+        pagination.addResult(userBOList);
+        
+        return pagination;
+        
+    }
+    
 
     private UserBO convertUsrDOToUserBO(TblBTSSysUsrDO tblBTSSysUsrDO) {
         UserBO userBO = new UserBO();

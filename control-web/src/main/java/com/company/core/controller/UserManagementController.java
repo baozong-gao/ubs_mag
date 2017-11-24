@@ -36,6 +36,7 @@ import com.company.core.service.RoleService;
 import com.company.core.service.UserService;
 import com.company.core.shiro.CustomCredentialsMatcher;
 import com.company.core.shiro.MonitorRealm;
+import org.springframework.web.servlet.ModelAndView;
 
 /**
  * Created by fireWorks on 2016/2/26.
@@ -128,7 +129,7 @@ public class UserManagementController extends BaseController{
                 return resultMap;
             }
             userBO.setUsrType(UserConstant.USER_INST);  //wwk
-            userBO.setUsrCode(instId);
+            userBO.setUserCode(instId);
         }
         if (StringUtils.isNotBlank(agentId)) {
             i ++;
@@ -139,7 +140,7 @@ public class UserManagementController extends BaseController{
                 return resultMap;
             }
             userBO.setUsrType(UserConstant.USER_AGENT);  //wwk
-            userBO.setUsrCode(agentId);
+            userBO.setUserCode(agentId);
         }
         if (i > 1) {
             resultMap.put("statusCode", 300);
@@ -189,17 +190,34 @@ public class UserManagementController extends BaseController{
     public String queryTheUser(@ModelAttribute("userManageForm") UserManageForm userManageForm) {
 
         UserBO userBO = new UserBO();
+        Boolean acctSearch = false;
+        Boolean userSearch = false;
+        
         if (!(userManageForm.getUsername() == null
               || userManageForm.getUsername().trim().equals(""))) {
             userBO.setUsrName(userManageForm.getUsername());
+            acctSearch = true;
+        }
+        if (StringUtils.isNotBlank(userManageForm.getUserCode()) && StringUtils.isNotBlank(userManageForm.getUserCode().trim())){
+            userBO.setUserCode(userManageForm.getUserCode());
+            userSearch = true;
+        }
+        if (StringUtils.isNotBlank(userManageForm.getUserCodeName()) && StringUtils.isNotBlank(userManageForm.getUserCodeName().trim())){
+            userBO.setUserCodeName(userManageForm.getUserCodeName());
+            userSearch = true;
         }
         String pageCurrent = userManageForm.getPageCurrent();
         String pageSize = userManageForm.getPageSize();
 
         userBO.setPageCurrent(Integer.valueOf(pageCurrent));
         userBO.setPageSize(Integer.valueOf(pageSize));
-
-        Pagination<UserBO> userBOPagination = userService.getTheUsr(userBO);
+    
+        Pagination<UserBO> userBOPagination = null;
+        if(userSearch) {
+            userBOPagination = userService.getUsrsByUserInfo(userBO);
+        } else {
+            userBOPagination = userService.getTheUsr(userBO);
+        }
 
         userManageForm.setPagination(userBOPagination);
 

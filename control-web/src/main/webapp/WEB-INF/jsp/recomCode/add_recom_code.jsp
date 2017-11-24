@@ -33,7 +33,7 @@
                         <div class="panel-heading"><h3 class="panel-title">注册码信息</h3></div>
                         <div class="panel-body">
                             <div class="row-input" style="margin: 20px 0 20px; width: 100%">
-                                <div class="form-group col-md-6">
+                                <div class="form-group" style="padding-left: 15px">
                                     <label class="control-label labelblock">选择机构：</label>
                                     <select name="instId" id="instId" data-toggle="selectpicker"    data-live-search="true"
                                             data-nextselect="#agentIdA"
@@ -49,13 +49,13 @@
                                     </select>
                                 </div>
 
-                                <div class="form-group col-md-6">
-                                    <label class="control-label labelblock">选择代理：</label>
-                                    <select name="agentId" id="agentIdA" data-toggle="selectpicker" data-live-search="true"
-                                            style="width: 134px">
-                                        <option value="">--代理--</option>
-                                    </select>
-                                </div>
+                                <%--<div class="form-group col-md-6">--%>
+                                    <%--<label class="control-label labelblock">选择代理：</label>--%>
+                                    <%--<select name="agentId" id="agentIdA" data-toggle="selectpicker" data-live-search="true"--%>
+                                            <%--style="width: 134px">--%>
+                                        <%--<option value="">--代理--</option>--%>
+                                    <%--</select>--%>
+                                <%--</div>--%>
                             </div>
 
                             <div class="row-input" style="margin: 20px 0 20px;">

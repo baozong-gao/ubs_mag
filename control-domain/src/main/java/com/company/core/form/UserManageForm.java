@@ -30,7 +30,13 @@ public class UserManageForm extends BaseForm {
     private String bindMer;
     
     private String bindUser;
-
+    
+    private String userCodeType;
+    
+    private String userCode;
+    
+    private String userCodeName;
+    
     public String getUsrid() {
         return usrId;
     }

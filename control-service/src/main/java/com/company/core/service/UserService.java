@@ -22,6 +22,8 @@ public interface UserService {
     Pagination<UserBO> getAllUsr(UserBO userBO);
 
     Pagination<UserBO> getTheUsr(UserBO userBO);
+    
+    Pagination<UserBO> getUsrsByUserInfo(UserBO userBO);
 
     Map cancelAcctAuthority(String id, String uid) throws Exception;
 

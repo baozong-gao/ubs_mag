@@ -19,11 +19,15 @@
     <div class="bjui-searchBar">
     	<table>
     	<tr>
-	        <td>查找账号：</td>
+	        <td>账号：</td>
 	        <td><input type="text" name="username" id="username" value="${userManageForm.username}"  size="15"></td>
+            <td>用户号：</td>
+	        <td><input type="text" name="userCode" id="userCode" value="${userManageForm.userCode}"  size="15"></td>
+            <td>用户名：</td>
+            <td><input type="text" name="userCodeName" id="userCodeName" value="${userManageForm.userCodeName}"  size="15"></td>
         	<td><a href="javascript:;" class="btn btn-default" data-toggle="reloadsearch" data-clear-query="true">重置</a></td>
         	<td><button type="submit" class="btn-default" data-icon="search">查询</button></td>
-        	<td><a href="${pageContext.request.contextPath}/userManagement/addnewpage" class="btn btn-green" data-toggle="dialog" data-width="450" data-height="350" data-id="dialog-normal" data-title="新增账户信息">新增用户</a></td>
+        	<td><a href="${pageContext.request.contextPath}/userManagement/addnewpage" class="btn btn-green" data-toggle="dialog" data-width="350" data-height="500" data-id="dialog-normal" data-title="新增账户信息">新增用户</a></td>
     	</tr>
     	</table>
     </div>
@@ -35,6 +39,8 @@
     <tr>
       <th align="center">账户ID</th>
       <th align="center">账户名</th>
+      <th align="center">关联用户</th>
+      <th align="center">用户名</th>
       <th align="center">组标识</th>
       <th align="center">状态</th>
       <th align="center">邮箱</th>
@@ -43,18 +49,28 @@
     </thead>
     <tbody>
 <c:forEach var="record" items="${userManageForm.pagination.list}" varStatus="status">
-<tr data-id="<c:out value="${record.usrId}"/>">
-      <td align="center"><c:out value="${record.usrId}"/></td>
-      <td align="center"><c:out value="${record.usrName}"/></td>
-      <td align="center"><c:out value="${record.usrRemark}"/></td>
-      <td align="center"><c:out value="${record.usrDisableTag}"/></td>
-      <td align="center"><c:out value="${record.usrEmail}"/></td>
-      <td align="center">
-        <a href="${pageContext.request.contextPath}/userManagement/modifyacctoauth?id=<c:out value="${record.usrId}"/>" class="btn btn-green" data-toggle="dialog" data-width="800" data-height="400" data-id="dialog-normal" data-title="账户信息">授权</a>
-          <%--<a href="${pageContext.request.contextPath}/userManagement/goToChangepwdPage?loginName=<c:out value="${record.usrName}"/>&loginId=<c:out value="${record.usrId}" />" class="btn btn-green" data-toggle="dialog" data-width="800" data-height="400" data-id="dialog-normal" data-title="账户信息">修改密码</a>--%>
-          <button type="button" class="btn-green" data-toggle="dialog" data-id="change-password" data-url="${pageContext.request.contextPath}/userManagement/goToChangepwdPage?loginName=<c:out value="${record.usrName}"/>&loginId=<c:out value="${record.usrId}" />">修改密码</button>
-      </td>
-    </tr>
+  <tr data-id="<c:out value="${record.usrId}"/>">
+    <td align="center"><c:out value="${record.usrId}"/></td>
+    <td align="center"><c:out value="${record.usrName}"/></td>
+    <td align="center"><c:out value="${record.userCode}"/></td>
+    <td align="center"><c:out value="${record.userCodeName}"/></td>
+    <td align="center"><c:out value="${record.usrRemark}"/></td>
+    <td align="center"><c:out value="${record.usrDisableTag}"/></td>
+    <td align="center"><c:out value="${record.usrEmail}"/></td>
+    <td align="center">
+      <a href="${pageContext.request.contextPath}/userManagement/modifyacctoauth?id=<c:out value="${record.usrId}"/>"
+         class="btn btn-green" data-toggle="dialog" data-width="800" data-height="400" data-id="dialog-normal"
+         data-title="账户信息">授权</a>
+        <%--<a href="${pageContext.request.contextPath}/userManagement/goToChangepwdPage?loginName=<c:out value="${record.usrName}"/>&loginId=<c:out value="${record.usrId}" />" class="btn btn-green" data-toggle="dialog" data-width="800" data-height="400" data-id="dialog-normal" data-title="账户信息">修改密码</a>--%>
+      <button type="button" class="btn-green" data-toggle="dialog" data-id="change-password"
+              data-url="${pageContext.request.contextPath}/userManagement/goToChangepwdPage?loginName=<c:out value="${record.usrName}"/>&loginId=<c:out value="${record.usrId}" />">
+        修改密码
+      </button>
+      <%--<a href="${pageContext.request.contextPath}/userManagement/goBindWithMer?id=<c:out value="${record.usrName}"/>&userCode=<c:out value="${record.userCode}"/>&userCodeType=<c:out value="${record.userCodeType}"/>"--%>
+         <%--class="btn btn-green" data-toggle="dialog" data-width="800" data-height="400" data-id="dialog-normal"--%>
+         <%--data-title="绑定用户">绑定</a>--%>
+    </td>
+  </tr>
   </c:forEach>
     </tbody>
   </table>

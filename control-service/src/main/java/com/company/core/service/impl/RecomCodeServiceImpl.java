@@ -59,26 +59,26 @@ public class RecomCodeServiceImpl implements RecomCodeService {
             expireDate = DateUtil.getAnotherDate(180, 5); //半年之后
         }
     
-        //如果没有选择下发的一级代理, 则默认下发给机构自己的默认代理
-        String agentId = "";
-        if(StringUtils.isBlank(recomCodeForm.getAgentId())){
-            UcAgentDo ucAgentDo = agentService.getAgentOfInstOwn(recomCodeForm.getInstId());
-            if(ucAgentDo == null){
-                throw new ErrorException("机构默认目标代理没有开通, 请确认");
-            }
-            agentId = ucAgentDo.getAgentId();
-        }else {
-            agentId = recomCodeForm.getAgentId();
-        }
-        
-        //检查代理的状态
-        UcAgentDo ucAgentDo = agentService.getAgent(agentId);
-        if(ucAgentDo == null){
-            throw new ErrorException("下发目标代理未找到, 请核实");
-        }
-        if(!StatusConstant.STATUS_ENABLE.equals(ucAgentDo.getStatus())){
-            throw new ErrorException("下发目标代理未激活");
-        }
+//        //如果没有选择下发的一级代理, 则默认下发给机构自己的默认代理
+//        String agentId = "";
+//        if(StringUtils.isBlank(recomCodeForm.getAgentId())){
+//            UcAgentDo ucAgentDo = agentService.getAgentOfInstOwn(recomCodeForm.getInstId());
+//            if(ucAgentDo == null){
+//                throw new ErrorException("机构默认目标代理没有开通, 请确认");
+//            }
+//            agentId = ucAgentDo.getAgentId();
+//        }else {
+//            agentId = recomCodeForm.getAgentId();
+//        }
+//
+//        //检查代理的状态
+//        UcAgentDo ucAgentDo = agentService.getAgent(agentId);
+//        if(ucAgentDo == null){
+//            throw new ErrorException("下发目标代理未找到, 请核实");
+//        }
+//        if(!StatusConstant.STATUS_ENABLE.equals(ucAgentDo.getStatus())){
+//            throw new ErrorException("下发目标代理未激活");
+//        }
         
         //生成注册码
         String catagoryId = "";
@@ -106,8 +106,8 @@ public class RecomCodeServiceImpl implements RecomCodeService {
             ucReccomCodeCntlDo.setStatus(StatusConstant.RECOMCODE_STATUS_NEW);
             ucReccomCodeCntlDo.setPwdRequired(recomCodeForm.getPwdRequired());
             ucReccomCodeCntlDo.setReccomCodePwd("");  //密码
-            ucReccomCodeCntlDo.setUserType(userType);
-            ucReccomCodeCntlDo.setUserCode(agentId);
+            ucReccomCodeCntlDo.setUserType(UserConstant.USER_INST);
+            ucReccomCodeCntlDo.setUserCode(recomCodeForm.getInstId());
             ucReccomCodeCntlDo.setExpireDate(expireDate);
             ucReccomCodeCntlDo.setPrice(recomCodeForm.getPrice());
     

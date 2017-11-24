@@ -1,7 +1,7 @@
 <component name="ArtifactManager">
   <artifact type="war" name="control-web-agent:war">
     <output-path>$PROJECT_DIR$/control-web-agent/target</output-path>
-    <root id="archive" name="basismag.war">
+    <root id="archive" name="agent.war">
       <element id="artifact" artifact-name="control-web-agent:war exploded" />
     </root>
   </artifact>

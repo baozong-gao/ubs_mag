@@ -128,7 +128,7 @@ public class UserManagementController extends BaseController{
                 return resultMap;
             }
             userBO.setUsrType(UserConstant.USER_INST);  //wwk
-            userBO.setUsrCode(instId);
+            userBO.setUserCode(instId);
         }
         if (StringUtils.isNotBlank(agentId)) {
             i ++;
@@ -139,7 +139,7 @@ public class UserManagementController extends BaseController{
                 return resultMap;
             }
             userBO.setUsrType(UserConstant.USER_AGENT);  //wwk
-            userBO.setUsrCode(agentId);
+            userBO.setUserCode(agentId);
         }
         if (i > 1) {
             resultMap.put("statusCode", 300);
