@@ -53,6 +53,10 @@ public class InstServiceImpl implements InstService {
     UserService userService;
     @Autowired
     TblBtsUserMapBiz tblBtsUserMapBiz;
+    @Autowired
+    UCCategoryBiz ucCategoryBiz;
+    
+    
     
     
     @Override
@@ -145,11 +149,31 @@ public class InstServiceImpl implements InstService {
         //更新机构详细信息
         this.updateInstDetailInfo(instForm, userBO);
         
+//        //更新机构费率信息
+//        this.updateInstFeeInfo(instForm, userBO);
+        
+    }
+    
+    @Override
+    @Transactional
+    public void updateInstInfo(InstForm instForm, UserBO userBO) throws Exception {
+        
+        //更新机构基础信息
+        this.updateInstBaseInfo(instForm, userBO);
+        
+        //更新机构详细信息
+        this.updateInstDetailInfo(instForm, userBO);
+        
+    }
+    
+    @Override
+    @Transactional
+    public void updateInstFee(InstForm instForm, UserBO userBO) throws Exception {
+    
         //更新机构费率信息
         this.updateInstFeeInfo(instForm, userBO);
         
     }
-    
     
     @Override
     @Transactional
@@ -624,37 +648,30 @@ public class InstServiceImpl implements InstService {
         }
         ucFeeDo.setStatus(StatusConstant.STATUS_ENABLE);
         ucFeeDo.setPercentFlag("N");
-        
-//        ucFeeDo.setCreateUser(userBO.getUsrName());
-//        ucFeeDo.setCreateSource(SystemConstant.DEFAULT_SOURCE_CODE);
-//        ucFeeDo.setCreateTime(DateUtil.getCurrentDateTime());
-        
         ucFeeDo.setModifyUser(userBO.getUsrName());
         ucFeeDo.setModifySource(SystemConstant.DEFAULT_SOURCE_CODE);
         ucFeeDo.setModifyTime(DateUtil.getCurrentDateTime());
         
-//        ucFeeDo.setLockedVersion(String.valueOf(0));
-        
-        //默认固定单笔
-        if(StringUtils.isNotBlank(instForm.getDefaultFeeFixed()) && !ucFeeBiz.zeroFee(instForm.getDefaultFeeFixed())){
-            ucFeeDo.setFeeType(Constant.FEE_DEFAULT_FIXED);
-            ucFeeDo.setFeeDesc(Constant.FEE_DEFAULT_FIXED_DESC);
-            ucFeeDo.setFeeMode(instForm.getDefaultFeeFixed());
-            int i = ucFeeBiz.updateFee(ucFeeDo);
-            if(i <=0 ){
-                throw new ErrorException("费率更新失败");
-            }
-        }
-        //默认固定比例
-        if(StringUtils.isNotBlank(instForm.getDefaultFeeRate()) && !ucFeeBiz.zeroFee(instForm.getDefaultFeeRate())){
-            ucFeeDo.setFeeType(Constant.FEE_DEFAULT_RATE);
-            ucFeeDo.setFeeDesc(Constant.FEE_DEFAULT_RATE_DESC);
-            ucFeeDo.setFeeMode(instForm.getDefaultFeeRate());
-            int c = ucFeeBiz.updateFee(ucFeeDo);
-            if(c <=0 ){
-                throw new ErrorException("费率更新失败");
-            }
-        }
+//        //默认固定单笔
+//        if(StringUtils.isNotBlank(instForm.getDefaultFeeFixed()) && !ucFeeBiz.zeroFee(instForm.getDefaultFeeFixed())){
+//            ucFeeDo.setFeeType(Constant.FEE_DEFAULT_FIXED);
+//            ucFeeDo.setFeeDesc(Constant.FEE_DEFAULT_FIXED_DESC);
+//            ucFeeDo.setFeeMode(instForm.getDefaultFeeFixed());
+//            int i = ucFeeBiz.updateFee(ucFeeDo);
+//            if(i <=0 ){
+//                throw new ErrorException("费率更新失败");
+//            }
+//        }
+//        //默认固定比例
+//        if(StringUtils.isNotBlank(instForm.getDefaultFeeRate()) && !ucFeeBiz.zeroFee(instForm.getDefaultFeeRate())){
+//            ucFeeDo.setFeeType(Constant.FEE_DEFAULT_RATE);
+//            ucFeeDo.setFeeDesc(Constant.FEE_DEFAULT_RATE_DESC);
+//            ucFeeDo.setFeeMode(instForm.getDefaultFeeRate());
+//            int c = ucFeeBiz.updateFee(ucFeeDo);
+//            if(c <=0 ){
+//                throw new ErrorException("费率更新失败");
+//            }
+//        }
         //实收固定单笔
         if(StringUtils.isNotBlank(instForm.getEffectiveFeeFixed()) && !ucFeeBiz.zeroFee(instForm.getEffectiveFeeFixed())){
             ucFeeDo.setFeeType(Constant.FEE_EFFECTIVE_FIXED);
@@ -732,22 +749,42 @@ public class InstServiceImpl implements InstService {
         
         String error = "";
         
-        //默认费率 必须配置一个非0费率
-        if(StringUtils.isBlank(instForm.getDefaultFeeFixed())){
-            instForm.setDefaultFeeFixed("0");
+//        //默认费率 必须配置一个非0费率
+//        if(StringUtils.isBlank(instForm.getDefaultFeeFixed())){
+//            instForm.setDefaultFeeFixed("0");
+//        }
+//        if(StringUtils.isBlank(instForm.getDefaultFeeRate())){
+//            instForm.setDefaultFeeRate("0");
+//        }
+//        BigDecimal zero = new BigDecimal("0");
+//        BigDecimal df = new BigDecimal(instForm.getDefaultFeeFixed());
+//        BigDecimal dr = new BigDecimal(instForm.getDefaultFeeRate());
+//        if(zero.compareTo(df) == 0 && zero.compareTo(dr) == 0){
+//            error = "默认费率不能同时为0和空";
+//            return error;
+//        }
+    
+        //获取当前机构默认费率
+        UcFeeDo ucFeeDo = new UcFeeDo();
+        ucFeeDo.setUserType(UserConstant.USER_INST);
+        ucFeeDo.setUserCode(instForm.getInstId());
+        ucFeeDo.setCategory(Constant.CATEGORY_DEFAULT);
+        ucFeeDo.setCategoryId("P001");
+        ucFeeDo.setFeeType("DF");
+        UcFeeDo df = ucFeeBiz.getFee(ucFeeDo);
+        ucFeeDo.setFeeType("DR");
+        UcFeeDo dr = ucFeeBiz.getFee(ucFeeDo);
+        BigDecimal bdf = null;
+        BigDecimal bdr = null;
+        if(df != null){
+            bdf = new BigDecimal(df.getFeeMode());
         }
-        if(StringUtils.isBlank(instForm.getDefaultFeeRate())){
-            instForm.setDefaultFeeRate("0");
-        }
-        BigDecimal zero = new BigDecimal("0");
-        BigDecimal df = new BigDecimal(instForm.getDefaultFeeFixed());
-        BigDecimal dr = new BigDecimal(instForm.getDefaultFeeRate());
-        if(zero.compareTo(df) == 0 && zero.compareTo(dr) == 0){
-            error = "默认费率不能同时为0和空";
-            return error;
+        if(dr != null){
+            bdr = new BigDecimal(dr.getFeeMode());
         }
     
-        //默认费率 必须配置一个非0费率
+        //实行费率 必须配置一个非0费率
+        BigDecimal zero = new BigDecimal("0");
         if(StringUtils.isBlank(instForm.getEffectiveFeeFixed())){
             instForm.setEffectiveFeeFixed("0");
         }
@@ -758,6 +795,11 @@ public class InstServiceImpl implements InstService {
         BigDecimal er = new BigDecimal(instForm.getEffectiveFeeRate());
         if(zero.compareTo(ef) == 0 && zero.compareTo(er) == 0){
             error = "实行费率不能同时为0和空";
+            return error;
+        }
+        
+        if(bdr.compareTo(er) == 1){
+            error = "实行费率不能低于成本费率";
             return error;
         }
         
@@ -781,6 +823,17 @@ public class InstServiceImpl implements InstService {
         instForm.setAgentCountLimit(String.valueOf(ucInstDo.getAgentCountLimit()));
         instForm.setLimitArea(ucInstDo.getLimitArea());
         instForm.setLimitAreaCode(ucInstDo.getLimitAreaCode());
+        
+        if(StringUtils.isNotBlank(ucInstDo.getCategoryId())){
+            UcCategoryDoKey ucCategoryDoKey = new UcCategoryDoKey();
+            ucCategoryDoKey.setCategory(ucInstDo.getCategory());
+            ucCategoryDoKey.setCategoryId(ucInstDo.getCategoryId());
+            UcCategoryDo ucCategoryDo = ucCategoryBiz.selectByPrimaryKey(ucCategoryDoKey);
+            if(ucCategoryDo != null){
+                instForm.setCategoryName(ucCategoryDo.getCategoryName());
+                instForm.setCategoryIdName(ucCategoryDo.getCategoryIdName());
+            }
+        }
     }
     
     @Override

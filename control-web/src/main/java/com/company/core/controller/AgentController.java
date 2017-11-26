@@ -76,15 +76,15 @@ public class AgentController extends BaseController {
         
         Boolean dupshortname = agentService.checkIfDupAgentByName("", agentForm.getAgentShortName());
         if(dupshortname){
-            return returnSuccess("代理简称重复");
+            return returnError("代理简称重复");
         }
         Boolean dupname = agentService.checkIfDupAgentByName(agentForm.getAgentName(), "");
         if(dupname){
-            return returnSuccess("代理全称重复");
+            return returnError("代理全称重复");
         }
     
         //检查费率
-        String error = agentService.checkFees(agentForm);
+        String error = agentService.checkFeesAgentOpen(agentForm);
         if(StringUtils.isNotBlank(error)){
             return returnError(error);
         }

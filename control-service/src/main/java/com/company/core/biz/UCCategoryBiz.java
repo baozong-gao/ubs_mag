@@ -40,5 +40,16 @@ public class UCCategoryBiz {
         return ucCategoryDoMapper.selectByPrimaryKey(ucCategoryDoKey);
     }
     
+    public String getCatagoryName(String catagory){
+    
+        UcCategoryDoExample ucCategoryDoExample = new UcCategoryDoExample();
+        ucCategoryDoExample.createCriteria().andCategoryEqualTo(catagory);
+        List<UcCategoryDo> ucCategoryDoList = ucCategoryDoMapper.selectByExample(ucCategoryDoExample);
+        if(ucCategoryDoList == null || ucCategoryDoList.size() == 0){
+            return ucCategoryDoList.get(0).getCategoryName();
+        }
+    
+        return "基础服务";
+    }
     
 }

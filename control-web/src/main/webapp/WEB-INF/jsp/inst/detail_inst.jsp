@@ -236,50 +236,49 @@
                     </div>
                 </div>
 
+                <%--<!-- 机构费率 -->--%>
+                <%--<div class="col-md-12">--%>
+                    <%--<div class="panel panel-default">--%>
+                        <%--<div class="panel-heading"><h3 class="panel-title">机构费率</h3></div>--%>
+                        <%--<div class="panel-body">--%>
+                            <%--<div class="row-input" style="margin: 20px 0 20px; width: 100%">--%>
+                                <%--<div class="row-input" style="margin: 20px 0 20px; width: 100%">--%>
+                                    <%--<div class="form-group col-md-6">--%>
+                                        <%--<label class="control-label">成本固定单笔费用：</label>--%>
+                                        <%--<input type="text"--%>
+                                               <%--name="defaultFeeFixed" size="15" data-rule="number;range[1~200] "--%>
+                                               <%--value="${instDetailForm.defaultFeeFixed}"--%>
+                                               <%--placeholder="单位笔/元"/>&nbsp;--%>
+                                    <%--</div>--%>
 
-                <!-- 机构费率 -->
-                <div class="col-md-12">
-                    <div class="panel panel-default">
-                        <div class="panel-heading"><h3 class="panel-title">机构费率</h3></div>
-                        <div class="panel-body">
-                            <div class="row-input" style="margin: 20px 0 20px; width: 100%">
-                                <div class="row-input" style="margin: 20px 0 20px; width: 100%">
-                                    <div class="form-group col-md-6">
-                                        <label class="control-label">成本固定单笔费用：</label>
-                                        <input type="text"
-                                               name="defaultFeeFixed" size="15" data-rule="number;range[1~200] "
-                                               value="${instDetailForm.defaultFeeFixed}"
-                                               placeholder="单位笔/元"/>&nbsp;
-                                    </div>
+                                    <%--<div class="form-group col-md-6">--%>
+                                        <%--<label class="control-label">成本交易比例费率：</label>--%>
+                                        <%--<input type="text"--%>
+                                               <%--name="defaultFeeRate" size="15" data-rule="number;range[0~1] "--%>
+                                               <%--value="${instDetailForm.defaultFeeRate}"--%>
+                                               <%--placeholder="如:千5, 请输入0.5"/>%&nbsp;--%>
+                                    <%--</div>--%>
+                                <%--</div>--%>
+                                <%--<div class="row-input" style="margin: 20px 0 20px; width: 100%">--%>
+                                    <%--<div class="form-group col-md-6">--%>
+                                        <%--<label class="control-label">实收固定单笔费用：</label>--%>
+                                        <%--<input type="text"--%>
+                                               <%--name="effectiveFeeFixed" size="15" data-rule="number;range[1~200] "--%>
+                                               <%--value="${instDetailForm.effectiveFeeFixed}"--%>
+                                               <%--placeholder="单位笔/元"/>&nbsp;--%>
+                                    <%--</div>--%>
 
-                                    <div class="form-group col-md-6">
-                                        <label class="control-label">成本交易比例费率：</label>
-                                        <input type="text"
-                                               name="defaultFeeRate" size="15" data-rule="number;range[0~1] "
-                                               value="${instDetailForm.defaultFeeRate}"
-                                               placeholder="如:千5, 请输入0.5"/>%&nbsp;
-                                    </div>
-                                </div>
-                                <div class="row-input" style="margin: 20px 0 20px; width: 100%">
-                                    <div class="form-group col-md-6">
-                                        <label class="control-label">实收固定单笔费用：</label>
-                                        <input type="text"
-                                               name="effectiveFeeFixed" size="15" data-rule="number;range[1~200] "
-                                               value="${instDetailForm.effectiveFeeFixed}"
-                                               placeholder="单位笔/元"/>&nbsp;
-                                    </div>
-
-                                    <div class="form-group col-md-6">
-                                        <label class="control-label">实收交易比例费率：</label>
-                                        <input type="text"
-                                               name="effectiveFeeRate" size="15" data-rule="number;range[0~1] "
-                                               value="${instDetailForm.effectiveFeeRate}"
-                                               placeholder="如:千5, 请输入0.5"/>%&nbsp;
-                                    </div>
-                                </div>
-                        </div>
-                    </div>
-                </div>
+                                    <%--<div class="form-group col-md-6">--%>
+                                        <%--<label class="control-label">实收交易比例费率：</label>--%>
+                                        <%--<input type="text"--%>
+                                               <%--name="effectiveFeeRate" size="15" data-rule="number;range[0~1] "--%>
+                                               <%--value="${instDetailForm.effectiveFeeRate}"--%>
+                                               <%--placeholder="如:千5, 请输入0.5"/>%&nbsp;--%>
+                                    <%--</div>--%>
+                                <%--</div>--%>
+                        <%--</div>--%>
+                    <%--</div>--%>
+                <%--</div>--%>
 
                 <div class="col-md-12" style="margin: 20px 0 20px; ">
                     <button type="submit" class="btn-default" data-icon="save" style="float: right">更新</button>&nbsp;

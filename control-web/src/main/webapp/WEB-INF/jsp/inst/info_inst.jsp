@@ -4,9 +4,8 @@
 <head>
     <script
             src="http://static.runoob.com/assets/jquery-validation-1.14.0/dist/jquery.validate.min.js"></script>
-    <title>机构开户</title>
+    <title>机构信息更改</title>
 </head>
-
 
 <style>
 
@@ -23,10 +22,14 @@
 <div class="bjui-pageContent tableContent">
 
 
-    <form id="pagerForm" name="instForm" data-toggle="validate"
-          novalidate="novalidate"
-          action="${pageContext.request.contextPath}/inst/add_new_inst"
-          method="post">
+    <%--<form id="pagerForm" name="instDetailForm" data-toggle="validate"--%>
+          <%--novalidate="novalidate"--%>
+          <%--action="${pageContext.request.contextPath}/inst/update_inst_info"--%>
+          <%--method="post">--%>
+
+        <form id="pagerForm" name="instDetailForm">
+
+        <input type="hidden" id="instId" name="instId" value="${instDetailForm.instId}">
 
         <div style="margin:15px auto 0; width:96%;">
             <div class="row" style="padding: 0 8px;">
@@ -34,99 +37,68 @@
                 <!-- 机构属性 -->
                 <div class="col-md-12">
                     <div class="panel panel-default">
-                        <div class="panel-heading"><h3 class="panel-title">机构信息</h3></div>
+                        <div class="panel-heading"><h3 class="panel-title">机构${instDetailForm.instId}信息</h3></div>
                         <div class="panel-body">
                             <div class="row-input" style="margin: 20px 0 20px; width: 100%">
                                 <div class="form-group col-md-4">
                                     <label class="control-label labelblock">机构简称：</label>
                                     <input type="text"
                                            name="instShortName" size="15" data-rule="机构简称:required;"
-                                           placeholder="请输入机构简称"/>&nbsp;
+                                           value="${instDetailForm.instShortName}"/>&nbsp;
                                 </div>
 
                                 <div class="form-group col-md-4">
                                     <label class="control-label labelblock">机构全称：</label>
                                     <input type="text"
                                            name="instName" size="15" data-rule="机构全称:required;"
-                                           placeholder="请输入机构全称"/>&nbsp;
+                                           value="${instDetailForm.instName}"/>&nbsp;
                                 </div>
 
                                 <div class="form-group col-md-4">
                                     <label class="control-label labelblock">营业执照：</label>
                                     <input type="text"
                                            name="businessLicense" size="15" data-rule="营业执照:required;"
-                                           placeholder="请输入营业执照"/>&nbsp;
+                                           value="${instDetailForm.businessLicense}"/>&nbsp;
                                 </div>
                             </div>
 
                             <div class="row-input" style="margin: 20px 0 20px;">
                                 <div class="form-group col-md-4">
                                     <label class="control-label labelblock">机构类型：</label>
-                                    <select
+                                    <select disabled="true"
                                             name="instType" id="instType" data-rule="机构类型:required;"
+                                            value="${instDetailForm.instType}"
                                             data-toggle="selectpicker">
                                         <option value="1">-请选择-</option>
-                                        <option value="1">发展机构</option>
-                                        <option value="0">直属机构-</option>
+                                        <option value="1" <c:if test="${instDetailForm.instType == '1'}">selected</c:if>>发展机构</option>
+                                        <option value="0" <c:if test="${instDetailForm.instType == '0'}">selected</c:if>>直属机构</option>
                                     </select>&nbsp;
                                 </div>
 
                                 <div class="form-group col-md-4">
                                     <label class="control-label labelblock">类别：</label>
-                                    <select name="category" id="category" data-rule="机构类型:required;"
-                                            data-toggle="selectpicker" data-live-search="true"
-                                            data-nextselect="#categoryIdL"
-                                            data-refurl="${pageContext.request.contextPath}/comcon/select_catagory_ids?catagory={value}">
-                                        <option value="all">-请选择-</option>
-                                        <option value="0">基础业务</option>
+                                    <select name="category" id="category"   data-toggle="selectpicker"  data-live-search="true" data-rule="机构类型:required;">
+                                        <option value="${instDetailForm.category}">${instDetailForm.categoryName}</option>
                                     </select>&nbsp;
                                 </div>
                                 <div class="form-group col-md-4">
                                     <label class="control-label labelblock">类别ID&nbsp;：</label>
-                                    <select name="categoryId" id="categoryIdL" data-toggle="selectpicker"  data-live-search="true">
-                                        <option style="width: 60px; display: inline-block" value="">-请选择-</option>
-                                        <%--<c:forEach var="record" items="${categoryList}"--%>
-                                                   <%--varStatus="status">--%>
-                                            <%--<option value="${record.categoryId}"--%>
-                                                    <%--<c:if test="${record.categoryId == instListForm.categoryId}">selected</c:if> >${record.categoryIdName}</option>--%>
-                                        <%--</c:forEach>--%>
+                                    <select name="categoryId" id="categoryId" data-toggle="selectpicker"  data-live-search="true">
+                                        <option value="${instDetailForm.categoryId}">${instDetailForm.categoryIdName}</option>
                                     </select>
-
                                 </div>
-                                <%--<div class="form-group col-md-4">--%>
-                                    <%--<label class="control-label labelblock">类别ID&nbsp;：</label>--%>
-                                    <%--<select name="categoryId" id="categoryIdL" data-toggle="selectpicker"  data-live-search="true">--%>
-                                        <%--<option style="width: 60px; display: inline-block" value="">-请选择-</option>--%>
-                                        <%--<c:forEach var="record" items="${categoryList}"--%>
-                                                   <%--varStatus="status">--%>
-                                            <%--<option value="${record.categoryId}"--%>
-                                                    <%--<c:if test="${record.categoryId == instListForm.categoryId}">selected</c:if> >${record.categoryIdName}</option>--%>
-                                        <%--</c:forEach>--%>
-                                    <%--</select>--%>
-
-                                <%--</div>--%>
                             </div>
 
                             <div class="row-input" style="margin: 20px 0 20px;">
                                 <label class="control-label x15"></label>
                                 <input name="agentOk" id="agentOk" value="Y" data-toggle="icheck" data-label="允许代理"
+                                       value="${instDetailForm.agentOk}"
                                        checked="" type="checkbox">
                                 <label class="control-label x85">代理上限</label>
-                                <input name="agentCountLimit" value="0" data-toggle="spinner" data-step="10" data-min="0" data-rule="Integar; range[0~200]"
+                                <input name="agentCountLimit" value="0" data-toggle="spinner" data-step="10" data-min="0"
+                                       value="${instDetailForm.agentCountLimit}"
                                        size="5" type="text">
                             </div>
-
-                            <%--<div class="row-input" style="margin: 20px 0 20px;">--%>
-                                <%--<label class="control-label x15"></label>--%>
-                                <%--<input name="limitArea" id="limitArea" value="Y" data-toggle="icheck" data-label="地区保护"--%>
-                                       <%--type="checkbox">--%>
-                                <%--<label class="control-label x85">地区代码:</label>--%>
-                                <%--<select--%>
-                                        <%--name="limitAreaCode" id="limitAreaCode"--%>
-                                        <%--data-toggle="selectpicker">--%>
-                                    <%--<option value="0">默认-全国</option>--%>
-                                <%--</select>&nbsp;--%>
-                            <%--</div>--%>
                         </div>
                     </div>
                 </div>
@@ -141,6 +113,7 @@
                                     <label class="control-label labelblock">姓名：</label>
                                     <input type="text"
                                            name="legalPersonName" size="15" data-rule="法人姓名:required;"
+                                           value="${instDetailForm.legalPersonName}"
                                            placeholder="请输入法人姓名"/>&nbsp;
                                 </div>
 
@@ -148,6 +121,7 @@
                                     <label class="control-label labelblock">手机号：</label>
                                     <input type="text"
                                            name="legalPersonPhone" size="15" data-rule="法人手机号:required; mobile"
+                                           value="${instDetailForm.legalPersonPhone}"
                                            placeholder="请输入法人手机号"/>&nbsp;
                                 </div>
 
@@ -155,6 +129,7 @@
                                     <label class="control-label labelblock">邮件：</label>
                                     <input type="text"
                                            name="legalPersonMail" size="20"  data-rule="邮箱:required; email"
+                                           value="${instDetailForm.legalPersonMail}"
                                            placeholder="请输入法人邮件"/>&nbsp;
                                 </div>
                             </div>
@@ -165,9 +140,9 @@
                                     <select
                                             name="legalPersonIdType" id="legalPersonIdType" data-rule="证件类型:required;"
                                             data-toggle="selectpicker">
-                                        <option value="0">请选择</option>
-                                        <option value="1">身份证</option>
-                                        <option value="2">护照</option>
+                                        <option value="">请选择</option>
+                                        <option value="0" <c:if test="${instDetailForm.legalPersonIdType == '0'}">selected</c:if>>身份证</option>
+                                        <option value="1" <c:if test="${instDetailForm.legalPersonIdType == '1'}">selected</c:if>>护照</option>
                                     </select>&nbsp;
                                 </div>
 
@@ -175,6 +150,7 @@
                                     <label class="control-label labelblock">证件ID：</label>
                                     <input type="text"
                                            name="legalPersonId" size="20" data-rule="法人证件ID:required;"
+                                           value="${instDetailForm.legalPersonId}"
                                            placeholder="请输入法人证件号"/>&nbsp;
                                 </div>
 
@@ -182,6 +158,7 @@
                                     <label class="control-label labelblock">地址：</label>
                                     <input type="text"
                                            name="legalPersonAddress" size="20"
+                                           value="${instDetailForm.legalPersonAddress}"
                                            placeholder="请输入法人地址"/>&nbsp;
                                 </div>
                             </div>
@@ -199,7 +176,8 @@
                                     <div class="form-group col-md-4">
                                         <label class="control-label labelblock">姓名：</label>
                                         <input type="text"
-                                               name="contactName" size="15" data-rule="联系人姓名:required;"
+                                               name="contactName" size="15"
+                                               value="${instDetailForm.contactName}"
                                                placeholder="请输入联系人姓名"/>&nbsp;
                                     </div>
 
@@ -207,13 +185,15 @@
                                         <label class="control-label labelblock">手机号：</label>
                                         <input type="text"
                                                name="contactPhone" size="15" data-rule="联系人手机号:required; mobile"
+                                               value="${instDetailForm.contactPhone}"
                                                placeholder="请输入联系人手机号"/>&nbsp;
                                     </div>
 
                                     <div class="form-group col-md-4">
                                         <label class="control-label labelblock">邮件：</label>
                                         <input type="text"
-                                               name="contactMail" size="20" data-rule="联系人邮件:required; email"
+                                               name="contactMail" size="20" data-rule="邮箱:required; email"
+                                               value="${instDetailForm.contactMail}"
                                                placeholder="请输入联系人邮件"/>&nbsp;
                                     </div>
                                 </div>
@@ -225,9 +205,9 @@
                                                 name="contactIdType" id="contactIdType"
                                                 data-rule="证件类型:required;"
                                                 data-toggle="selectpicker">
-                                            <option value="0">请选择</option>
-                                            <option value="1">身份证</option>
-                                            <option value="2">护照</option>
+                                            <option value="">请选择</option>
+                                            <option value="0" <c:if test="${instDetailForm.contactIdType == '0'}">selected</c:if>>身份证</option>
+                                            <option value="1" <c:if test="${instDetailForm.contactIdType == '1'}">selected</c:if>>护照</option>
                                         </select>&nbsp;
                                     </div>
 
@@ -235,6 +215,7 @@
                                         <label class="control-label labelblock">证件ID：</label>
                                         <input type="text"
                                                name="contactCertId" size="20"
+                                               value="${instDetailForm.contactCertId}"
                                                placeholder="请输入联系人证件号"/>&nbsp;
                                     </div>
 
@@ -242,6 +223,7 @@
                                         <label class="control-label labelblock">地址：</label>
                                         <input type="text"
                                                name="contactAddress" size="20"
+                                               value="${instDetailForm.contactAddress}"
                                                placeholder="请输入联系人地址"/>&nbsp;
                                     </div>
                                 </div>
@@ -251,50 +233,9 @@
                 </div>
 
 
-                <!-- 机构费率 -->
-                <div class="col-md-12">
-                    <div class="panel panel-default">
-                        <div class="panel-heading"><h3 class="panel-title">机构费率</h3></div>
-                        <div class="panel-body">
-                            <div class="row-input" style="margin: 20px 0 20px; width: 100%">
-                                <div class="row-input" style="margin: 20px 0 20px; width: 100%">
-                                    <div class="form-group col-md-6">
-                                        <label class="control-label">成本固定单笔费用：</label>
-                                        <input type="text"
-                                               name="defaultFeeFixed" size="15" data-rule="number;range[1~200] "
-                                               placeholder="单位笔/元"/>&nbsp;
-                                    </div>
-
-                                    <div class="form-group col-md-6">
-                                        <label class="control-label">成本交易比例费率：</label>
-                                        <input type="text"
-                                               name="defaultFeeRate" size="15" data-rule="number;range[0~1] "
-                                               placeholder="如:千5, 请输入0.5"/>%&nbsp;
-                                    </div>
-                                </div>
-                                <div class="row-input" style="margin: 20px 0 20px; width: 100%">
-                                    <div class="form-group col-md-6">
-                                        <label class="control-label">实收固定单笔费用：</label>
-                                        <input type="text"
-                                               name="EffectiveFeeFixed" size="15" data-rule="number;range[1~200] "
-                                               placeholder="单位笔/元"/>&nbsp;
-                                    </div>
-
-                                    <div class="form-group col-md-6">
-                                        <label class="control-label">实收交易比例费率：</label>
-                                        <input type="text"
-                                               name="EffectiveFeeRate" size="15" data-rule="number;range[0~1] "
-                                               placeholder="如:千5, 请输入0.5"/>%&nbsp;
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-md-12" style="margin: 20px 0 20px; ">
-                    <button type="submit" class="btn-default" data-icon="save" style="float: right">提交</button>&nbsp;
-                </div>
+                <%--<div class="col-md-12" style="margin: 20px 0 20px; ">--%>
+                    <%--<button type="submit" class="btn-default" data-icon="save" style="float: right">更新</button>&nbsp;--%>
+                <%--</div>--%>
             </div>
         </div>
     </form>

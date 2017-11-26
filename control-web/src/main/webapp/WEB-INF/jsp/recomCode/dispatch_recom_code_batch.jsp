@@ -27,10 +27,10 @@
                 <div class=" col-md-6">
                     <label class="labellength8">选择机构:</label>
                     <select name="instId" id="instId" data-toggle="selectpicker"    data-live-search="true"
-                            data-nextselect="#agentIdD"
+                            data-nextselect="#toAgentIdD" onchange="checkRecomCount(value)"
                     <%--<!-- status = E 代表enable 激活的状态, 这里查找的该机构下的所有的激活状态的代理列表-->--%>
                     data-refurl="${pageContext.request.contextPath}/comcon/select_agent_active?instId={value}&status=E">
-                        <option value="">-机构--</option>
+                        <option value="">-请选择机构--</option>
                         <c:forEach var="record" items="${instList}"
                                    varStatus="status">
                             <option value="${record.instId}"
@@ -38,23 +38,23 @@
                         </c:forEach>
                     </select>
                 </div>
-                <div class=" col-md-6">
-                    <label class="labellength8">选择代理:</label>
-                    <select name="agentId" id="agentIdD" data-toggle="selectpicker" data-live-search="true" data-emptytxt="--所属代理--"
-                            data-nextselect="#toAgentId"
-                            <%--这里的dataurl是选择所有机构的直接下级代理, 并且激活状态--%>
-                            data-refurl="${pageContext.request.contextPath}/comcon/select_downagent_active?agentId={value}&status=E">
-                            style="width: 134px">
-                        <option value="all">--所属代理--</option>
-                    </select>
-                </div>
+                <%--<div class=" col-md-6">--%>
+                    <%--<label class="labellength8">选择代理:</label>--%>
+                    <%--<select name="agentId" id="agentIdD" data-toggle="selectpicker" data-live-search="true" data-emptytxt="--所属代理--"--%>
+                            <%--data-nextselect="#toAgentId"--%>
+                            <%--&lt;%&ndash;这里的dataurl是选择所有机构的直接下级代理, 并且激活状态&ndash;%&gt;--%>
+                            <%--data-refurl="${pageContext.request.contextPath}/comcon/select_downagent_active?agentId={value}&status=E">--%>
+                            <%--style="width: 134px">--%>
+                        <%--<option value="all">--所属代理--</option>--%>
+                    <%--</select>--%>
+                <%--</div>--%>
             </div>
 
             <div class="row-inut col-md-12" style="margin: 10px 0 10px; width: 100%">
                 <div class=" col-md-6">
-                    <label class="labellength8 ">已用个数:</label>
+                    <label class="labellength8 ">总共个数:</label>
                     <input type="text"
-                           name="recomCodeUsedCount" id="recomCodeUsedCount" size="19" disabled="true"/>个&nbsp;
+                           name="recomCodeTotalCount" id="recomCodeTotalCount" size="19" disabled="true"/>个&nbsp;
                 </div>
                 <div class=" col-md-6">
                     <label class="labellength8 ">可用个数:</label>
@@ -74,7 +74,7 @@
             <div class="row-inut col-md-12" style="margin: 10px 0 10px; width: 100%">
                 <div class=" col-md-6">
                     <label class="labellength8 ">下发代理:</label>
-                    <select name="toAgentId" id="toAgentId" data-toggle="selectpicker" data-live-search="true" style="width: 134px" data-emptytxt="--下发代理--">
+                    <select name="toAgentId" id="toAgentIdD" data-toggle="selectpicker" data-live-search="true" style="width: 134px" data-emptytxt="--下发代理--">
                         <option value="all">--请选择--</option>
                     </select>
                 </div>
@@ -90,6 +90,37 @@
         </table>
     </form:form>
 </div>
+
+
+<script type="text/javascript">
+
+    function checkRecomCount(value){
+
+        if('' == value || typeof value == 'undefined' || 'null' == value){
+            return;
+        }
+        $.ajax({
+            async: false,
+            cache: false,
+            type: 'GET',
+            url: "<%=request.getContextPath() %>/recomCode/checkRecomCodeCount",
+            data: {'instId': value},
+            success: function (data) {
+                var status = data.status;
+                if('' == status){
+                    return
+                }
+                var totalCount = data.totalCount;
+                var availableCount = data.availableCount;
+                $("#recomCodeTotalCount").val(totalCount);
+                $("#recomCodeAvailableCount").val(availableCount);
+            }
+        });
+    }
+
+</script>
+
+
 <div class="bjui-pageFooter">
 </div>
 </body>

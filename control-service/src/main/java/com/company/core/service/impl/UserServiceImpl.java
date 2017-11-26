@@ -342,7 +342,18 @@ public class UserServiceImpl implements UserService {
         userBO.setUsrName(tblBTSSysUsrDO.getUsrName());
         userBO.setUsrPwd(tblBTSSysUsrDO.getUsrPwd());
         userBO.setUsrDisableTag(tblBTSSysUsrDO.getUsrDisableTag());
-        userBO.setUsrType(tblBTSSysUsrDO.getUsrType());   //wwk
+    
+        //wwk -
+        userBO.setUsrType(tblBTSSysUsrDO.getUsrType());
+        TblBtsUsrMapDoKey tblBtsUsrMapDoKey = new TblBtsUsrMapDoKey();
+        tblBtsUsrMapDoKey.setLoginSeq(tblBTSSysUsrDO.getUsrId());
+        tblBtsUsrMapDoKey.setLoginId(tblBTSSysUsrDO.getUsrName());
+        TblBtsUsrMapDo tblBtsUsrMapDo = tblBtsUserMapBiz.selectByPrimaryKey(tblBtsUsrMapDoKey);
+        if(tblBtsUsrMapDo != null){
+            userBO.setUserCode(tblBtsUsrMapDo.getUserCode());
+            userBO.setUserCodeType(tblBtsUsrMapDo.getUsrType());
+            userBO.setUserCodeName(tblBtsUsrMapDo.getUserName());
+        }
         return userBO;
     }
 

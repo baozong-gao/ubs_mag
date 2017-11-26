@@ -12,6 +12,14 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = false)
 public class AgentForm extends BaseForm {
     
+    private String userType;
+    private String userCode;
+    private String userCodeName;
+    private String upInstId;
+    private String upInstName;
+    private String upAgentId;
+    private String upAgentName;
+    
     private String agentId;
     private String instId;
     private String agentType;

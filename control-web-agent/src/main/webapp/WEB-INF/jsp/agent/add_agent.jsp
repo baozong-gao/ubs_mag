@@ -25,26 +25,33 @@
           action="${pageContext.request.contextPath}/agent/add_new_agent"
           method="post">
 
+        <input type="hidden" id="upInstId" name="upInstId" value="${agentForm.upInstId}">
+        <input type="hidden" id="instId" name="instId" value="${agentForm.instId}">
+        <input type="hidden" id="upAgentId" name="upAgentId" value="${agentForm.upAgentId}">
+        <input type="hidden" id="userType" name="userType" value="${agentForm.userType}">
+
         <div style="margin:15px auto 0; width:96%;">
             <div class="row" style="padding: 0 8px;">
-
-                <!-- 选择机构 -->
-                <div class="col-md-12">
-                    <div class="panel panel-default">
-                        <div class="panel-heading"><h3 class="panel-title">机构信息</h3></div>
-                        <div class="panel-body">
-                            <div class="form-group col-md-4">
-                                <label class="control-label labelblock">机构号：</label>
-                                <select name="instId" id="instId" data-toggle="selectpicker" data-live-search="true">
-                                    <option value="">请选择</option>
-                                    <c:forEach var="item" items="${instList}" varStatus="status">
-                                        <option value="${item.instId}">${item.instName}</option>
-                                    </c:forEach>
-                                </select>&nbsp;
+                <c:if test="${ '1' == agentForm.userType}">
+                    <%--机构身份登录进来 - 可以开1级代理, 可以开2级代理, 如果没有选择代理, 就是开1级代理--%>
+                    <!-- 选择代理 -->
+                    <div class="col-md-12">
+                        <div class="panel panel-default">
+                            <div class="panel-heading"><h3 class="panel-title">当前代理信息</h3></div>
+                            <div class="panel-body">
+                                <div class="form-group col-md-4">
+                                    <label class="control-label labelblock">代理号：</label>
+                                    <select name="agentId" id="agentId" data-toggle="selectpicker" data-live-search="true">
+                                        <option value="">请选择</option>
+                                        <c:forEach var="item" items="${agentList}" varStatus="status">
+                                            <option value="${item.agentId}">${item.agentName}</option>
+                                        </c:forEach>
+                                    </select>&nbsp;
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                </c:if>
 
                 <!-- 代理属性 -->
                 <div class="col-md-12">
@@ -80,9 +87,8 @@
                                     <select
                                             name="agentType" id="agentType" data-rule="代理类型:required;"
                                             data-toggle="selectpicker">
-                                        <option value="1">-请选择-</option>
+                                         <%--代理开户是不会有直属代理--%>
                                         <option value="1">发展代理</option>
-                                        <option value="0">直属代理-</option>
                                     </select>&nbsp;
                                 </div>
 
@@ -166,9 +172,8 @@
                                     <select
                                             name="legalPersonIdType" id="legalPersonIdType" data-rule="证件类型:required;"
                                             data-toggle="selectpicker">
-                                        <option value="0">请选择</option>
-                                        <option value="1">身份证</option>
-                                        <option value="2">护照</option>
+                                        <option value="0">身份证</option>
+                                        <option value="1">护照</option>
                                     </select>&nbsp;
                                 </div>
 
@@ -226,9 +231,8 @@
                                                 name="contactIdType" id="contactIdType"
                                                 data-rule="证件类型:required;"
                                                 data-toggle="selectpicker">
-                                            <option value="0">请选择</option>
-                                            <option value="1">身份证</option>
-                                            <option value="2">护照</option>
+                                            <option value="0">身份证</option>
+                                            <option value="1">护照</option>
                                         </select>&nbsp;
                                     </div>
 

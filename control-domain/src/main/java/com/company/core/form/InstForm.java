@@ -50,4 +50,9 @@ public class InstForm extends BaseForm {
     
     private String status;
     
+    private String categoryName;
+    private String categoryIdName;
+    
+    
+    
 }

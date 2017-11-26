@@ -196,20 +196,29 @@ public class RecomCodeServiceImpl implements RecomCodeService {
         return page;
     }
     
+    
+    @Override
+    public int getTotalRecomCodeByInst(String instId, String status){
+        
+        UcReccomCodeCntlDoExample ucReccomCodeCntlDoExample = new UcReccomCodeCntlDoExample();
+        UcReccomCodeCntlDoExample.Criteria criteria = ucReccomCodeCntlDoExample.createCriteria();
+        if(StringUtils.isNotBlank(instId)){
+            criteria.andUserTypeEqualTo(UserConstant.USER_INST).andUserCodeEqualTo(instId);
+        }
+        if(StringUtils.isNotBlank(status)){
+            criteria.andStatusEqualTo(status);
+        }
+        
+        //获取满足的记录条数
+        int tranSize = ucRecomCodeControlBiz.countByExample(ucReccomCodeCntlDoExample);
+        
+        return tranSize;
+    }
+    
     public UcReccomCodeCntlDoExample formatSearchCriteria(RecomCodeForm recomCodeForm){
     
         UcReccomCodeCntlDoExample ucReccomCodeCntlDoExample = new UcReccomCodeCntlDoExample();
         UcReccomCodeCntlDoExample.Criteria criteria = ucReccomCodeCntlDoExample.createCriteria();
-        
-//        if(StringUtils.isNotBlank(recomCodeForm.getInstId())){
-//            List<String> agentIdList = agentService.getAgentIdList(recomCodeForm.getInstId(), "");
-//            criteria.andUserTypeEqualTo(UserConstant.USER_AGENT);
-//            criteria.andUserCodeIn(agentIdList);
-//        }
-//        if(StringUtils.isNotBlank(recomCodeForm.getAgentId())){
-//            criteria.andUserTypeEqualTo(UserConstant.USER_AGENT);
-//            criteria.andUserCodeEqualTo(recomCodeForm.getAgentId());
-//        }
         
         if(StringUtils.isNotBlank(recomCodeForm.getUserId())){
             criteria.andUserTypeEqualTo(UserConstant.USER_USER);
@@ -218,9 +227,8 @@ public class RecomCodeServiceImpl implements RecomCodeService {
             criteria.andUserTypeEqualTo(UserConstant.USER_AGENT);
             criteria.andUserCodeEqualTo(recomCodeForm.getAgentId());
         } else if(StringUtils.isNotBlank(recomCodeForm.getInstId())){
-            List<String> agentIdList = agentService.getAgentIdList(recomCodeForm.getInstId(), "");
-            criteria.andUserTypeEqualTo(UserConstant.USER_AGENT);
-            criteria.andUserCodeIn(agentIdList);
+            criteria.andUserTypeEqualTo(UserConstant.USER_INST);
+            criteria.andUserCodeEqualTo(recomCodeForm.getInstId());
         }
         
         if(StringUtils.isNotBlank(recomCodeForm.getStatus())){
@@ -257,14 +265,14 @@ public class RecomCodeServiceImpl implements RecomCodeService {
     
     
     /**
-     * 下发指定个数的推荐码到指定下级代理
+     * 从机构下发指定个数的推荐码到指定下级代理
      */
     @Override
     @Transactional
-    public void dispatchRecomCode(String agentId, String toAgentId, int dispatchCount, String user) {
+    public void dispatchRecomCodeBatchFromInst(String instId, String toAgentId, int dispatchCount, String user) {
     
         UcReccomCodeCntlDoExample ucReccomCodeCntlDoExample = new UcReccomCodeCntlDoExample();
-        ucReccomCodeCntlDoExample.createCriteria().andUserCodeEqualTo(agentId);
+        ucReccomCodeCntlDoExample.createCriteria().andUserTypeEqualTo(UserConstant.USER_INST).andUserCodeEqualTo(instId);
         List<UcReccomCodeCntlDo> ucReccomCodeCntlDoList = ucRecomCodeControlBiz.selectByExample(ucReccomCodeCntlDoExample);
         int i = 0;
         for (UcReccomCodeCntlDo uc : ucReccomCodeCntlDoList) {
@@ -287,14 +295,90 @@ public class RecomCodeServiceImpl implements RecomCodeService {
     }
     
     /**
+     * 从代理下发指定个数的推荐码到指定下级代理
+     */
+    @Override
+    @Transactional
+    public void dispatchRecomCodeBatchFromAgent(String agentId, String toAgentId, int dispatchCount, String user) {
+        
+        UcReccomCodeCntlDoExample ucReccomCodeCntlDoExample = new UcReccomCodeCntlDoExample();
+        ucReccomCodeCntlDoExample.createCriteria().andUserTypeEqualTo(UserConstant.USER_AGENT).andUserCodeEqualTo(agentId);
+        List<UcReccomCodeCntlDo> ucReccomCodeCntlDoList = ucRecomCodeControlBiz.selectByExample(ucReccomCodeCntlDoExample);
+        int i = 0;
+        for (UcReccomCodeCntlDo uc : ucReccomCodeCntlDoList) {
+            if (i >= dispatchCount) {
+                break;
+            }
+            uc.setModifySource(SystemConstant.DEFAULT_SOURCE_CODE);
+            uc.setModifyTime(DateUtil.getCurrentDateTime());
+            uc.setModifyUser(user);
+            uc.setUserCode(toAgentId);
+            int d = ucRecomCodeControlBiz.updateSelective(uc);
+            if (d <= 0) {
+                throw new ErrorException("下发注册时数据库更新异常");
+            }
+            i++;
+            if (i == dispatchCount) {
+                break;
+            }
+        }
+    }
+    
+    /**
+     * 下拨某一个注册码
+     */
+    @Override
+    @Transactional
+    public void dispatchRecomCode(String recomCode, String agentId, UserBO userBO) {
+        
+        UcReccomCodeCntlDo ucReccomCodeCntlDo = ucRecomCodeControlBiz.selectByPrimaryKey(recomCode);
+        ucReccomCodeCntlDo.setUserType(UserConstant.USER_AGENT);
+        ucReccomCodeCntlDo.setUserCode(agentId);
+    
+        ucReccomCodeCntlDo.setModifySource(SystemConstant.DEFAULT_SOURCE_CODE);
+        ucReccomCodeCntlDo.setModifyTime(DateUtil.getCurrentDateTime());
+        ucReccomCodeCntlDo.setModifyUser(userBO.getUsrName());
+        
+        ucRecomCodeControlBiz.updateSelective(ucReccomCodeCntlDo);
+        
+    }
+    
+    /**
      * 挂起某一个注册码
      */
     @Override
     @Transactional
-    public void disableRecomCode(String recomCode) {
+    public void disableRecomCode(String recomCode, UserBO userBO) {
         
         UcReccomCodeCntlDo ucReccomCodeCntlDo = ucRecomCodeControlBiz.selectByPrimaryKey(recomCode);
         ucReccomCodeCntlDo.setStatus(StatusConstant.RECOMCODE_STATUS_DISABLE);
+    
+        ucReccomCodeCntlDo.setModifySource(SystemConstant.DEFAULT_SOURCE_CODE);
+        ucReccomCodeCntlDo.setModifyTime(DateUtil.getCurrentDateTime());
+        ucReccomCodeCntlDo.setModifyUser(userBO.getUsrName());
+        
+        ucRecomCodeControlBiz.updateSelective(ucReccomCodeCntlDo);
+        
+    }
+    
+    /**
+     * 激活某一个注册码
+     */
+    @Override
+    @Transactional
+    public void activateRecomCode(String recomCode, UserBO userBO) {
+        
+        UcReccomCodeCntlDo ucReccomCodeCntlDo = ucRecomCodeControlBiz.selectByPrimaryKey(recomCode);
+        ucReccomCodeCntlDo.setStatus(StatusConstant.RECOMCODE_STATUS_ENABLE);
+        if("Y".equals(ucReccomCodeCntlDo.getPwdRequired())){
+            String pw = RandomCodesUtils.genRandomNumber(4);   //生成4位数字密码
+            ucReccomCodeCntlDo.setReccomCodePwd(pw);
+        }
+    
+        ucReccomCodeCntlDo.setModifySource(SystemConstant.DEFAULT_SOURCE_CODE);
+        ucReccomCodeCntlDo.setModifyTime(DateUtil.getCurrentDateTime());
+        ucReccomCodeCntlDo.setModifyUser(userBO.getUsrName());
+        
         ucRecomCodeControlBiz.updateSelective(ucReccomCodeCntlDo);
         
     }
@@ -333,4 +417,151 @@ public class RecomCodeServiceImpl implements RecomCodeService {
         
     }
     
+    
+    /**
+     * 激活指定推荐码到指定代理
+     */
+    @Override
+    @Transactional
+    public String activateRecomCodeSelected(List<String> recomCodeList, String user) {
+        
+        List<String> sList = new ArrayList<>();
+        List<String> eList = new ArrayList<>();
+        
+        String recomP = "";
+        for(String recomCode: recomCodeList){
+            
+            UcReccomCodeCntlDo ucReccomCodeCntlDo = ucRecomCodeControlBiz.selectByPrimaryKey(recomCode);
+            if(ucReccomCodeCntlDo == null){
+                eList.add(recomP);
+                continue;
+            }
+            if(!StatusConstant.RECOMCODE_STATUS_NEW.equals(ucReccomCodeCntlDo.getStatus())){
+                eList.add(recomP);
+                continue;
+            }
+            if("Y".equals(ucReccomCodeCntlDo.getPwdRequired())){
+                String pw = RandomCodesUtils.genRandomNumber(4);   //生成4位数字密码
+                ucReccomCodeCntlDo.setReccomCodePwd(pw);
+            }
+            ucReccomCodeCntlDo.setStatus(StatusConstant.RECOMCODE_STATUS_ENABLE);
+            ucReccomCodeCntlDo.setModifySource(SystemConstant.DEFAULT_SOURCE_CODE);
+            ucReccomCodeCntlDo.setModifyTime(DateUtil.getCurrentDateTime());
+            ucReccomCodeCntlDo.setModifyUser(user);
+            int d = ucRecomCodeControlBiz.updateSelective(ucReccomCodeCntlDo);
+            if (d <= 0) {
+                throw new ErrorException("激活选中注册码时数据库更新异常");
+            }
+            sList.add(recomCode);
+        }
+        
+        return "激活成功个数:" + sList.size() + "个." + "激活失败个数:" + eList.size() + "个";
+        
+    }
+    
+    /**
+     * 禁用指定推荐码到指定代理
+     */
+    @Override
+    @Transactional
+    public String disableRecomCodeSelected(List<String> recomCodeList, String user) {
+        
+        List<String> sList = new ArrayList<>();
+        List<String> eList = new ArrayList<>();
+        
+        String recomP = "";
+        for(String recomCode: recomCodeList){
+            
+            UcReccomCodeCntlDo ucReccomCodeCntlDo = ucRecomCodeControlBiz.selectByPrimaryKey(recomCode);
+            if(ucReccomCodeCntlDo == null){
+                eList.add(recomP);
+                continue;
+            }
+            if(StatusConstant.RECOMCODE_STATUS_USED.equals(ucReccomCodeCntlDo.getStatus())){
+                eList.add(recomP);
+                continue;
+            }
+            ucReccomCodeCntlDo.setStatus(StatusConstant.RECOMCODE_STATUS_DISABLE);
+            ucReccomCodeCntlDo.setModifySource(SystemConstant.DEFAULT_SOURCE_CODE);
+            ucReccomCodeCntlDo.setModifyTime(DateUtil.getCurrentDateTime());
+            ucReccomCodeCntlDo.setModifyUser(user);
+            int d = ucRecomCodeControlBiz.updateSelective(ucReccomCodeCntlDo);
+            if (d <= 0) {
+                throw new ErrorException("禁用选中注册码时数据库更新异常");
+            }
+            sList.add(recomCode);
+        }
+        
+        return "禁用成功个数:" + sList.size() + "个." + "禁用失败个数:" + eList.size() + "个";
+        
+    }
+    
+    /**
+     * 下发指定推荐码到指定代理
+     */
+    @Override
+    @Transactional
+    public String dispatchRecomCodeSelectedFromInst(List<String> recomCodeList, String toAgentId, String user) {
+        
+        List<String> sList = new ArrayList<>();
+        List<String> eList = new ArrayList<>();
+        
+        String recomP = "";
+        for(String recomCode: recomCodeList){
+            
+            UcReccomCodeCntlDo ucReccomCodeCntlDo = ucRecomCodeControlBiz.selectByPrimaryKey(recomCode);
+            if(ucReccomCodeCntlDo == null || !StatusConstant.STATUS_NEW.equals(ucReccomCodeCntlDo.getStatus())){
+                eList.add(recomP);
+                continue;
+            }
+            
+            ucReccomCodeCntlDo.setModifySource(SystemConstant.DEFAULT_SOURCE_CODE);
+            ucReccomCodeCntlDo.setModifyTime(DateUtil.getCurrentDateTime());
+            ucReccomCodeCntlDo.setModifyUser(user);
+            ucReccomCodeCntlDo.setUserType(UserConstant.USER_AGENT);
+            ucReccomCodeCntlDo.setUserCode(toAgentId);
+            int d = ucRecomCodeControlBiz.updateSelective(ucReccomCodeCntlDo);
+            if (d <= 0) {
+                throw new ErrorException("下发注册时数据库更新异常");
+            }
+            sList.add(recomCode);
+        }
+        
+        return "下发成功个数:" + sList.size() + "个." + "下发失败个数:" + eList.size() + "个";
+        
+    }
+    
+    /**
+     * 下发指定推荐码到指定代理
+     */
+    @Override
+    @Transactional
+    public String dispatchRecomCodeSelectedFromAgent(List<String> recomCodeList, String toAgentId, String user) {
+        
+        List<String> sList = new ArrayList<>();
+        List<String> eList = new ArrayList<>();
+        
+        String recomP = "";
+        for(String recomCode: recomCodeList){
+            
+            UcReccomCodeCntlDo ucReccomCodeCntlDo = ucRecomCodeControlBiz.selectByPrimaryKey(recomP);
+            if(ucReccomCodeCntlDo == null || !StatusConstant.STATUS_ENABLE.equals(ucReccomCodeCntlDo.getStatus())){
+                eList.add(recomP);
+                continue;
+            }
+            
+            ucReccomCodeCntlDo.setModifySource(SystemConstant.DEFAULT_SOURCE_CODE);
+            ucReccomCodeCntlDo.setModifyTime(DateUtil.getCurrentDateTime());
+            ucReccomCodeCntlDo.setModifyUser(user);
+            ucReccomCodeCntlDo.setUserCode(toAgentId);
+            int d = ucRecomCodeControlBiz.updateSelective(ucReccomCodeCntlDo);
+            if (d <= 0) {
+                throw new ErrorException("下发注册时数据库更新异常");
+            }
+            sList.add(recomCode);
+        }
+        
+        return "下发成功个数:" + sList.size() + "个." + "下发失败个数:" + eList.size() + "个";
+        
+    }
 }

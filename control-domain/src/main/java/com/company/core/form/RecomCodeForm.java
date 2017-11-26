@@ -14,6 +14,9 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = false)
 public class RecomCodeForm  extends BaseForm {
     
+    private String userType;
+    private String userCode;
+    
     private String instId;
     private String agentId;
     private String recomCodeType;
@@ -44,5 +47,11 @@ public class RecomCodeForm  extends BaseForm {
     
     //上次查询agentId
     private String lastSearchAgentId;
+    
+    private String recomCodeTotalCount;  //总个数
+    private String recomCodeAvailableCount; //可用个数
+    
+    
+    
     
 }

@@ -24,14 +24,40 @@ public interface RecomCodeService {
     
     Pagination getAllRecomcodes(RecomCodeForm recomCodeForm);
     
+    int getTotalRecomCodeByInst(String instId, String status);
+    
     int getRecomCodeCount(String userCode, String status);
     
-    @Transactional
-    void dispatchRecomCode(String agentId, String toAgentId, int dispatchCount, String user);
+//    @Transactional
+//    void dispatchRecomCodeBatch(String agentId, String toAgentId, int dispatchCount, String user);
     
     @Transactional
-    void disableRecomCode(String recomCode);
+    void dispatchRecomCodeBatchFromInst(String instId, String toAgentId, int dispatchCount, String user);
+    
+    @Transactional
+    void dispatchRecomCodeBatchFromAgent(String agentId, String toAgentId, int dispatchCount, String user);
+    
+    @Transactional
+    void dispatchRecomCode(String recomCode, String agentId, UserBO userBO);
+    
+    @Transactional
+    void disableRecomCode(String recomCode, UserBO userBO);
+    
+    @Transactional
+    void activateRecomCode(String recomCode, UserBO userBO);
     
     @Transactional
     String dispatchRecomCodeSelected(List<String> recomCodeList, String toAgentId, String user);
+    
+    @Transactional
+    String activateRecomCodeSelected(List<String> recomCodeList, String user);
+    
+    @Transactional
+    String disableRecomCodeSelected(List<String> recomCodeList, String user);
+    
+    @Transactional
+    String dispatchRecomCodeSelectedFromInst(List<String> recomCodeList, String toAgentId, String user);
+    
+    @Transactional
+    String dispatchRecomCodeSelectedFromAgent(List<String> recomCodeList, String toAgentId, String user);
 }

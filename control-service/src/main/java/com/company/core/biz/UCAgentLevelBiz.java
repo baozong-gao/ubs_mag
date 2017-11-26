@@ -57,4 +57,10 @@ public class UCAgentLevelBiz {
 
     }
     
+    public int insert (UcAgentLevelDo ucAgentLevelDo){
+        
+        return ucAgentLevelDoMapper.insertSelective(ucAgentLevelDo);
+        
+    }
+    
 }

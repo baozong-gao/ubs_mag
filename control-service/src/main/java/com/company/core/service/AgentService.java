@@ -30,6 +30,9 @@ public interface AgentService {
     //为下拉框重新定义返回
     List<UcAgentDo> getAgentListForDropDown(String instId, String agentType, String status);
     
+    //为下拉框重新定义返回
+    List<UcAgentDo> getAgentListForDropDown(String instId, String agentType, String status, String level);
+    
     public List<String> getAgentIdList(String instId, String status);
     
     List<UcAgentDo> getAgentIdListOfAgentOwnEnabled(String agentId);
@@ -41,6 +44,8 @@ public interface AgentService {
     void createAgentDetailInfo(AgentForm agentForm, UserBO userBO);
     
     void createAgentFeeInfo(AgentForm agentForm, UserBO userBO);
+    
+    void createAgentLevelInfo(AgentForm agentForm, UserBO userBO);
     
     void formatAgentFormFromAgent(AgentForm agentForm);
     
@@ -65,6 +70,8 @@ public interface AgentService {
     
     Pagination getAgentListPage(AgentForm agentForm);
     
+    List<UcAgentDo> getAgentListOfAgentOwn(String agentId, String status);
+    
     public Map<String , String> checkAgentBefore(AgentForm agentForm, UserBO userBO);
     
     void updateAgent(AgentForm agentForm, UserBO userBO);
@@ -85,6 +92,8 @@ public interface AgentService {
     void disableAgent(String agentId, UserBO userBO) throws Exception;
     
     String checkFees(AgentForm agentForm);
+    
+    String checkFeesAgentOpen(AgentForm agentForm);
     
     @Transactional
     void createAgentAcct(UcAgentDo ucAgentDo, UserBO shiroUserBo);

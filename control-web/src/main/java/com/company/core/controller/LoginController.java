@@ -88,10 +88,10 @@ public class LoginController {
         try {
             currentUser.login(captchaUsernamePasswordToken);
     
-            log.info("判断用户类型");  //不是机构, 代理, 商户类型, 都可以登录控台  wwk
+            log.info("判断用户类型");  //不机构, 代理, 商户类型, 不允许登录控台  wwk
             UserBO userBO = userService.get(loginForm.getUsername());
-            if(StringUtils.isNotBlank(userBO.getUsrType()) && !UserConstant.USER_INST.equals(userBO.getUsrType()) &&
-                    !UserConstant.USER_AGENT.equals(userBO.getUsrType()) && !UserConstant.USER_USER.equals(userBO.getUsrType())){
+            if(StringUtils.isNotBlank(userBO.getUsrType()) && (UserConstant.USER_INST.equals(userBO.getUsrType()) ||
+                    UserConstant.USER_AGENT.equals(userBO.getUsrType()) || UserConstant.USER_USER.equals(userBO.getUsrType()))){
                 currentUser.logout();
                 resultMap.put("statusCode", "300");
                 resultMap.put("message", "请前往机构代理平台登录!");

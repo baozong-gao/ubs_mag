@@ -26,16 +26,6 @@
         <input type="hidden" id="pageCurrent" name="pageCurrent" value="${recomCodeListForm.pageCurrent}">
         <div class="bjui-searchBar">
             <div class="row-inut">
-
-                <label class="labelblock">机构号:</label>
-                <select name="instId" id="instId" data-toggle="selectpicker"  data-live-search="true">
-                    <option style="width: 60px; display: inline-block" value="">-请选择-</option>
-                    <c:forEach var="record" items="${instList}"
-                               varStatus="status">
-                        <option value="${record.instId}"
-                                <c:if test="${record.instId == recomCodeListForm.instId}">selected</c:if> >${record.instName}</option>
-                    </c:forEach>
-                </select>
                 <label class="labelblock">代理号:</label>
                 <select name="agentId" id="agentId" data-toggle="selectpicker" data-live-search="true">
                     <option style="width: 60px; display: inline-block" value="">-请选择-</option>
@@ -47,7 +37,7 @@
                 </select>
 
                 <label class="labelblock">用户号:</label>
-                <input type="text" name="userId" id="userId" placeholder="输入用户号" size="15" value="${recomCodeListForm.userId}">&nbsp;
+                <input type="text" name="userId" id="userId" placeholder="输入用户号" size="19" value="${recomCodeListForm.userId}">&nbsp;
 
                 <label class="labelblock">状态:</label>
                 <select name="status" id="status" data-toggle="selectpicker">
@@ -72,9 +62,14 @@
             </div>
 
             <div class="row-input">
-                    <a data-icon="save" class="btn btn-default" id="dispatch_selected" name='dispatch_selected' data-toggle="dialog" data-width="300" data-height="200" data-id="dialog-normal" data-title="下拨注册码">下拨选中</a>
 
-                    <a href="${pageContext.request.contextPath}/recomCode/dispatchBatchPage" data-icon="home" class="btn btn-default" data-id="navtab-recomCode-dispatch-batch" data-toggle="dialog" data-width="600" data-height="400" data-id="dialog-normal" data-title="批量下拨注册码">批量下拨</a>
+                <a data-icon="save" class="btn btn-default" id="dispatch_selected" name='dispatch_selected' data-toggle="dialog" data-width="300" data-height="200" data-id="dialog-normal" data-title="下拨注册码">下拨选中</a>
+
+                <a data-icon="save" class="btn btn-default" id="activate_selected" name='activate_selected'>激活选中</a>
+
+                <a data-icon="save" class="btn btn-default" id="disable_selected" name='disable_selected'>禁用选中</a>
+
+                <a href="${pageContext.request.contextPath}/recomCode/dispatchBatchPage" data-icon="home" class="btn btn-default" data-id="navtab-recomCode-dispatch-batch" data-toggle="dialog" data-width="600" data-height="400" data-id="dialog-normal" data-title="批量下拨注册码">批量下拨</a>
             </div>
         </div>
     </form>
@@ -88,7 +83,7 @@
             <th align="center">批次号</th>
             <th align="center">序列号</th>
             <th align="center">注册码</th>
-            <th align="center">代理号</th>
+            <th align="center">所属</th>
             <th align="center">绑定用户</th>
             <th align="center">状态</th>
             <th align="center">过期日期</th>
@@ -118,11 +113,9 @@
             <td align="center"><c:out value="${record.createUser}"/></td>
             <td align="center"><c:out value="${record.createTime}"/></td>
             <td align="center">
-                    <%--<a href="${pageContext.request.contextPath}/recomCode/activate?recomCode=<c:out value="${record.recomCode}"/>" class="btn btn-green" data-toggle="doajax" <c:if test="${record.status=='E'} || ${record.status=='M'} || ${record.status=='U'}"> disabled=true </c:if>>激活</a>--%>
-                <%--<a href="${pageContext.request.contextPath}/recomCode/activate?recomCode=<c:out value="${record.recomCode}"/>" class="btn btn-green" data-toggle="doajax" <c:if test="${record.status=='E' || record.status=='M' || record.status=='U'}"> disabled=true </c:if>>激活</a>--%>
-                <a href="${pageContext.request.contextPath}/recomCode/disabled?recomCode=<c:out value="${record.recomCode}"/>" class="btn btn-blue" data-toggle="doajax" data-confirm-msg="确定？" <c:if test="${record.status=='D' || record.status=='U' }"> disabled=true </c:if>>禁用</a>
-                <%--<a href="${pageContext.request.contextPath}/recomCode/modifyPage?recomCode=<c:out value="${record.recomCode}"/>" class="btn btn-refresh" data-toggle="dialog" data-width="600" data-height="400" data-id="dialog-normal" data-title="注册码修改" <c:if test="${record.status=='U'}"> disabled=true </c:if>>修改</a>--%>
-                <a href="${pageContext.request.contextPath}/recomCode/dispatchPage?recomCode=<c:out value="${record.recomCode}"/>" class="btn btn-primary" data-toggle="dialog" data-width="600" data-height="400" data-id="dialog-normal" data-title="注册码下发" <c:if test="${record.status=='D' || record.status=='M' || record.status=='U' }"> disabled=true </c:if>>下发</a>
+                <a href="${pageContext.request.contextPath}/recomCode/activate?recomCode=<c:out value="${record.recomCode}"/>&userCode=<c:out value="${record.userCode}"/>&userType=<c:out value="${record.userType}"/>" class="btn btn-green" data-toggle="doajax" data-confirm-msg="确定？" <c:if test="${record.status=='C' || record.status=='U' || record.status=='E'}"> disabled=true </c:if>>激活</a>
+                <a href="${pageContext.request.contextPath}/recomCode/disable?recomCode=<c:out value="${record.recomCode}"/>&userCode=<c:out value="${record.userCode}"/>&userType=<c:out value="${record.userType}"/>" class="btn btn-blue" data-toggle="doajax" data-confirm-msg="确定？" <c:if test="${record.status=='D' || record.status=='U' }"> disabled=true </c:if>>禁用</a>
+                <a href="${pageContext.request.contextPath}/recomCode/dispatchPage?recomCode=<c:out value="${record.recomCode}"/>&userCode=<c:out value="${record.userCode}"/>&userType=<c:out value="${record.userType}"/>" class="btn btn-primary" data-toggle="dialog" data-width="600" data-height="400" data-id="dialog-normal" data-title="注册码下发" <c:if test="${'E' != record.status}"> disabled=true </c:if>>下发</a>
             </td>
             </tr>
         </c:forEach>
@@ -161,7 +154,7 @@
 
 
     /**
-     * 批量操作
+     * 批量下发操作
      */
     $(document.body).on("click", "#dispatch_selected", function () {
 
@@ -181,7 +174,7 @@
                     compareAgent = recAgent;
                 }
                 if(compareAgent != recAgent){
-                    alert("注册码不属于同一代理无法批量下发选中");
+                    alert("注册码不属于同一机构无法批量下发选中");
                     eflag = true;
                     return;
                 }
@@ -198,7 +191,61 @@
         }
 
         $("#dispatch_selected").attr("href", ("${pageContext.request.contextPath}/recomCode/dispatchSelectedPage" + "?recomCode=" +
-            array.join(" ") + "&agentId=" +  recAgent));
+            array.join(" ") + "&instId=" +  recAgent));
+    });
+
+
+    /**
+     * 批量激活操作
+     */
+    $(document.body).on("click", "#activate_selected", function () {
+
+        var array= new Array();
+        var eflag = false;
+        var c = 1;
+        var oagent = "";
+        var recAgent = "";
+        var compareAgent = "";
+        $('input[type="checkbox"][name="selone"]:checked').each(
+            function() {
+                var str = $(this).val();
+                var sa = str.split("&");
+                oagent = $("#agentId").val().trim();
+                recAgent = sa[0].trim();
+                if("" == compareAgent){
+                    compareAgent = recAgent;
+                }
+                if(compareAgent != recAgent){
+                    alert("注册码不属于同一机构无法批量激活选中");
+                    eflag = true;
+                    return;
+                }
+                sa[1].replace("[", "").replace("]", "");
+                array.push(sa[1]);  //推荐码
+            }
+        );
+        if(eflag){
+            return;
+        }
+        if (array.length == "") {
+            alert("未选中任何记录!");
+            return;
+        }
+
+        var data = {};
+        data["recomCode"] = array.join(" ");
+        data["userCode"] = recAgent;
+        $.ajax({
+            async: false,
+            cache: false,
+            type: 'POST',
+            url: "<%=request.getContextPath() %>/recomCode/activate_selected",
+            data: data,
+            success: function (result) {
+                var message = result.message;
+                alert(message);
+            }
+        });
     });
 
 

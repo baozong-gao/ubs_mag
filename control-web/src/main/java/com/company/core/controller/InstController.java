@@ -3,6 +3,7 @@ package com.company.core.controller;
 import com.company.core.constant.Constant;
 import com.company.core.constant.ErrorException;
 import com.company.core.constant.StatusConstant;
+import com.company.core.constant.UserConstant;
 import com.company.core.domain.UserBO;
 import com.company.core.entity.UcCategoryDo;
 import com.company.core.entity.UcInstDo;
@@ -158,11 +159,11 @@ public class InstController extends BaseController {
         try {
             UserBO userBO = getCurrentUser();
 
-            //检查费率
-            String error = instService.checkFees(instForm);
-            if(StringUtils.isNotBlank(error)){
-                return returnError(error);
-            }
+//            //检查费率
+//            String error = instService.checkFees(instForm);
+//            if(StringUtils.isNotBlank(error)){
+//                return returnError(error);
+//            }
             
             instService.updateInst(instForm, userBO);
             
@@ -316,6 +317,60 @@ public class InstController extends BaseController {
         }
         
         return returnSuccess("新增机构成功, 机构号为:" + inst);
+        
+    }
+    
+    @RequestMapping(value = "/feePage", method = RequestMethod.GET)
+    public ModelAndView toFeePage(HttpServletRequest request, HttpServletResponse response, ModelAndView modelAndView) {
+        
+        String instId = request.getParameter("instId");
+        if(StringUtils.isBlank(instId)){
+            modelAndView.getModel().put("statusCode", 300);
+            modelAndView.getModel().put("message", "查看费率的机构号参数为空");
+            modelAndView.setViewName("/inst/fee_inst");
+            return modelAndView;
+        }
+        
+        UcInstDo ucInstDo = instService.getInst(instId);
+        if(ucInstDo == null){
+            modelAndView.getModel().put("statusCode", 300);
+            modelAndView.getModel().put("message", "查看费率的机构不存在");
+            modelAndView.setViewName("/inst/fee_inst");
+            return modelAndView;
+        }
+        
+        InstForm instForm = new InstForm();
+        instForm.setInstId(instId);
+        
+        instService.formatInstFormFromFee(instForm); //费率信息
+        
+        modelAndView.getModel().put("instFeeForm", instForm);
+        modelAndView.setViewName("/inst/fee_inst");
+        return modelAndView;
+    }
+    
+    
+    @RequestMapping(value = "/update_inst_fee", method = RequestMethod.POST)
+    @ResponseBody
+    public Map<String, Object> toUpdateInstFee (HttpServletRequest request, HttpServletResponse response, ModelAndView modelAndView, @ModelAttribute("instFeeForm") InstForm instForm) {
+        
+        try {
+            UserBO userBO = getCurrentUser();
+            
+            //检查费率
+            String error = instService.checkFees(instForm);
+            if(StringUtils.isNotBlank(error)){
+                return returnError(error);
+            }
+            
+            instService.updateInstFee(instForm, userBO);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            return returnError("数据更新失败");
+        }
+        
+        return returnSuccess("数据更新成功");
         
     }
     

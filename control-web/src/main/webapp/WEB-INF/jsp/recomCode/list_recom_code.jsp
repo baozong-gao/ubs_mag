@@ -88,7 +88,7 @@
             <th align="center">批次号</th>
             <th align="center">序列号</th>
             <th align="center">注册码</th>
-            <th align="center">代理号</th>
+            <th align="center">所属</th>
             <th align="center">绑定用户</th>
             <th align="center">状态</th>
             <th align="center">过期日期</th>
@@ -100,7 +100,7 @@
         <tbody>
         <c:forEach var="record" items="${recomCodeListForm.pagination.list}" varStatus="status">
             <td align="center">
-                <input type="checkbox" name ='selone' value=" ${record.userCode}&${record.recomCode}">
+                <input type="checkbox" name ='selone' value=" ${record.userCode}&${record.recomCode}" <c:if test="${'1' != record.userType}">disabled="true"</c:if>>
             </td>
             <td align="center"><c:out value="${record.batchId}"/></td>
             <td align="center"><c:out value="${record.recomCodeSeq}"/></td>
@@ -118,11 +118,8 @@
             <td align="center"><c:out value="${record.createUser}"/></td>
             <td align="center"><c:out value="${record.createTime}"/></td>
             <td align="center">
-                    <%--<a href="${pageContext.request.contextPath}/recomCode/activate?recomCode=<c:out value="${record.recomCode}"/>" class="btn btn-green" data-toggle="doajax" <c:if test="${record.status=='E'} || ${record.status=='M'} || ${record.status=='U'}"> disabled=true </c:if>>激活</a>--%>
-                <%--<a href="${pageContext.request.contextPath}/recomCode/activate?recomCode=<c:out value="${record.recomCode}"/>" class="btn btn-green" data-toggle="doajax" <c:if test="${record.status=='E' || record.status=='M' || record.status=='U'}"> disabled=true </c:if>>激活</a>--%>
-                <a href="${pageContext.request.contextPath}/recomCode/disabled?recomCode=<c:out value="${record.recomCode}"/>" class="btn btn-blue" data-toggle="doajax" data-confirm-msg="确定？" <c:if test="${record.status=='D' || record.status=='U' }"> disabled=true </c:if>>禁用</a>
-                <%--<a href="${pageContext.request.contextPath}/recomCode/modifyPage?recomCode=<c:out value="${record.recomCode}"/>" class="btn btn-refresh" data-toggle="dialog" data-width="600" data-height="400" data-id="dialog-normal" data-title="注册码修改" <c:if test="${record.status=='U'}"> disabled=true </c:if>>修改</a>--%>
-                <a href="${pageContext.request.contextPath}/recomCode/dispatchPage?recomCode=<c:out value="${record.recomCode}"/>" class="btn btn-primary" data-toggle="dialog" data-width="600" data-height="400" data-id="dialog-normal" data-title="注册码下发" <c:if test="${record.status=='D' || record.status=='M' || record.status=='U' }"> disabled=true </c:if>>下发</a>
+                <a href="${pageContext.request.contextPath}/recomCode/disabled?recomCode=<c:out value="${record.recomCode}"/>&userCode=<c:out value="${record.userCode}"/>&userType=<c:out value="${record.userType}"/>" class="btn btn-blue" data-toggle="doajax" data-confirm-msg="确定？" <c:if test="${record.status=='D' || record.status=='U' }"> disabled=true </c:if>>禁用</a>
+                <a href="${pageContext.request.contextPath}/recomCode/dispatchPage?recomCode=<c:out value="${record.recomCode}"/>&userCode=<c:out value="${record.userCode}"/>&userType=<c:out value="${record.userType}"/>" class="btn btn-primary" data-toggle="dialog" data-width="600" data-height="400" data-id="dialog-normal" data-title="注册码下发" <c:if test="${record.status=='D' || record.status=='M' || record.status=='U' || record.userType != '1'}"> disabled=true </c:if>>下发</a>
             </td>
             </tr>
         </c:forEach>
@@ -181,7 +178,7 @@
                     compareAgent = recAgent;
                 }
                 if(compareAgent != recAgent){
-                    alert("注册码不属于同一代理无法批量下发选中");
+                    alert("注册码不属于同一机构无法批量下发选中");
                     eflag = true;
                     return;
                 }
@@ -198,7 +195,7 @@
         }
 
         $("#dispatch_selected").attr("href", ("${pageContext.request.contextPath}/recomCode/dispatchSelectedPage" + "?recomCode=" +
-            array.join(" ") + "&agentId=" +  recAgent));
+            array.join(" ") + "&instId=" +  recAgent));
     });
 
 

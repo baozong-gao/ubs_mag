@@ -2,6 +2,7 @@ package com.company.core.controller;
 
 import com.company.core.constant.ErrorException;
 import com.company.core.constant.StatusConstant;
+import com.company.core.constant.UserConstant;
 import com.company.core.domain.UserBO;
 import com.company.core.entity.UcAgentDo;
 import com.company.core.entity.UcAgentLevelDo;
@@ -42,13 +43,22 @@ public class AgentController extends BaseController {
     
     @RequestMapping(value = "/addPage", method = RequestMethod.GET)
     public ModelAndView toAddPage(HttpServletRequest request, HttpServletResponse response, ModelAndView modelAndView) {
-        
-        List<UcInstDo> ucInstDoList = instService.getInstListByStatus(StatusConstant.STATUS_ENABLE);
-        modelAndView.getModel().put("instList", ucInstDoList);
     
-//        List<UcProdDo> ucProdDos = prodCategoryService.getProdList();
-//        modelAndView.getModel().put("prodList", ucProdDos);
-        
+        UserBO userBO = getCurrentUser();
+        AgentForm agentForm = new AgentForm();
+        agentForm.setUserType(userBO.getUserCodeType());
+        agentForm.setUserCode(userBO.getUserCode());
+        agentForm.setUserCodeName(userBO.getUserCodeName());
+        if(UserConstant.USER_INST.equals(userBO.getUserCodeType())){
+            agentForm.setInstId(userBO.getUserCode());
+            List<UcAgentDo> ucAgentDoList = agentService.getAgentListForDropDown(userBO.getUserCode(),"", StatusConstant.STATUS_ENABLE);
+            modelAndView.getModel().put("agentList", ucAgentDoList);
+        } else if(UserConstant.USER_AGENT.equals(userBO.getUserCodeType())){
+            UcAgentDo ucAgentDo = agentService.getAgent(userBO.getUserCode());
+            agentForm.setInstId(ucAgentDo.getInstId());
+        }
+    
+        modelAndView.getModel().put("agentForm", agentForm);
         modelAndView.setViewName("/agent/add_agent");
         return modelAndView;
     }
@@ -59,18 +69,41 @@ public class AgentController extends BaseController {
     public Map toAddNewAgent(HttpServletRequest request, HttpServletResponse response, ModelAndView modelAndView, @ModelAttribute("agentForm") AgentForm agentForm) {
         
         UserBO userBO = getCurrentUser();
-        
-        log.info("代理开户");
-        log.info("代理开户-检查机构信息");
-        if(StringUtils.isBlank(agentForm.getInstId())){
-            return returnError("机构号不能为空, 请选择机构号");
+        if(!UserConstant.USER_INST.equals(userBO.getUserCodeType()) && !UserConstant.USER_AGENT.equals(userBO.getUserCodeType())){
+            return returnError("此登录账号不允许添加代理");
         }
-        UcInstDo ucInstDo = instService.getInst(agentForm.getInstId());
-        if(ucInstDo == null){
-            return returnError("机构号不存在");
-        }
-        if(!"Y".equals(ucInstDo.getAgentOk())){
-            return returnError("机构不允许开代理");
+    
+        //如果是机构身份登录, 可以开1级代理, 也可以开下级代理
+        if(UserConstant.USER_INST.equals(userBO.getUserCodeType())){
+            //机构角色
+            log.info("代理开户-检查机构信息");
+            if(StringUtils.isBlank(agentForm.getUserCode())){
+                return returnError("请重新登录, 获取登录用户信息");
+            }
+            UcInstDo ucInstDo = instService.getInst(agentForm.getUserCode());
+            if(ucInstDo == null){
+                return returnError("机构号不存在");
+            }
+            if(!"Y".equals(ucInstDo.getAgentOk())){
+                return returnError("机构不允许开代理");
+            }
+        } else if (UserConstant.USER_AGENT.equals(userBO.getUserCodeType())){
+    
+            UcInstDo ucInstDo = instService.getInst(agentForm.getUserCode());
+            if(ucInstDo == null){
+                return returnError("机构号不存在");
+            }
+            if(!"Y".equals(ucInstDo.getAgentOk())){
+                return returnError("机构不允许开代理");
+            }
+            
+            UcAgentDo ucAgentDo = agentService.getAgent(agentForm.getUserCode());
+            if(ucAgentDo == null){
+                return returnError("请核实登录代理是否正确");
+            }
+            if(!"Y".equals(ucAgentDo.getAgentOk())){
+                return returnError("代理不允许开下级代理");
+            }
         }
         
         Boolean dupshortname = agentService.checkIfDupAgentByName("", agentForm.getAgentShortName());
@@ -83,21 +116,29 @@ public class AgentController extends BaseController {
         }
     
         //检查费率
-        String error = agentService.checkFees(agentForm);
+        String error = agentService.checkFeesAgentOpen(agentForm);
         if(StringUtils.isNotBlank(error)){
             return returnError(error);
         }
     
+        //保存下发的代理
+        if(StringUtils.isNotBlank(agentForm.getAgentId())){
+            agentForm.setUpAgentId(agentForm.getAgentId());
+        } else {
+            agentForm.setUpAgentId("");
+        }
+        
         //新增代理
         String agent = "";
         try {
-            //检查一些代理信息, 比如费率问题 - 后续添加
-           Map<String, String> result = agentService.checkAgentBefore(agentForm, userBO);
-           if(result.containsKey("error")){
-               return returnError(result.get("error"));
-           }
+//            //检查一些代理信息, 比如费率问题 - 后续添加
+//           Map<String, String> result = agentService.checkAgentBefore(agentForm, userBO);
+//           if(result.containsKey("error")){
+//               return returnError(result.get("error"));
+//           }
             
            agent = agentService.createNewAgent(agentForm, userBO);
+           
         } catch (Exception e) {
             e.printStackTrace();
             if(e instanceof ErrorException){
@@ -114,6 +155,19 @@ public class AgentController extends BaseController {
     
     @RequestMapping(value = "/listPage", method = RequestMethod.GET)
     public ModelAndView toListPage(HttpServletRequest request, HttpServletResponse response, ModelAndView modelAndView) {
+    
+        UserBO userBO = getCurrentUser();
+        if(!UserConstant.USER_INST.equals(userBO.getUserCodeType()) && !UserConstant.USER_AGENT.equals(userBO.getUserCodeType())){
+            modelAndView.setViewName("/agent/list_agent");
+            return modelAndView;
+        }
+        if(UserConstant.USER_INST.equals(userBO.getUserCodeType())){
+            List<UcAgentDo> ucAgentDoList = agentService.getAgentListForDropDown(userBO.getUserCode(),"", "");
+            modelAndView.getModel().put("agentList", ucAgentDoList);
+        } else if(UserConstant.USER_AGENT.equals(userBO.getUserCodeType())){
+            List<UcAgentDo> ucAgentDoList = agentService.getAgentListOfAgentOwn(userBO.getUserCode(), "");
+            modelAndView.getModel().put("agentList", ucAgentDoList);
+        }
         
         AgentForm agentForm = new AgentForm();
         agentForm.setPageCurrent("0");
@@ -198,6 +252,11 @@ public class AgentController extends BaseController {
     public Map<String, Object> toActivateAgent (HttpServletRequest request, HttpServletResponse response) {
         
         try {
+    
+            UserBO userBO = getCurrentUser();
+            if(!UserConstant.USER_INST.equals(userBO.getUserCodeType()) && !UserConstant.USER_AGENT.equals(userBO.getUserCodeType())){
+                return returnError("登录账户类型不允许激活代理");
+            }
             
             String agentId = request.getParameter("agentId");
             if(StringUtils.isBlank(agentId)){
@@ -216,13 +275,15 @@ public class AgentController extends BaseController {
             
             UcAgentLevelDo ucAgentLevelDo = agentService.getAgentLevel(agentId);
             if(ucAgentLevelDo == null){
-                return returnError("代理等级未知");
+                if(!UserConstant.USER_INST.equals(userBO.getUserCodeType())){
+                    return returnError("代理等级未知");
+                }
+            }else {
+                UcAgentLevelDo ucAgentLevelDo1 = agentService.getAgentLevel(userBO.getUserCode());
+                if(ucAgentLevelDo1.getAgentLevel() != ucAgentLevelDo.getAgentLevel()){
+                    return returnError("等级关系不正确,无法激活");
+                }
             }
-            if(!"1".equals(ucAgentLevelDo)){
-                return returnError("只能激活一级代理");
-            }
-            
-            UserBO userBO = getCurrentUser();
             
             //激活
             agentService.activateAgent(agentId, userBO);
@@ -242,6 +303,11 @@ public class AgentController extends BaseController {
         
         try {
     
+            UserBO userBO = getCurrentUser();
+            if(!UserConstant.USER_INST.equals(userBO.getUserCodeType()) && !UserConstant.USER_AGENT.equals(userBO.getUserCodeType())){
+                return returnError("登录账户类型不允许激活代理");
+            }
+            
             String agentId = request.getParameter("agentId");
             if(StringUtils.isBlank(agentId)){
         
@@ -259,13 +325,15 @@ public class AgentController extends BaseController {
     
             UcAgentLevelDo ucAgentLevelDo = agentService.getAgentLevel(agentId);
             if(ucAgentLevelDo == null){
-                return returnError("代理等级未知");
+                if(!UserConstant.USER_INST.equals(userBO.getUserCodeType())){
+                    return returnError("代理等级未知");
+                }
+            }else {
+                UcAgentLevelDo ucAgentLevelDo1 = agentService.getAgentLevel(userBO.getUserCode());
+                if(ucAgentLevelDo1.getAgentLevel() != ucAgentLevelDo.getAgentLevel()){
+                    return returnError("等级关系不正确,无法挂起");
+                }
             }
-            if(!"1".equals(ucAgentLevelDo)){
-                return returnError("只能挂起一级代理");
-            }
-            
-            UserBO userBO = getCurrentUser();
             
             agentService.disableAgent(agentId, userBO);
             
@@ -285,6 +353,11 @@ public class AgentController extends BaseController {
         
         try {
     
+            UserBO userBO = getCurrentUser();
+            if(!UserConstant.USER_INST.equals(userBO.getUserCodeType()) && !UserConstant.USER_AGENT.equals(userBO.getUserCodeType())){
+                return returnError("登录账户类型不允许注销代理");
+            }
+            
             String agentId = request.getParameter("agentId");
             if(StringUtils.isBlank(agentId)){
         
@@ -296,16 +369,18 @@ public class AgentController extends BaseController {
             if(StatusConstant.STATUS_CANNEL.equals(ucAgentDo.getStatus())){
                 return returnError("代理已注销, 不需要重复注销");
             }
-            
+    
             UcAgentLevelDo ucAgentLevelDo = agentService.getAgentLevel(agentId);
             if(ucAgentLevelDo == null){
-                return returnError("代理等级未知");
+                if(!UserConstant.USER_INST.equals(userBO.getUserCodeType())){
+                    return returnError("代理等级未知");
+                }
+            }else {
+                UcAgentLevelDo ucAgentLevelDo1 = agentService.getAgentLevel(userBO.getUserCode());
+                if(ucAgentLevelDo1.getAgentLevel() != ucAgentLevelDo.getAgentLevel()){
+                    return returnError("等级关系不正确,无法激活");
+                }
             }
-            if(!"1".equals(ucAgentLevelDo)){
-                return returnError("只能注销一级代理");
-            }
-            
-            UserBO userBO = getCurrentUser();
     
             agentService.cancelAgent(agentId,  userBO);
             

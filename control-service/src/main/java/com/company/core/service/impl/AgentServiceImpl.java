@@ -1,6 +1,5 @@
 package com.company.core.service.impl;
 
-import com.alibaba.druid.sql.visitor.functions.Ucase;
 import com.company.core.biz.*;
 import com.company.core.constant.*;
 import com.company.core.domain.AgentBO;
@@ -26,6 +25,11 @@ import java.util.*;
  */
 @Service("AgentService")
 public class AgentServiceImpl implements AgentService {
+    
+    private static final String LEVEL_1 = "1";
+    private static final String LEVEL_2 = "2";
+    private static final String LEVEL_3 = "3";
+    private static final String LEVEL_4 = "4";
     
     @Autowired
     UCAgentBiz ucAgentBiz;
@@ -100,6 +104,44 @@ public class AgentServiceImpl implements AgentService {
         return list;
     }
     
+    //为下拉框重新定义返回
+    @Override
+    public List<UcAgentDo> getAgentListForDropDown(String instId, String agentType, String status, String level) {
+        
+        List<UcAgentDo> list = new ArrayList<>();
+        UcAgentLevelDo ucAgentLevelDo = null;
+        String agentName = "";
+        String agentSortedKey = "";
+        TreeMap treeMap = new TreeMap();
+        List<UcAgentDo> ucAgentDoList =  ucAgentBiz.selectAllAgents(instId, agentType, status, "");
+        for(UcAgentDo ucAgentDo: ucAgentDoList){
+            ucAgentLevelDo = new UcAgentLevelDo();
+            agentName = "";
+            ucAgentLevelDo = getAgentLevel(ucAgentDo.getAgentId());
+            if(ucAgentLevelDo == null){
+                agentName = "1级:" + ucAgentDo.getAgentName();
+                agentSortedKey = "1级:" + ucAgentDo.getAgentId();
+            } else {
+                if(StringUtils.isNotBlank(level) && !level.equals(ucAgentLevelDo.getAgentLevel())){
+                    continue;
+                }
+                agentName = ucAgentLevelDo.getAgentLevel() + "级:" + ucAgentDo.getAgentName();
+                agentSortedKey = ucAgentLevelDo.getAgentLevel() + "级:" + ucAgentDo.getAgentId();
+            }
+            ucAgentDo.setAgentName(agentName);
+            treeMap.put(agentSortedKey, ucAgentDo);
+        }
+        Set set = treeMap.keySet();
+        for(Iterator<String> it = set.iterator(); it.hasNext();){
+            String key = it.next();
+            UcAgentDo value = (UcAgentDo) treeMap.get(key);
+            list.add(value);
+        }
+        
+        return list;
+    }
+    
+    
     
     @Override
     public List<String> getAgentIdList(String instId, String status) {
@@ -129,8 +171,6 @@ public class AgentServiceImpl implements AgentService {
         
     }
     
-    ;
-    
     
     @Override
     public List<String> getAgentIdListOfAgentOwn(String agentId) {
@@ -144,6 +184,8 @@ public class AgentServiceImpl implements AgentService {
         }
         return agentIdList;
     }
+    
+    
     
     @Override
     public List<UcAgentDo> getAgentIdListOfAgentOwnEnabled(String agentId) {
@@ -162,6 +204,25 @@ public class AgentServiceImpl implements AgentService {
         return agentIdList;
     }
     
+    
+    @Override
+    public List<UcAgentDo> getAgentListOfAgentOwn(String agentId, String status) {
+        
+        List<UcAgentDo> agentIdList = new ArrayList<>();
+        UcAgentDo ucAgentDo = null;
+        List<UcAgentLevelDo> list = ucAgentLevelBiz.getAllDownAgentLevelList(agentId);
+        if (list != null && list.size() > 0) {
+            for (UcAgentLevelDo s : list) {
+                ucAgentDo = ucAgentBiz.selectAgent(agentId);
+                if (StringUtils.isNotBlank(status)) {
+                    if (status.equals(ucAgentDo.getStatus())) {
+                        agentIdList.add(ucAgentDo);
+                    }
+                }
+            }
+        }
+        return agentIdList;
+    }
     
     @Override
     public Map<String, String> checkAgentBefore(AgentForm agentForm, UserBO userBO) {
@@ -231,6 +292,9 @@ public class AgentServiceImpl implements AgentService {
         //创建代理费率
         this.createAgentFeeInfo(agentForm, userBO);
         
+        //创建等级记录
+        this.createAgentLevelInfo(agentForm, userBO);
+        
         return agentForm.getAgentId();
         
     }
@@ -244,7 +308,7 @@ public class AgentServiceImpl implements AgentService {
         ucAgentDo.setAgentId(sequenceBiz.genAgentId());
         
         //机构发展的代理商类型为1,  机构自身的代理商号是0,
-        if (UserConstant.USER_TYPE_DEFAULT.equals(agentForm.getAgentType()) || UserConstant.USER_TYPE_AGENT.equals(agentForm.getAgentType())) {
+        if (UserConstant.USER_TYPE_DEFAULT.equals(agentForm.getAgentType())) {
             //机构默认代理, 直接激活
             ucAgentDo.setAgentType(UserConstant.USER_TYPE_DEFAULT);
             ucAgentDo.setStatus(StatusConstant.STATUS_ENABLE);
@@ -321,7 +385,7 @@ public class AgentServiceImpl implements AgentService {
         //存入机构费率
         UcFeeDo ucFeeDo = new UcFeeDo();
         ucFeeDo.setUserType(UserConstant.USER_AGENT);
-        ucFeeDo.setUserCode(agentForm.getInstId());
+        ucFeeDo.setUserCode(agentForm.getAgentId());
         
         if (StringUtils.isNotBlank(agentForm.getCategory())) {
             ucFeeDo.setCategory(agentForm.getCategory());
@@ -383,6 +447,62 @@ public class AgentServiceImpl implements AgentService {
             if (f <= 0) {
                 throw new ErrorException("数据新增失败");
             }
+        }
+    }
+    
+    
+    @Override
+    public void createAgentLevelInfo(AgentForm agentForm, UserBO userBO) {
+    
+        UcAgentLevelDo ucAgentLevelDo = new UcAgentLevelDo();
+        ucAgentLevelDo.setAgentId(agentForm.getAgentId());
+    
+        String level = "";
+        String upAgent = "";
+        if(UserConstant.USER_INST.equals(agentForm.getUserType())){
+            ucAgentLevelDo.setInstId(agentForm.getUserCode());
+            if(StringUtils.isNotBlank(agentForm.getUpAgentId())){
+                UcAgentLevelDo uplevel = ucAgentLevelBiz.getAgentLevel(agentForm.getUpAgentId());
+                if(uplevel == null){
+                    level = LEVEL_1;
+                    upAgent = agentForm.getUserCode();
+                } else {
+                   int newL = Integer.parseInt(uplevel.getAgentLevel()) + 1;
+                    level = String.valueOf(newL);
+                    upAgent = agentForm.getUpAgentId();
+                }
+            } else {
+                level = LEVEL_1;
+                upAgent = agentForm.getUserCode();
+            }
+        } else if(UserConstant.USER_AGENT.equals(agentForm.getUserType())){
+            String upAgentId = agentForm.getUserCode();
+            UcAgentLevelDo ulevel = ucAgentLevelBiz.getAgentLevel(upAgentId);
+            if(ulevel == null){
+                level = LEVEL_2;
+                upAgent = agentForm.getUserCode();
+            } else {
+                int newL = Integer.parseInt(ulevel.getAgentLevel()) + 1;
+                level = String.valueOf(newL);
+                upAgent = agentForm.getUpAgentId();
+            }
+            ucAgentLevelDo.setInstId(agentForm.getInstId());
+        } else {
+            level = LEVEL_1;
+            upAgent = agentForm.getInstId();
+        }
+        
+        ucAgentLevelDo.setCreateUser(userBO.getUsrName());
+        ucAgentLevelDo.setCreateSource(SystemConstant.DEFAULT_SOURCE_CODE);
+        ucAgentLevelDo.setCreateTime(DateUtil.getCurrentDateTime());
+        ucAgentLevelDo.setModifyUser(userBO.getUsrName());
+        ucAgentLevelDo.setModifySource(SystemConstant.DEFAULT_SOURCE_CODE);
+        ucAgentLevelDo.setModifyTime(DateUtil.getCurrentDateTime());
+        ucAgentLevelDo.setLockVersion(String.valueOf(0));
+    
+        int f = ucAgentLevelBiz.insert(ucAgentLevelDo);
+        if (f <= 0) {
+            throw new ErrorException("数据新增失败");
         }
     }
     
@@ -866,11 +986,11 @@ public class AgentServiceImpl implements AgentService {
         BigDecimal df = new BigDecimal(agentForm.getDefaultFeeFixed());
         BigDecimal dr = new BigDecimal(agentForm.getDefaultFeeRate());
         if (zero.compareTo(df) == 0 && zero.compareTo(dr) == 0) {
-            error = "默认费率不能同时为0和空";
+            error = "成本费率不能同时为0和空";
             return error;
         }
         
-        //默认费率 必须配置一个非0费率
+        //实行费率 必须配置一个非0费率
         if (StringUtils.isBlank(agentForm.getEffectiveFeeFixed())) {
             agentForm.setEffectiveFeeFixed("0");
         }
@@ -884,9 +1004,97 @@ public class AgentServiceImpl implements AgentService {
             return error;
         }
         
+        if(dr.compareTo(er) == 1){
+            error = "实行费率不能低于成本费率";
+            return error;
+        }
+        
+        
+        
+        
         return null;
     }
     
+    @Override
+    public String checkFeesAgentOpen(AgentForm agentForm) {
+        
+        String error = "";
+        
+        //默认费率 必须配置一个非0费率
+        if (StringUtils.isBlank(agentForm.getDefaultFeeFixed())) {
+            agentForm.setDefaultFeeFixed("0");
+        }
+        if (StringUtils.isBlank(agentForm.getEffectiveFeeRate())) {
+            agentForm.setEffectiveFeeRate("0");
+        }
+        BigDecimal zero = new BigDecimal("0");
+        BigDecimal df = new BigDecimal(agentForm.getDefaultFeeFixed());
+        BigDecimal dr = new BigDecimal(agentForm.getDefaultFeeRate());
+        if (zero.compareTo(df) == 0 && zero.compareTo(dr) == 0) {
+            error = "默认费率不能同时为0和空";
+            return error;
+        }
+        
+        //实行费率 必须配置一个非0费率
+        if (StringUtils.isBlank(agentForm.getEffectiveFeeFixed())) {
+            agentForm.setEffectiveFeeFixed("0");
+        }
+        if (StringUtils.isBlank(agentForm.getEffectiveFeeRate())) {
+            agentForm.setEffectiveFeeRate("0");
+        }
+        BigDecimal ef = new BigDecimal(agentForm.getEffectiveFeeFixed());
+        BigDecimal er = new BigDecimal(agentForm.getEffectiveFeeRate());
+        if (zero.compareTo(ef) == 0 && zero.compareTo(er) == 0) {
+            error = "实行费率不能同时为0和空";
+            return error;
+        }
+        
+        BigDecimal bdf = new BigDecimal("0");;
+        BigDecimal bdr = new BigDecimal("0");;
+        //如果是机构开下级
+        if(UserConstant.USER_INST.equals(agentForm.getUserType())){
+            UcFeeDo ucFeeDo = new UcFeeDo();
+            ucFeeDo.setUserType(UserConstant.USER_INST);
+            ucFeeDo.setUserCode(agentForm.getUserCode());
+            ucFeeDo.setCategory(Constant.CATEGORY_DEFAULT);
+            ucFeeDo.setCategoryId("P001");
+            ucFeeDo.setFeeType("DF");
+            UcFeeDo instdf = ucFeeBiz.getFee(ucFeeDo);
+            ucFeeDo.setFeeType("DR");
+            UcFeeDo instdr = ucFeeBiz.getFee(ucFeeDo);
+            if(df != null){
+                bdf = new BigDecimal(instdf.getFeeMode());
+            }
+            if(dr != null){
+                bdr = new BigDecimal(instdr.getFeeMode());
+            }
+        } else if(UserConstant.USER_AGENT.equals(agentForm.getUserType())) {
+            //如果代理开下级
+            UcFeeDo ucFeeDo = new UcFeeDo();
+            ucFeeDo.setUserType(UserConstant.USER_AGENT);
+            ucFeeDo.setUserCode(agentForm.getUserCode());
+            ucFeeDo.setCategory(Constant.CATEGORY_DEFAULT);
+            ucFeeDo.setCategoryId("P001");
+            ucFeeDo.setFeeType("DF");
+            UcFeeDo agentdf = ucFeeBiz.getFee(ucFeeDo);
+            ucFeeDo.setFeeType("DR");
+            UcFeeDo agentdr = ucFeeBiz.getFee(ucFeeDo);
+            if (df != null) {
+                bdf = new BigDecimal(agentdf.getFeeMode());
+            }
+            if (dr != null) {
+                bdr = new BigDecimal(agentdr.getFeeMode());
+            }
+        }
+        
+        //开户的成本费率不能低于上级的实行费率
+        if(dr.compareTo(bdr) == 1){
+            error = "成本费率低于上级代理/机构";
+            return error;
+        }
+        
+        return null;
+    }
     
     /**
      * 创建代理用户

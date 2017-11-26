@@ -3,6 +3,7 @@ package com.company.core.controller;
 import com.company.core.constant.Constant;
 import com.company.core.constant.ErrorException;
 import com.company.core.constant.StatusConstant;
+import com.company.core.constant.UserConstant;
 import com.company.core.domain.UserBO;
 import com.company.core.entity.UcInstDo;
 import com.company.core.entity.UcProdDo;
@@ -102,6 +103,47 @@ public class InstController extends BaseController {
         return modelAndView;
     }
     
+    @RequestMapping(value = "/infoPage", method = RequestMethod.GET)
+    public ModelAndView toInfoPage(HttpServletRequest request, HttpServletResponse response, ModelAndView modelAndView) {
+        
+        //从登陆session里获取机构号
+        UserBO userBO = getCurrentUser();
+        if(!UserConstant.USER_INST.equals(userBO.getUserCodeType())){
+            modelAndView.setViewName("/inst/info_inst");
+            return modelAndView;
+        }
+        
+        InstForm instForm = new InstForm();
+        instForm.setInstId(userBO.getUserCode());
+        
+        instService.formatInstFormFromInst(instForm);  // 基本信息
+        instService.formatInstFormFromInstInfo(instForm); //附加信息
+        
+        modelAndView.getModel().put("instDetailForm", instForm);
+        modelAndView.setViewName("/inst/info_inst");
+        return modelAndView;
+    }
+    
+    @RequestMapping(value = "/feePage", method = RequestMethod.GET)
+    public ModelAndView toFeePage(HttpServletRequest request, HttpServletResponse response, ModelAndView modelAndView) {
+        
+        //从登陆session里获取机构号
+        UserBO userBO = getCurrentUser();
+        if(!UserConstant.USER_INST.equals(userBO.getUserCodeType())){
+            modelAndView.setViewName("/inst/fee_inst");
+            return modelAndView;
+        }
+        
+        InstForm instForm = new InstForm();
+        instForm.setInstId(userBO.getUserCode());
+        
+        instService.formatInstFormFromFee(instForm); //费率信息
+        
+        modelAndView.getModel().put("instFeeForm", instForm);
+        modelAndView.setViewName("/inst/fee_inst");
+        return modelAndView;
+    }
+    
     @RequestMapping(value = "/add_new_inst", method = RequestMethod.POST)
     @ResponseBody
     @RequiresAuthentication
@@ -150,10 +192,10 @@ public class InstController extends BaseController {
     @RequestMapping(value = "/update_inst", method = RequestMethod.POST)
     @ResponseBody
     public Map<String, Object> toUpdateInst (HttpServletRequest request, HttpServletResponse response, ModelAndView modelAndView, @ModelAttribute("instUpdateForm") InstForm instForm) {
-    
+        
         try {
             UserBO userBO = getCurrentUser();
-
+            
             //检查费率
             String error = instService.checkFees(instForm);
             if(StringUtils.isNotBlank(error)){
@@ -166,9 +208,51 @@ public class InstController extends BaseController {
             e.printStackTrace();
             return returnError("数据更新失败");
         }
+        
+        return returnSuccess("数据更新成功");
+        
+    }
+    
+    @RequestMapping(value = "/update_inst_info", method = RequestMethod.POST)
+    @ResponseBody
+    public Map<String, Object> toUpdateInstInfo (HttpServletRequest request, HttpServletResponse response, ModelAndView modelAndView, @ModelAttribute("instUpdateForm") InstForm instForm) {
+    
+        try {
+            UserBO userBO = getCurrentUser();
+            
+            instService.updateInstInfo(instForm, userBO);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            return returnError("数据更新失败");
+        }
     
         return returnSuccess("数据更新成功");
 
+    }
+    
+    @RequestMapping(value = "/update_inst_fee", method = RequestMethod.POST)
+    @ResponseBody
+    public Map<String, Object> toUpdateInstFee (HttpServletRequest request, HttpServletResponse response, ModelAndView modelAndView, @ModelAttribute("instFeeForm") InstForm instForm) {
+        
+        try {
+            UserBO userBO = getCurrentUser();
+            
+            //检查费率
+            String error = instService.checkFees(instForm);
+            if(StringUtils.isNotBlank(error)){
+                return returnError(error);
+            }
+            
+            instService.updateInstFee(instForm, userBO);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            return returnError("数据更新失败");
+        }
+        
+        return returnSuccess("数据更新成功");
+        
     }
     
     @RequestMapping(value = "/activate_inst", method = RequestMethod.POST)

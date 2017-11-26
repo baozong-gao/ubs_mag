@@ -45,7 +45,7 @@ public class UCRecomCodeControlBiz {
     
     public int updateSelective(UcReccomCodeCntlDo ucReccomCodeCntlDo){
         
-        return ucReccomCodeCntlDoMapper.updateByPrimaryKey(ucReccomCodeCntlDo);
+        return ucReccomCodeCntlDoMapper.updateByPrimaryKeySelective(ucReccomCodeCntlDo);
     }
     
     public UcReccomCodeCntlDo selectByPrimaryKey(String recomCode){

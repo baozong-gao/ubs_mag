@@ -26,6 +26,10 @@ import java.util.List;
 @RequestMapping (value = "/comcon")
 public class ComconFuncController {
     
+    private final static String LEVEL_1 = "1";
+    private final static String LEVEL_2 = "2";
+    private final static String LEVEL_3 = "3";
+    
     @Autowired
     AgentService agentService;
     @Autowired
@@ -62,7 +66,7 @@ public class ComconFuncController {
             status = StatusConstant.STATUS_ENABLE;
         }
         if(StringUtils.isNotBlank(level)){
-            if("1".equals(level)){
+            if(LEVEL_1.equals(level)){
                 type = UserConstant.USER_TYPE_DEFAULT;   //默认在代理表里- 0 代理是机构本身自己的代理号
             } else {
                 type = UserConstant.USER_TYPE_AGENT;   //默认在代理表里- 1 代理机构为发展的代理

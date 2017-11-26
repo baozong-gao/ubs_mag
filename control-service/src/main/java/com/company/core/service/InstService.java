@@ -4,6 +4,7 @@ import com.company.core.domain.UserBO;
 import com.company.core.entity.UcInstDo;
 import com.company.core.entity.UcInstInfoDo;
 import com.company.core.form.InstForm;
+import com.company.core.form.OrderForm;
 import com.company.core.form.Pagination;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +27,12 @@ public interface InstService {
     
     @Transactional
     void updateInst(InstForm instForm, UserBO userBO) throws Exception;
+    
+    @Transactional
+    void updateInstInfo(InstForm instForm, UserBO userBO) throws Exception;
+    
+    @Transactional
+    void updateInstFee(InstForm instForm, UserBO userBO) throws Exception;
     
     @Transactional
     Map<String , String> activateCheck(String instId) throws Exception;
@@ -57,4 +64,5 @@ public interface InstService {
     
     @Transactional
     void createInstAcct(UcInstDo ucInstDo, UserBO shiroUserBo);
+    
 }

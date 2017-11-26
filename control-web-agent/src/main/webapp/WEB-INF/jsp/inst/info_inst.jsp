@@ -22,10 +22,12 @@
 <div class="bjui-pageContent tableContent">
 
 
-    <form id="pagerForm" name="instDetailForm" data-toggle="validate"
-          novalidate="novalidate"
-          action="${pageContext.request.contextPath}/inst/update_inst"
-          method="post">
+    <%--<form id="pagerForm" name="instDetailForm" data-toggle="validate"--%>
+          <%--novalidate="novalidate"--%>
+          <%--action="${pageContext.request.contextPath}/inst/update_inst_info"--%>
+          <%--method="post">--%>
+
+        <form id="pagerForm" name="instDetailForm">
 
         <input type="hidden" id="instId" name="instId" value="${instDetailForm.instId}">
 
@@ -75,18 +77,14 @@
 
                                 <div class="form-group col-md-4">
                                     <label class="control-label labelblock">类别：</label>
-                                    <select name="category" id="category" data-rule="机构类型:required;"
-                                            data-toggle="selectpicker" data-live-search="true"
-                                            data-nextselect="#categoryIdQ"
-                                            data-refurl="${pageContext.request.contextPath}/comcon/select_catagory_ids?catagory={value}">
-                                        <option value="all">-请选择-</option>
-                                        <option value="0" <c:if test="${instDetailForm.category == '0'}">selected</c:if>>基础业务</option>
+                                    <select name="category" id="category"   data-toggle="selectpicker"  data-live-search="true" data-rule="机构类型:required;">
+                                        <option value="${instDetailForm.category}">${instDetailForm.categoryName}</option>
                                     </select>&nbsp;
                                 </div>
                                 <div class="form-group col-md-4">
                                     <label class="control-label labelblock">类别ID&nbsp;：</label>
-                                    <select name="categoryId" id="categoryIdQ" data-toggle="selectpicker"  data-live-search="true" data-rule="机构类别ID:required;">
-                                        <option style="width: 60px; display: inline-block" value="">-请选择-</option>
+                                    <select name="categoryId" id="categoryId" data-toggle="selectpicker"  data-live-search="true">
+                                        <option value="${instDetailForm.categoryId}">${instDetailForm.categoryIdName}</option>
                                     </select>
                                 </div>
                             </div>
@@ -141,11 +139,10 @@
                                     <label class="control-label labelblock">证件类型：</label>
                                     <select
                                             name="legalPersonIdType" id="legalPersonIdType" data-rule="证件类型:required;"
-                                            value="${instDetailForm.legalPersonIdType}"
                                             data-toggle="selectpicker">
-                                        <option value="0">请选择</option>
-                                        <option value="1">身份证</option>
-                                        <option value="2">护照</option>
+                                        <option value="">请选择</option>
+                                        <option value="0" <c:if test="${instDetailForm.legalPersonIdType == '0'}">selected</c:if>>身份证</option>
+                                        <option value="1" <c:if test="${instDetailForm.legalPersonIdType == '1'}">selected</c:if>>护照</option>
                                     </select>&nbsp;
                                 </div>
 
@@ -206,12 +203,11 @@
                                         <label class="control-label labelblock">证件类型：</label>
                                         <select
                                                 name="contactIdType" id="contactIdType"
-                                                value="${instDetailForm.contactIdType}"
                                                 data-rule="证件类型:required;"
                                                 data-toggle="selectpicker">
-                                            <option value="0">请选择</option>
-                                            <option value="1">身份证</option>
-                                            <option value="2">护照</option>
+                                            <option value="">请选择</option>
+                                            <option value="0" <c:if test="${instDetailForm.contactIdType == '0'}">selected</c:if>>身份证</option>
+                                            <option value="1" <c:if test="${instDetailForm.contactIdType == '1'}">selected</c:if>>护照</option>
                                         </select>&nbsp;
                                     </div>
 
@@ -237,53 +233,9 @@
                 </div>
 
 
-                <!-- 机构费率 -->
-                <div class="col-md-12">
-                    <div class="panel panel-default">
-                        <div class="panel-heading"><h3 class="panel-title">机构费率</h3></div>
-                        <div class="panel-body">
-                            <div class="row-input" style="margin: 20px 0 20px; width: 100%">
-                                <div class="row-input" style="margin: 20px 0 20px; width: 100%">
-                                    <div class="form-group col-md-6">
-                                        <label class="control-label">成本固定单笔费用：</label>
-                                        <input type="text"
-                                               name="defaultFeeFixed" size="15" data-rule="number;range[1~200] "
-                                               value="${instDetailForm.defaultFeeFixed}"
-                                               placeholder="单位笔/元"/>&nbsp;
-                                    </div>
-
-                                    <div class="form-group col-md-6">
-                                        <label class="control-label">成本交易比例费率：</label>
-                                        <input type="text"
-                                               name="defaultFeeRate" size="15" data-rule="number;range[0~1] "
-                                               value="${instDetailForm.defaultFeeRate}"
-                                               placeholder="如:千5, 请输入0.5"/>%&nbsp;
-                                    </div>
-                                </div>
-                                <div class="row-input" style="margin: 20px 0 20px; width: 100%">
-                                    <div class="form-group col-md-6">
-                                        <label class="control-label">实收固定单笔费用：</label>
-                                        <input type="text"
-                                               name="effectiveFeeFixed" size="15" data-rule="number;range[1~200] "
-                                               value="${instDetailForm.effectiveFeeFixed}"
-                                               placeholder="单位笔/元"/>&nbsp;
-                                    </div>
-
-                                    <div class="form-group col-md-6">
-                                        <label class="control-label">实收交易比例费率：</label>
-                                        <input type="text"
-                                               name="effectiveFeeRate" size="15" data-rule="number;range[0~1] "
-                                               value="${instDetailForm.effectiveFeeRate}"
-                                               placeholder="如:千5, 请输入0.5"/>%&nbsp;
-                                    </div>
-                                </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-md-12" style="margin: 20px 0 20px; ">
-                    <button type="submit" class="btn-default" data-icon="save" style="float: right">更新</button>&nbsp;
-                </div>
+                <%--<div class="col-md-12" style="margin: 20px 0 20px; ">--%>
+                    <%--<button type="submit" class="btn-default" data-icon="save" style="float: right">更新</button>&nbsp;--%>
+                <%--</div>--%>
             </div>
         </div>
     </form>

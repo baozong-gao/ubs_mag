@@ -20,8 +20,11 @@
 <body>
 <div class="bjui-pageContent">
     <form:form class="nice-validator n-red" data-alertmsg="false"
-               data-toggle="validate" action="recomCode/dispatch_recomCode"
+               data-toggle="validate" action="recomCode/dispatch" method="post"
                novalidate="novalidate" modelAttribute="recomCodeDispatchForm" id="recomCodeDispatchForm" name="recomCodeDispatchForm">
+
+        <input type="hidden" id="recomCode" name="recomCode" value="${recomCodeDispatchForm.recomCode}">
+
         <table class="table table-condensed table-hover" width="100%">
             <div class="row-inut col-md-12" style="margin: 10px 0 10px; width: 100%">
                 <div class=" col-md-6">
@@ -34,16 +37,16 @@
                 </div>
             </div>
 
-            <div class="row-inut col-md-12" style="margin: 10px 0 10px; width: 100%">
-                <div class=" col-md-6">
-                    <label class="labellength ">所属代理:</label>
-                    <input type="text" name="agentId" id="agentId" value="${recomCodeDispatchForm.agentId}" size="15" disabled="true">&nbsp;
-                </div>
-                <div class=" col-md-6">
-                    <label class="labellength ">代理名称:</label>
-                    <input type="text" name="agentName" id="agentName" value="${recomCodeDispatchForm.agentName}" size="15" disabled="true">&nbsp;
-                </div>
-            </div>
+            <%--<div class="row-inut col-md-12" style="margin: 10px 0 10px; width: 100%">--%>
+                <%--<div class=" col-md-6">--%>
+                    <%--<label class="labellength ">所属代理:</label>--%>
+                    <%--<input type="text" name="agentId" id="agentId" value="${recomCodeDispatchForm.agentId}" size="15" disabled="true">&nbsp;--%>
+                <%--</div>--%>
+                <%--<div class=" col-md-6">--%>
+                    <%--<label class="labellength ">代理名称:</label>--%>
+                    <%--<input type="text" name="agentName" id="agentName" value="${recomCodeDispatchForm.agentName}" size="15" disabled="true">&nbsp;--%>
+                <%--</div>--%>
+            <%--</div>--%>
 
             <div class="row-inut col-md-12" style="margin: 10px 0 10px; width: 100%">
                 <div class=" col-md-6">
@@ -53,7 +56,7 @@
                         <c:forEach var="record" items="${toAgentList}"
                                    varStatus="status">
                             <option value="${record.agentId}"
-                                    <c:if test="${record.agentId == recomCodeDispatchForm.toAgentId}">selected</c:if> >${record.agentId}</option>
+                                    <c:if test="${record.agentId == recomCodeDispatchForm.toAgentId}">selected</c:if> >${record.agentName}</option>
                         </c:forEach>
                     </select>
                 </div>

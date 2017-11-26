@@ -1,6 +1,7 @@
 package com.company.core.controller;
 
 import com.company.core.constant.StatusConstant;
+import com.company.core.constant.UserConstant;
 import com.company.core.domain.UserBO;
 import com.company.core.entity.UcAgentDo;
 import com.company.core.entity.UcAgentLevelDo;
@@ -32,6 +33,10 @@ import java.util.Map;
 @Slf4j
 @RequestMapping (value = "/recomCode")
 public class RecomCodeController extends BaseController {
+    
+    private final static String LEVEL_1 = "1";
+    private final static String LEVEL_2 = "2";
+    private final static String LEVEL_3 = "3";
     
     @Autowired
     InstService instService;
@@ -88,22 +93,30 @@ public class RecomCodeController extends BaseController {
     @RequestMapping(value = "/listPage", method = RequestMethod.GET)
     public ModelAndView toListPage(HttpServletRequest request, HttpServletResponse response, ModelAndView modelAndView) {
     
-        //获取-激活状态下的机构列表
-        List<UcInstDo> ucInstDoList = instService.getInstListByStatus(StatusConstant.STATUS_ENABLE);
-        modelAndView.getModel().put("instList", ucInstDoList);
+        UserBO userBO = getCurrentUser();
+        if(!UserConstant.USER_INST.equals(userBO.getUserCodeType()) && !UserConstant.USER_AGENT.equals(userBO.getUserCodeType())){
+            //登录账户类型错误
+            modelAndView.setViewName("/recomCode/list_recom_code");
+            return modelAndView;
+        }
     
-        //获取-激活状态下的代理列表
-        List<UcAgentDo> ucAgentDoList = agentService.getAgentListForDropDown("","", StatusConstant.STATUS_ENABLE);
-        
         RecomCodeForm recomCodeForm = new RecomCodeForm();
+        //获取-激活状态下的代理列表
+        if(UserConstant.USER_INST.equals(userBO.getUserCodeType())){
+            List<UcAgentDo> ucAgentDoList = agentService.getAgentListForDropDown(userBO.getUserCode(),"", StatusConstant.STATUS_ENABLE);
+            modelAndView.getModel().put("agentList", ucAgentDoList);
+            recomCodeForm.setInstId(userBO.getUserCode());
+        } else if(UserConstant.USER_AGENT.equals(userBO.getUserCodeType())){
+            List<UcAgentDo> ucAgentDoList = agentService.getAgentListOfAgentOwn(userBO.getUserCode(), StatusConstant.STATUS_ENABLE);
+            modelAndView.getModel().put("agentList", ucAgentDoList);
+            recomCodeForm.setAgentId(userBO.getUserCode());
+        }
         
         //获取该机构下的所有注册码信息
         Pagination page= recomCodeService.getAllRecomcodes(recomCodeForm);
         recomCodeForm.setPagination(page);
         
         modelAndView.getModel().put("recomCodeListForm", recomCodeForm);
-        modelAndView.getModel().put("instList", ucInstDoList);
-        modelAndView.getModel().put("agentList", ucAgentDoList);
         modelAndView.setViewName("/recomCode/list_recom_code");
         return modelAndView;
     }
@@ -114,20 +127,35 @@ public class RecomCodeController extends BaseController {
     @RequestMapping(value = "/query_recomCode_list", method = RequestMethod.GET)
     @ResponseBody
     public ModelAndView toQueryRecomCodeList (HttpServletRequest request, HttpServletResponse response, ModelAndView modelAndView, @ModelAttribute("recomCodeListForm") RecomCodeForm recomCodeForm) {
-        
-        //获取-激活状态下的机构列表
-        List<UcInstDo> ucInstDoList = instService.getInstListByStatus(StatusConstant.STATUS_ENABLE);
+    
+        UserBO userBO = getCurrentUser();
+        if(!UserConstant.USER_INST.equals(userBO.getUserCodeType()) && !UserConstant.USER_AGENT.equals(userBO.getUserCodeType())){
+            //登录账户类型错误
+            modelAndView.setViewName("/recomCode/list_recom_code");
+            return modelAndView;
+        }
     
         //获取-激活状态下的代理列表
-        List<UcAgentDo> ucAgentDoList = agentService.getAgentListForDropDown("","", StatusConstant.STATUS_ENABLE);
+        if(UserConstant.USER_INST.equals(userBO.getUserCodeType())){
+            List<UcAgentDo> ucAgentDoList = agentService.getAgentListForDropDown(userBO.getUserCode(),"", StatusConstant.STATUS_ENABLE);
+            modelAndView.getModel().put("agentList", ucAgentDoList);
+        } else if(UserConstant.USER_AGENT.equals(userBO.getUserCodeType())){
+            List<UcAgentDo> ucAgentDoList = agentService.getAgentListOfAgentOwn(userBO.getUserCode(), StatusConstant.STATUS_ENABLE);
+            modelAndView.getModel().put("agentList", ucAgentDoList);
+        }
     
+        if(UserConstant.USER_INST.equals(userBO.getUserCodeType())){
+            if(StringUtils.isBlank(recomCodeForm.getAgentId()) && StringUtils.isBlank(recomCodeForm.getRecomCode())
+                    && StringUtils.isBlank(recomCodeForm.getBatchId()) && StringUtils.isBlank(recomCodeForm.getUserId()) && StringUtils.isBlank(recomCodeForm.getStatus())){
+                recomCodeForm.setInstId(userBO.getUserCode());
+            }
+        }
+        
         //获取该机构下的所有注册码信息
         Pagination page= recomCodeService.getAllRecomcodes(recomCodeForm);
         recomCodeForm.setPagination(page);
     
         modelAndView.getModel().put("recomCodeListForm", recomCodeForm);
-        modelAndView.getModel().put("instList", ucInstDoList);
-        modelAndView.getModel().put("agentList", ucAgentDoList);
         modelAndView.setViewName("/recomCode/list_recom_code");
         return modelAndView;
     }
@@ -138,22 +166,37 @@ public class RecomCodeController extends BaseController {
     @RequestMapping(value = "/query_recomCode_list", method = RequestMethod.POST)
     @ResponseBody
     public ModelAndView toQueryRecomCodeListPost (HttpServletRequest request, HttpServletResponse response, ModelAndView modelAndView, @ModelAttribute("recomCodeListForm") RecomCodeForm recomCodeForm) {
-
-        //获取-激活状态下的机构列表
-        List<UcInstDo> ucInstDoList = instService.getInstListByStatus(StatusConstant.STATUS_ENABLE);
+    
+        UserBO userBO = getCurrentUser();
+        if(!UserConstant.USER_INST.equals(userBO.getUserCodeType()) && !UserConstant.USER_AGENT.equals(userBO.getUserCodeType())){
+            //登录账户类型错误
+            modelAndView.setViewName("/recomCode/list_recom_code");
+            return modelAndView;
+        }
     
         //获取-激活状态下的代理列表
-        List<UcAgentDo> ucAgentDoList = agentService.getAgentListForDropDown("","", StatusConstant.STATUS_ENABLE);
+        if(UserConstant.USER_INST.equals(userBO.getUserCodeType())){
+            List<UcAgentDo> ucAgentDoList = agentService.getAgentListForDropDown(userBO.getUserCode(),"", StatusConstant.STATUS_ENABLE);
+            modelAndView.getModel().put("agentList", ucAgentDoList);
+        } else if(UserConstant.USER_AGENT.equals(userBO.getUserCodeType())){
+            List<UcAgentDo> ucAgentDoList = agentService.getAgentListOfAgentOwn(userBO.getUserCode(), StatusConstant.STATUS_ENABLE);
+            modelAndView.getModel().put("agentList", ucAgentDoList);
+        }
+    
+        if(UserConstant.USER_INST.equals(userBO.getUserCodeType())){
+            if(StringUtils.isBlank(recomCodeForm.getAgentId()) && StringUtils.isBlank(recomCodeForm.getRecomCode())
+                    && StringUtils.isBlank(recomCodeForm.getBatchId()) && StringUtils.isBlank(recomCodeForm.getUserId()) && StringUtils.isBlank(recomCodeForm.getStatus())){
+                recomCodeForm.setInstId(userBO.getUserCode());
+            }
+        }
     
         //获取该机构下的所有注册码信息
         Pagination page= recomCodeService.getAllRecomcodes(recomCodeForm);
         recomCodeForm.setPagination(page);
+    
         modelAndView.getModel().put("recomCodeListForm", recomCodeForm);
-        modelAndView.getModel().put("instList", ucInstDoList);
-        modelAndView.getModel().put("agentList", ucAgentDoList);
         modelAndView.setViewName("/recomCode/list_recom_code");
         return modelAndView;
-
     }
 
     
@@ -162,9 +205,29 @@ public class RecomCodeController extends BaseController {
      */
     @RequestMapping(value = "/dispatchPage", method = RequestMethod.GET)
     public ModelAndView toDispatchPage(HttpServletRequest request, HttpServletResponse response, ModelAndView modelAndView) {
-        
+    
+    
+        UserBO userBO = getCurrentUser();
         //获取注册码参数
         String recomCode = request.getParameter("recomCode");
+        String userCode = request.getParameter("userCode");
+        String userType = request.getParameter("userType");
+        
+        if(!UserConstant.USER_INST.equals(userBO.getUserCodeType()) && !UserConstant.USER_AGENT.equals(userBO.getUserCodeType())){
+            modelAndView.getModel().put("statusCode", 300);
+            modelAndView.getModel().put("message", "登录账户类型无法激活注册码");
+            modelAndView.setViewName("/recomCode/dispatch_recom_code");
+            return modelAndView;
+        }
+        if(UserConstant.USER_INST.equals(userBO.getUserCodeType())){
+            if(!userBO.getUserCodeType().equals(userType) || !userBO.getUserCode().equals(userCode)){
+                modelAndView.getModel().put("statusCode", 300);
+                modelAndView.getModel().put("message", "注册码不属于登录账户无法激活");
+                modelAndView.setViewName("/recomCode/dispatch_recom_code");
+                return modelAndView;
+            }
+        }
+
         UcReccomCodeCntlDo ucReccomCodeCntlDo = recomCodeService.getRecomCode(recomCode);
         if(ucReccomCodeCntlDo == null){
             modelAndView.getModel().put("statusCode", 300);
@@ -172,47 +235,45 @@ public class RecomCodeController extends BaseController {
             modelAndView.setViewName("/recomCode/dispatch_recom_code");
             return modelAndView;
         }
-        
+    
         //注册码状态
         if(!StatusConstant.RECOMCODE_STATUS_ENABLE.equals(ucReccomCodeCntlDo.getStatus())){
             modelAndView.getModel().put("statusCode", 300);
-            modelAndView.getModel().put("message", "注册码状态不允许下发");
+            modelAndView.getModel().put("message", "注册码未激活不允许下发");
+            modelAndView.setViewName("/recomCode/dispatch_recom_code");
+            return modelAndView;
+        }
+    
+        //必须是机构注册码, 才能下发
+        if(!UserConstant.USER_INST.equals(userType)){
+            modelAndView.getModel().put("statusCode", 300);
+            modelAndView.getModel().put("message", "注册不属于代理/机构无法下拨");
             modelAndView.setViewName("/recomCode/dispatch_recom_code");
             return modelAndView;
         }
     
         RecomCodeForm recomCodeForm = new RecomCodeForm();
-        //代理
-        String ownerAgent = ucReccomCodeCntlDo.getUserCode();
-        //获取代理信息
-        UcAgentDo ucAgentDo = agentService.getAgent(ownerAgent);
-        if(ucAgentDo == null){
-            modelAndView.getModel().put("statusCode", 300);
-            modelAndView.getModel().put("message", "注册码代理不存在");
-            modelAndView.setViewName("/recomCode/dispatch_recom_code");
-            return modelAndView;
+        recomCodeForm.setRecomCode(recomCode);
+        if(UserConstant.USER_INST.equals(userType)){
+            //机构注册码, 获取机构信息
+            UcInstDo ucInstDo = instService.getInst(userCode);
+            if(ucInstDo == null){
+                modelAndView.getModel().put("statusCode", 300);
+                modelAndView.getModel().put("message", "注册码所属机构不存在");
+                modelAndView.setViewName("/recomCode/dispatch_recom_code");
+                return modelAndView;
+            }
+            recomCodeForm.setInstId(ucInstDo.getInstId());
+            recomCodeForm.setInstName(ucInstDo.getInstName());
         }
     
-        //获取机构信息
-        UcInstDo ucInstDo = instService.getInst(ucAgentDo.getInstId());
-        if(ucInstDo == null){
-            modelAndView.getModel().put("statusCode", 300);
-            modelAndView.getModel().put("message", "注册码机构不存在");
-            modelAndView.setViewName("/recomCode/dispatch_recom_code");
-            return modelAndView;
-        }
-        recomCodeForm.setInstId(ucInstDo.getInstId());
-        recomCodeForm.setInstName(ucInstDo.getInstName());
-        recomCodeForm.setAgentId(ucAgentDo.getAgentId());
-        recomCodeForm.setAgentName(ucAgentDo.getAgentName());
-        
         //获取该代理下的直属代理
-        List<String> downAgentList = agentService.getAgentIdListOfAgentOwn(ucAgentDo.getAgentId());
-        
+        List<UcAgentDo> ucAgentDoList = agentService.getAgentListForDropDown(userCode,"", StatusConstant.STATUS_ENABLE);
         modelAndView.getModel().put("recomCodeDispatchForm", recomCodeForm);
-        modelAndView.getModel().put("toAgentList", downAgentList);
+        modelAndView.getModel().put("toAgentList", ucAgentDoList);
         modelAndView.setViewName("/recomCode/dispatch_recom_code");
         return modelAndView;
+        
     }
     
     
@@ -222,26 +283,38 @@ public class RecomCodeController extends BaseController {
     @RequestMapping(value = "/dispatchBatchPage", method = RequestMethod.GET)
     public ModelAndView toDispatchBatchPage(HttpServletRequest request, HttpServletResponse response, ModelAndView modelAndView) {
     
+        UserBO userBO = getCurrentUser();
+        if(!UserConstant.USER_INST.equals(userBO.getUserCodeType()) && !UserConstant.USER_AGENT.equals(userBO.getUserCodeType())){
+            modelAndView.getModel().put("statusCode", 300);
+            modelAndView.getModel().put("message", "登录账户类型无法激活注册码");
+            modelAndView.setViewName("/recomCode/dispatch_recom_code_batch");
+            return modelAndView;
+        }
+        //获取当前登录账户可以下发的代理列表
+        if(UserConstant.USER_INST.equals(userBO.getUserCodeType())){
+            List<UcAgentDo> ucAgentDoList = agentService.getAgentListForDropDown(userBO.getUserCode(),"", StatusConstant.STATUS_ENABLE, LEVEL_1);
+            modelAndView.getModel().put("toAgentList", ucAgentDoList);
+            
+        } else if(UserConstant.USER_AGENT.equals(userBO.getUserCodeType())){
+            List<UcAgentDo> ucAgentDoList = agentService.getAgentListOfAgentOwn(userBO.getUserCode(), StatusConstant.STATUS_ENABLE);
+            modelAndView.getModel().put("toAgentList", ucAgentDoList);
+        }
+    
+        int total = recomCodeService.getRecomCodeCount(userBO.getUserCode(), "");
+        int available = recomCodeService.getRecomCodeCount(userBO.getUserCode(), StatusConstant.STATUS_ENABLE);
+    
         RecomCodeForm recomCodeForm = new RecomCodeForm();
-    
-        //获取-激活状态下的机构列表
-        List<UcInstDo> ucInstDoList = instService.getInstListByStatus(StatusConstant.STATUS_ENABLE);
-    
-        //获取该机构下的所有注册码信息
-        Pagination page= recomCodeService.getAllRecomcodes(recomCodeForm);
-        recomCodeForm.setPagination(page);
+        recomCodeForm.setRecomCodeTotalCount(String.valueOf(total));
+        recomCodeForm.setRecomCodeAvailableCount(String.valueOf(available));
+        recomCodeForm.setUserType(userBO.getUserCodeType());
+        recomCodeForm.setUserCode(userBO.getUserCode());
         
         modelAndView.getModel().put("recomCodeDispatchBatchForm", recomCodeForm);
-        modelAndView.getModel().put("instList", ucInstDoList);
         modelAndView.setViewName("/recomCode/dispatch_recom_code_batch");
         return modelAndView;
         
     }
-    
-    
-    
-    
-    
+
     /**
      * 批量下发注册码 - 实现
      */
@@ -250,20 +323,51 @@ public class RecomCodeController extends BaseController {
     public Map toDispatchRemcodeBatch (HttpServletRequest request, HttpServletResponse response, ModelAndView modelAndView, @ModelAttribute("recomCodeDispatchBatchForm") RecomCodeForm recomCodeForm) {
     
         UserBO userBO = getCurrentUser();
-        
-        UcAgentDo ucAgentDo = agentService.getAgent(recomCodeForm.getAgentId());
-        if(ucAgentDo == null){
-            return returnError("注册码所属代理不存在");
-        }
-    
-        UcAgentDo upUcAgentDo = agentService.getAgent(recomCodeForm.getToAgentId());
-        if(upUcAgentDo == null){
-            return returnError("下发代理不存在");
+        if(!UserConstant.USER_INST.equals(userBO.getUserCodeType()) && !UserConstant.USER_AGENT.equals(userBO.getUserCodeType())){
+            return returnError("登录账户类型无法激活注册码");
         }
         
-        UcAgentLevelDo toAgentLevel = agentService.getAgentLevel(recomCodeForm.getToAgentId());
-        if(toAgentLevel == null || !recomCodeForm.getAgentId().equals(toAgentLevel.getUpAgentId())) {
-            return returnError("下发代理并非所属机构下级代理");
+        if(StringUtils.isBlank(recomCodeForm.getUserType()) || StringUtils.isBlank(recomCodeForm.getUserCode())){
+            return returnError("未获取当前登录的账号类型信息");
+        }
+        
+        if(UserConstant.USER_INST.equals(userBO.getUserCodeType())){
+            UcInstDo ucInstDo = instService.getInst(userBO.getUserCode());
+            if(ucInstDo == null){
+                return returnError("登录账户绑定的机构信息未找到");
+            }
+            if(!StatusConstant.STATUS_ENABLE.equals(ucInstDo.getStatus())){
+                return returnError("登录账户绑定的机构信息未激活");
+            }
+            UcAgentDo toAgentDo = agentService.getAgent(recomCodeForm.getToAgentId());
+            if(toAgentDo == null){
+                return returnError("下发目标代理信息未找到");
+            }
+            if(!StatusConstant.STATUS_ENABLE.equals(toAgentDo.getStatus())){
+                return returnError("下发目标代理信息未激活");
+            }
+            if(!ucInstDo.getInstId().equals(toAgentDo.getInstId())){
+                return returnError("不是直接代理无法下发");
+            }
+        } else {
+            UcAgentDo upAgentDo = agentService.getAgent(recomCodeForm.getUserCode());
+            if(upAgentDo == null){
+                return returnError("登录账户绑定的代理未找到");
+            }
+            if(!StatusConstant.STATUS_ENABLE.equals(upAgentDo.getStatus())){
+                return returnError("登录账户绑定的代理未激活");
+            }
+            UcAgentDo toAgentDo = agentService.getAgent(recomCodeForm.getToAgentId());
+            if(toAgentDo == null){
+                return returnError("下发目标代理信息未找到");
+            }
+            if(!StatusConstant.STATUS_ENABLE.equals(toAgentDo.getStatus())){
+                return returnError("下发目标代理信息未激活");
+            }
+            UcAgentLevelDo toAgentLeveldo = agentService.getAgentLevel(recomCodeForm.getToAgentId());
+            if(toAgentLeveldo == null || !upAgentDo.getAgentId().equals(toAgentLeveldo.getUpAgentId())){
+                return returnError("不是直接代理无法下发");
+            }
         }
         
         //获取可用的推荐码个数
@@ -275,14 +379,17 @@ public class RecomCodeController extends BaseController {
         
         //下发注册码
         try {
-            recomCodeService.dispatchRecomCode(recomCodeForm.getAgentId(), recomCodeForm.getToAgentId(), dispatchCount, userBO.getUsrName());
+            if(UserConstant.USER_INST.equals(userBO.getUserCodeType())){
+                recomCodeService.dispatchRecomCodeBatchFromInst(recomCodeForm.getUserCode(), recomCodeForm.getToAgentId(), dispatchCount, userBO.getUsrName());
+            } else if(UserConstant.USER_AGENT.equals(userBO.getUserCodeType())) {
+                recomCodeService.dispatchRecomCodeBatchFromAgent(recomCodeForm.getUserCode(), recomCodeForm.getToAgentId(), dispatchCount, userBO.getUsrName());
+            }
         } catch (Exception ex){
             ex.printStackTrace();
             return returnError("系统异常");
         }
         return returnSuccess("下发成功");
     }
-    
     
     /**
      * 下发选中注册码 - 页面
@@ -352,25 +459,156 @@ public class RecomCodeController extends BaseController {
     
     
     /**
-     * 注册码激活
+     * 批量激活注册码 - 实现
      */
-    @RequestMapping(value = "/activate", method = RequestMethod.GET)
+    @RequestMapping(value = "/activate_selected", method = RequestMethod.POST)
     @ResponseBody
-    public Map toActivate (HttpServletRequest request, HttpServletResponse response, ModelAndView modelAndView) {
+    public Map toActivateSelected (HttpServletRequest request, HttpServletResponse response, ModelAndView modelAndView) {
         
         UserBO userBO = getCurrentUser();
-        String recomCode = request.getParameter("recomCode");
+        if(!UserConstant.USER_INST.equals(userBO.getUserCodeType()) && !UserConstant.USER_AGENT.equals(userBO.getUserCodeType())){
+            return returnError("登录账户类型无法激活注册码");
+        }
+        
+        String recomCodes = request.getParameter("recomCode");
+        String userCode = request.getParameter("userCode");  //
+        if(!userCode.equals(userBO.getUserCode())){
+            return returnError("该登录账户无权激活选中注册码");
+        }
+    
+        if(UserConstant.USER_INST.equals(userBO.getUserCodeType())){
+            UcInstDo ucInstDo = instService.getInst(userBO.getUserCode());
+            if(ucInstDo == null){
+                return returnError("登录账户绑定的机构信息未找到");
+            }
+            if(!StatusConstant.STATUS_ENABLE.equals(ucInstDo.getStatus())){
+                return returnError("登录账户绑定的机构信息未激活");
+            }
+        } else {
+            UcAgentDo upAgentDo = agentService.getAgent(userBO.getUserCode());
+            if(upAgentDo == null){
+                return returnError("登录账户绑定的代理未找到");
+            }
+            if(!StatusConstant.STATUS_ENABLE.equals(upAgentDo.getStatus())){
+                return returnError("登录账户绑定的代理未激活");
+            }
+        }
+        String recomP = "";
+        if(StringUtils.isNotBlank(recomCodes)){
+            recomP = recomCodes.replace("\\u005B", "").replace("\\u005C", "");
+        }
+        String[] recomArray = recomP.split("\\s");
+        log.info("下发到代理的注册码:" + recomArray);
+        
+        if(recomArray.length <=0){
+            return returnError("注册码选中列表为空");
+        }
+        List<String> recomList = Arrays.asList(recomArray);
+        
+        //激活选中注册码
+        String mesage = "";
+        try {
+            mesage = recomCodeService.activateRecomCodeSelected(recomList, userBO.getUsrName());
+        } catch (Exception ex){
+            ex.printStackTrace();
+            return returnError("系统异常");
+        }
+        return returnSuccess(mesage);
+    }
+    
+    
+    /**
+     * 批量禁用注册码 - 实现
+     */
+    @RequestMapping(value = "/disable_selected", method = RequestMethod.POST)
+    @ResponseBody
+    public Map toDisableSelected (HttpServletRequest request, HttpServletResponse response, ModelAndView modelAndView) {
+        
+        UserBO userBO = getCurrentUser();
+        if(!UserConstant.USER_INST.equals(userBO.getUserCodeType()) && !UserConstant.USER_AGENT.equals(userBO.getUserCodeType())){
+            return returnError("登录账户类型无法禁用注册码");
+        }
+        
+        String recomCodes = request.getParameter("recomCode");
+        String userCode = request.getParameter("userCode");  //
+        if(!userCode.equals(userBO.getUserCode())){
+            return returnError("该登录账户无权禁用选中注册码");
+        }
+        
+        if(UserConstant.USER_INST.equals(userBO.getUserCodeType())){
+            UcInstDo ucInstDo = instService.getInst(userBO.getUserCode());
+            if(ucInstDo == null){
+                return returnError("登录账户绑定的机构信息未找到");
+            }
+            if(!StatusConstant.STATUS_ENABLE.equals(ucInstDo.getStatus())){
+                return returnError("登录账户绑定的机构信息未激活");
+            }
+        } else {
+            UcAgentDo upAgentDo = agentService.getAgent(userBO.getUserCode());
+            if(upAgentDo == null){
+                return returnError("登录账户绑定的代理未找到");
+            }
+            if(!StatusConstant.STATUS_ENABLE.equals(upAgentDo.getStatus())){
+                return returnError("登录账户绑定的代理未激活");
+            }
+        }
+        String recomP = "";
+        if(StringUtils.isNotBlank(recomCodes)){
+            recomP = recomCodes.replace("\\u005B", "").replace("\\u005C", "");
+        }
+        String[] recomArray = recomP.split("\\s");
+        log.info("待禁用的注册码:" + recomArray);
+        
+        if(recomArray.length <=0){
+            return returnError("注册码选中列表为空");
+        }
+        List<String> recomList = Arrays.asList(recomArray);
+        
+        //激活选中注册码
+        String mesage = "";
+        try {
+            mesage = recomCodeService.disableRecomCodeSelected(recomList, userBO.getUsrName());
+        } catch (Exception ex){
+            ex.printStackTrace();
+            return returnError("系统异常");
+        }
+        return returnSuccess(mesage);
+    }
+    
+    
+    /**
+     * 注册码激活
+     */
+    @RequestMapping(value = "/dispatch", method = RequestMethod.POST)
+    @ResponseBody
+    public Map toDispatch (HttpServletRequest request, HttpServletResponse response, ModelAndView modelAndView, @ModelAttribute("recomCodeDispatchForm")RecomCodeForm recomCodeForm) {
+        
+        UserBO userBO = getCurrentUser();
+        String recomCode = recomCodeForm.getRecomCode();
         if(StringUtils.isBlank(recomCode)){
-            returnError("注册码为空无法激活");
+            return returnError("注册码为空无法激活");
         }
         
         UcReccomCodeCntlDo ucReccomCodeCntlDo = recomCodeService.getRecomCode(recomCode);
         if(ucReccomCodeCntlDo == null){
-            returnError("注册码非法无法激活");
+            return returnError("注册码非法无法激活");
         }
-        if(StatusConstant.RECOMCODE_STATUS_ENABLE.equals(ucReccomCodeCntlDo.getStatus())){
-            returnError("注册码已经激活无法再次激活");
+        if(!StatusConstant.RECOMCODE_STATUS_ENABLE.equals(ucReccomCodeCntlDo.getStatus())){
+            return returnError("注册码非激活无法下拨");
         }
+        
+        if(StringUtils.isBlank(recomCodeForm.getToAgentId())){
+            return returnError("下发目标代理未选择");
+        }
+        UcAgentDo ucAgentDo = agentService.getAgent(recomCodeForm.getToAgentId());
+        if(ucAgentDo == null){
+            return returnError("下发目标代理不存在");
+        }
+        if(!StatusConstant.STATUS_ENABLE.equals(ucAgentDo.getStatus())){
+            return returnError("不能下发给未激活代理");
+        }
+        
+        recomCodeService.dispatchRecomCode(recomCode, recomCodeForm.getToAgentId(), userBO);
         
         return returnSuccess("下发成功");
     }
@@ -378,35 +616,92 @@ public class RecomCodeController extends BaseController {
     /**
      * 注册码激活
      */
-    @RequestMapping(value = "/disable", method = RequestMethod.GET)
+    @RequestMapping(value = "/activate", method = RequestMethod.POST)
     @ResponseBody
-    public Map toDisable (HttpServletRequest request, HttpServletResponse response, ModelAndView modelAndView) {
-        
-        UserBO userBO = getCurrentUser();
+    public Map toActivate (HttpServletRequest request, HttpServletResponse response, ModelAndView modelAndView) {
+    
         String recomCode = request.getParameter("recomCode");
+        String userType = request.getParameter("userType");
+        String userCode = request.getParameter("userCode");
+        if(StringUtils.isBlank(userCode) || StringUtils.isBlank(userType)){
+            return returnError("注册码非法归属无法激活");
+        }
+    
+        UserBO userBO = getCurrentUser();
+        if(!UserConstant.USER_INST.equals(userBO.getUserCodeType()) && !UserConstant.USER_AGENT.equals(userBO.getUserCodeType())){
+            return returnError("登录账户类型无法激活注册码");
+        }
+        if(UserConstant.USER_INST.equals(userBO.getUserCodeType())){
+            if(!userBO.getUserCodeType().equals(userType) || !userBO.getUserCode().equals(userCode)){
+                return returnError("注册码不属于登录账户无法激活");
+            }
+        }
+        
         if(StringUtils.isBlank(recomCode)){
-            returnError("注册码为空无法挂起");
+            return returnError("注册码为空无法激活");
         }
         
         UcReccomCodeCntlDo ucReccomCodeCntlDo = recomCodeService.getRecomCode(recomCode);
         if(ucReccomCodeCntlDo == null){
-            returnError("注册码非法无法挂起");
+            return returnError("注册码非法无法激活");
         }
         if(StatusConstant.RECOMCODE_STATUS_ENABLE.equals(ucReccomCodeCntlDo.getStatus())){
-            returnError("注册码已经激活无法挂起");
+            return returnError("注册码已经激活无法再次激活");
+        }
+        
+        //激活
+        recomCodeService.activateRecomCode(recomCode, userBO);
+        
+        return returnSuccess("激活成功");
+    }
+    
+    /**
+     * 注册码激活
+     */
+    @RequestMapping(value = "/disable", method = RequestMethod.POST)
+    @ResponseBody
+    public Map toDisable (HttpServletRequest request, HttpServletResponse response, ModelAndView modelAndView) {
+    
+        String recomCode = request.getParameter("recomCode");
+        String userType = request.getParameter("userType");
+        String userCode = request.getParameter("userCode");
+        if(StringUtils.isBlank(userCode) || StringUtils.isBlank(userType)){
+            return returnError("注册码非法归属无法禁用");
+        }
+    
+        UserBO userBO = getCurrentUser();
+        if(!UserConstant.USER_INST.equals(userBO.getUserCodeType()) && !UserConstant.USER_AGENT.equals(userBO.getUserCodeType())){
+            return returnError("登录账户类型无法禁用注册码");
+        }
+        if(UserConstant.USER_INST.equals(userBO.getUserCodeType())){
+            if(!userBO.getUserCodeType().equals(userType) || !userBO.getUserCode().equals(userCode)){
+                return returnError("注册码不属于登录账户无法禁用");
+            }
+        }
+        
+        if(StringUtils.isBlank(recomCode)){
+            return returnError("注册码为空无法挂起");
+        }
+        
+        UcReccomCodeCntlDo ucReccomCodeCntlDo = recomCodeService.getRecomCode(recomCode);
+        if(ucReccomCodeCntlDo == null){
+            return returnError("注册码非法无法挂起");
+        }
+        if(StatusConstant.RECOMCODE_STATUS_ENABLE.equals(ucReccomCodeCntlDo.getStatus())){
+            return returnError("注册码已经激活无法挂起");
         }
         if(StatusConstant.RECOMCODE_STATUS_DISABLE.equals(ucReccomCodeCntlDo.getStatus())){
-            returnError("注册码已经挂起无法再次挂起");
+            return returnError("注册码已经挂起无法再次挂起");
         }
         if(StatusConstant.RECOMCODE_STATUS_USED.equals(ucReccomCodeCntlDo.getStatus())){
-            returnError("注册码已经被注册无法挂起");
+            return returnError("注册码已经被注册无法挂起");
         }
         if(StatusConstant.RECOMCODE_STATUS_MATURED.equals(ucReccomCodeCntlDo.getStatus())){
-            returnError("注册码已经过期无法挂起");
+            return returnError("注册码已经过期无法挂起");
         }
     
         //挂起
-        recomCodeService.disableRecomCode(recomCode);
+        recomCodeService.disableRecomCode(recomCode, userBO);
         
         return returnSuccess("注册码挂起成功");
     }

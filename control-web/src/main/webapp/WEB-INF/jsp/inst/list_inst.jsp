@@ -84,6 +84,7 @@
                 <a href="${pageContext.request.contextPath}/inst/disable_inst?instId=<c:out value="${record.instId}"/>" class="btn btn-blue" data-toggle="doajax" data-confirm-msg="确定？" <c:if test="${record.status=='D'}"> disabled=true </c:if>>禁用</a>
                 <a href="${pageContext.request.contextPath}/inst/cancel_inst?instId=<c:out value="${record.instId}"/>" class="btn btn-red" data-toggle="doajax" data-confirm-msg="确定？" <c:if test="${record.status=='C'}"> disabled=true </c:if>>注销</a>
                 <a href="${pageContext.request.contextPath}/inst/detailPage?instId=<c:out value="${record.instId}"/>" class="btn btn-primary" data-toggle="navtab" data-id="navtab-inst-detail" data-title="机构信息查询">详细</a>
+                <a href="${pageContext.request.contextPath}/inst/feePage?instId=<c:out value="${record.instId}"/>" class="btn btn-default" data-toggle="navtab" data-id="navtab-inst-fee" data-title="机构费率信息">费率</a>
             </td>
             </tr>
         </c:forEach>
