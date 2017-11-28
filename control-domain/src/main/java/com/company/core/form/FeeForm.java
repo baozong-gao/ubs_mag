@@ -12,6 +12,8 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = false)
 public class FeeForm extends BaseForm {
     
+    private String userType;
+    private String userCode;
     private String instId;
     private String agentId;
     

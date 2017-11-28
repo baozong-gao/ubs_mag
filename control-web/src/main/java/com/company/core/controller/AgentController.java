@@ -319,4 +319,60 @@ public class AgentController extends BaseController {
         
     }
     
+    @RequestMapping(value = "/feePage", method = RequestMethod.GET)
+    public ModelAndView toFeePage(HttpServletRequest request, HttpServletResponse response, ModelAndView modelAndView) {
+        
+        String agentId = request.getParameter("agentId");
+        if(StringUtils.isBlank(agentId)){
+            modelAndView.getModel().put("statusCode", 300);
+            modelAndView.getModel().put("message", "查看费率的代理号参数为空");
+            modelAndView.setViewName("/agent/fee_agent");
+            return modelAndView;
+        }
+        
+        UcAgentDo ucAgentDo = agentService.getAgent(agentId);
+        if(ucAgentDo == null){
+            modelAndView.getModel().put("statusCode", 300);
+            modelAndView.getModel().put("message", "查看费率的代理不存在");
+            modelAndView.setViewName("/agent/fee_agent");
+            return modelAndView;
+        }
+        
+        AgentForm agentForm = new AgentForm();
+        agentForm.setInstId(ucAgentDo.getInstId());
+        agentForm.setAgentId(ucAgentDo.getInstId());
+        
+//        instService.formatInstFormFromFee(agentForm); //费率信息
+        
+        modelAndView.getModel().put("instFeeForm", agentForm);
+        modelAndView.setViewName("/inst/fee_inst");
+        return modelAndView;
+    }
+    
+    
+    @RequestMapping(value = "/update_agent_fee", method = RequestMethod.POST)
+    @ResponseBody
+    public Map<String, Object> toUpdateInstFee (HttpServletRequest request, HttpServletResponse response, ModelAndView modelAndView, @ModelAttribute("instFeeForm") InstForm instForm) {
+        
+        try {
+            UserBO userBO = getCurrentUser();
+            
+            //检查费率
+            String error = instService.checkFees(instForm);
+            if(StringUtils.isNotBlank(error)){
+                return returnError(error);
+            }
+            
+            instService.updateInstFee(instForm, userBO);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            return returnError("数据更新失败");
+        }
+        
+        return returnSuccess("数据更新成功");
+        
+    }
+    
+    
 }

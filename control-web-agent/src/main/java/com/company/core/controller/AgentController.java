@@ -1,5 +1,6 @@
 package com.company.core.controller;
 
+import com.company.core.biz.UCCategoryBiz;
 import com.company.core.constant.ErrorException;
 import com.company.core.constant.StatusConstant;
 import com.company.core.constant.UserConstant;
@@ -9,6 +10,7 @@ import com.company.core.entity.UcAgentLevelDo;
 import com.company.core.entity.UcInstDo;
 import com.company.core.entity.UcProdDo;
 import com.company.core.form.AgentForm;
+import com.company.core.form.InstForm;
 import com.company.core.form.Pagination;
 import com.company.core.service.AgentService;
 import com.company.core.service.InstService;
@@ -40,6 +42,8 @@ public class AgentController extends BaseController {
     InstService instService;
     @Autowired
     ProdCategoryService prodCategoryService;
+    @Autowired
+    UCCategoryBiz ucCategoryBiz;
     
     @RequestMapping(value = "/addPage", method = RequestMethod.GET)
     public ModelAndView toAddPage(HttpServletRequest request, HttpServletResponse response, ModelAndView modelAndView) {
@@ -224,16 +228,11 @@ public class AgentController extends BaseController {
     }
     
     @RequestMapping(value = "/update_agent", method = RequestMethod.POST)
+    @ResponseBody
     public Map<String, Object> toUpdateAgent (HttpServletRequest request, HttpServletResponse response, ModelAndView modelAndView, @ModelAttribute("agentUpdateForm") AgentForm agentForm) {
         
         try {
             UserBO userBO = getCurrentUser();
-    
-            //检查费率
-            String error = agentService.checkFees(agentForm);
-            if(StringUtils.isNotBlank(error)){
-                return returnError(error);
-            }
             
             agentService.updateAgent(agentForm, userBO);
             
@@ -242,7 +241,7 @@ public class AgentController extends BaseController {
             return returnError("数据更新失败");
         }
         
-        return returnError("数据更新成功");
+        return returnSuccess("数据更新成功");
         
     }
     
@@ -293,7 +292,7 @@ public class AgentController extends BaseController {
             return returnError("数据更新失败");
         }
         
-        return returnError("代理激活成功");
+        return returnSuccess("代理激活成功");
         
     }
     
@@ -342,7 +341,7 @@ public class AgentController extends BaseController {
             return returnError("数据更新失败");
         }
         
-        return returnError("代理挂起成功");
+        return returnSuccess("代理挂起成功");
         
     }
     
@@ -389,8 +388,113 @@ public class AgentController extends BaseController {
             return returnError("数据更新失败");
         }
         
-        return returnError("代理注销成功");
+        return returnSuccess("代理注销成功");
         
     }
+    
+    @RequestMapping(value = "/feePage", method = RequestMethod.GET)
+    public ModelAndView toFeePage(HttpServletRequest request, HttpServletResponse response, ModelAndView modelAndView) {
+    
+        UserBO userBO = getCurrentUser();
+        if(!UserConstant.USER_INST.equals(userBO.getUserCodeType()) && !UserConstant.USER_AGENT.equals(userBO.getUserCodeType())){
+            modelAndView.getModel().put("statusCode", 300);
+            modelAndView.getModel().put("message", "登录账户类型不允许注销代理");
+            modelAndView.setViewName("/agent/fee_agent");
+            return modelAndView;
+        }
+        
+        String agentId = request.getParameter("agentId");
+        if(StringUtils.isBlank(agentId)){
+            modelAndView.getModel().put("statusCode", 300);
+            modelAndView.getModel().put("message", "查看费率的代理号参数为空");
+            modelAndView.setViewName("/agent/fee_agent");
+            return modelAndView;
+        }
+        
+        UcAgentDo ucAgentDo = agentService.getAgent(agentId);
+        if(ucAgentDo == null){
+            modelAndView.getModel().put("statusCode", 300);
+            modelAndView.getModel().put("message", "查看费率的代理不存在");
+            modelAndView.setViewName("/agent/fee_agent");
+            return modelAndView;
+        }
+    
+        //如果是机构身份登录
+        if(UserConstant.USER_INST.equals(userBO.getUserCodeType())){
+            //机构角色
+            UcInstDo ucInstDo = instService.getInst(userBO.getUserCode());
+            if(ucInstDo == null){
+                modelAndView.getModel().put("statusCode", 300);
+                modelAndView.getModel().put("message", "当前登录机构不存在");
+                modelAndView.setViewName("/agent/fee_agent");
+                return modelAndView;
+            }
+            if(!StatusConstant.STATUS_ENABLE.equals(ucInstDo.getStatus())){
+                modelAndView.getModel().put("statusCode", 300);
+                modelAndView.getModel().put("message", "当前登录机构未激活");
+                modelAndView.setViewName("/agent/fee_agent");
+                return modelAndView;
+            }
+            if(!ucAgentDo.getInstId().equals(ucInstDo.getInstId())){
+                modelAndView.getModel().put("statusCode", 300);
+                modelAndView.getModel().put("message", "代理不属于当前登录机构");
+                modelAndView.setViewName("/agent/fee_agent");
+                return modelAndView;
+            }
+        } else if (UserConstant.USER_AGENT.equals(userBO.getUserCodeType())){
+            
+            UcAgentDo agentDo = agentService.getAgent(userBO.getUserCode());
+            if(agentDo == null){
+                modelAndView.getModel().put("statusCode", 300);
+                modelAndView.getModel().put("message", "当前登录代理不存在");
+                modelAndView.setViewName("/agent/fee_agent");
+                return modelAndView;
+            }
+            if(!StatusConstant.STATUS_ENABLE.equals(agentDo.getStatus())){
+                modelAndView.getModel().put("statusCode", 300);
+                modelAndView.getModel().put("message", "当前登录代理未激活");
+                modelAndView.setViewName("/agent/fee_agent");
+                return modelAndView;
+            }
+        }
+        
+        AgentForm agentForm = new AgentForm();
+        agentForm.setInstId(ucAgentDo.getInstId());
+        agentForm.setAgentId(ucAgentDo.getAgentId());
+        agentForm.setUserType(userBO.getUserCodeType());
+        agentForm.setUserCode(userBO.getUserCode());
+
+        agentService.formatAgentFormFromFee(agentForm); //费率信息
+        
+        modelAndView.getModel().put("agentFeeForm", agentForm);
+        modelAndView.setViewName("/agent/fee_agent");
+        return modelAndView;
+    }
+    
+    
+    @RequestMapping(value = "/update_agent_fee", method = RequestMethod.POST)
+    @ResponseBody
+    public Map<String, Object> toUpdateAgentFee (HttpServletRequest request, HttpServletResponse response, ModelAndView modelAndView, @ModelAttribute("agentFeeForm") AgentForm agentForm) {
+        
+        try {
+            UserBO userBO = getCurrentUser();
+            
+            //检查费率
+            String error = agentService.checkFeesAgentOpen(agentForm);
+            if(StringUtils.isNotBlank(error)){
+                return returnError(error);
+            }
+            
+            agentService.updateAgentFeeInfo(agentForm, userBO);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            return returnError("数据更新失败");
+        }
+        
+        return returnSuccess("数据更新成功");
+        
+    }
+    
     
 }

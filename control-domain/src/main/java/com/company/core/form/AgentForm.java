@@ -27,7 +27,9 @@ public class AgentForm extends BaseForm {
     private String agentShortName;
     private String businessLicense;
     private String category;
+    private String categoryName;
     private String categoryId;
+    private String categoryIdName;
     private String agentOk;
     private String agentCountLimit;
     private String limitArea;

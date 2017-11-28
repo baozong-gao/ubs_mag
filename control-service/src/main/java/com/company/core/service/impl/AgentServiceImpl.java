@@ -47,6 +47,8 @@ public class AgentServiceImpl implements AgentService {
     UserService userService;
     @Autowired
     TblBtsUserMapBiz tblBtsUserMapBiz;
+    @Autowired
+    UCCategoryBiz ucCategoryBiz;
     
     @Override
     public List<UcAgentDo> getAgentList() {
@@ -520,6 +522,19 @@ public class AgentServiceImpl implements AgentService {
         agentForm.setStatus(ucAgentDo.getStatus());
         agentForm.setCategory(ucAgentDo.getCategory());
         agentForm.setCategoryId(ucAgentDo.getCategoryId());
+        //获取类别名称
+        if(StringUtils.isNotBlank(ucAgentDo.getCategory())){
+            agentForm.setCategoryName(ucCategoryBiz.getCatagoryName(ucAgentDo.getCategory()));
+        }
+        if(StringUtils.isNotBlank(ucAgentDo.getCategoryId())){
+            UcCategoryDoKey ucCategoryDoKey = new UcCategoryDoKey();
+            ucCategoryDoKey.setCategory(ucAgentDo.getCategory());
+            ucCategoryDoKey.setCategoryId(ucAgentDo.getCategoryId());
+            UcCategoryDo ucCategoryDo = ucCategoryBiz.selectByPrimaryKey(ucCategoryDoKey);
+            if(ucCategoryDo != null){
+                agentForm.setCategoryIdName(ucCategoryDo.getCategoryIdName());
+            }
+        }
         agentForm.setAgentOk(ucAgentDo.getAgentOk());
         agentForm.setAgentCountLimit(String.valueOf(ucAgentDo.getAgentCountLimit()));
         agentForm.setLimitArea(ucAgentDo.getLimitArea());
@@ -529,7 +544,7 @@ public class AgentServiceImpl implements AgentService {
     @Override
     public void formatAgentFormFromAgentInfo(AgentForm agentForm) {
         
-        UcAgentInfoDo ucAgentInfoDo = getAgentInfo(agentForm.getInstId());
+        UcAgentInfoDo ucAgentInfoDo = getAgentInfo(agentForm.getAgentId());
         if (ucAgentInfoDo == null) {
             return;
         }
@@ -560,7 +575,7 @@ public class AgentServiceImpl implements AgentService {
         ucFeeDo.setUserCode(agentForm.getAgentId());
         
         //之后扩充时, 需要替换掉
-        ucFeeDo.setCategory("1");
+        ucFeeDo.setCategory(Constant.CATEGORY_DEFAULT);
         ucFeeDo.setCategoryId("P001");
         ucFeeDo.setFeeType("DF");
         UcFeeDo df = ucFeeBiz.getFee(ucFeeDo);
@@ -717,8 +732,8 @@ public class AgentServiceImpl implements AgentService {
         //更新代理详细信息
         this.updateAgentDetailInfo(agentForm, userBO);
         
-        //更新代理费率信息
-        this.updateAgentFeeInfo(agentForm, userBO);
+//        //更新代理费率信息
+//        this.updateAgentFeeInfo(agentForm, userBO);
         
     }
     
@@ -807,37 +822,39 @@ public class AgentServiceImpl implements AgentService {
         //存入机构费率
         UcFeeDo ucFeeDo = new UcFeeDo();
         ucFeeDo.setUserType(UserConstant.USER_AGENT);
-        ucFeeDo.setUserCode(agentForm.getInstId());
-
-//        if(StringUtils.isNotBlank(agentForm.getCategory())){
-//            ucFeeDo.setCategory(agentForm.getCategory());
-//        } else {
-//            ucFeeDo.setCategory(SystemConstant.DEFAULT_CATEGORY);  //默认是1
-//        }
-//        if(StringUtils.isNotBlank(agentForm.getCategoryId())){
-//            ucFeeDo.setCategoryId(agentForm.getCategoryId());
-//        } else {
-//            ucFeeDo.setCategoryId(SystemConstant.DEFAULT_CATEGORY_ID);  //默认是P001
-//        }
-//        ucFeeDo.setStatus(StatusConstant.STATUS_ENABLE);
-//        ucFeeDo.setPercentFlag("N");
-
-//        ucFeeDo.setCreateUser(userBO.getUsrName());
-//        ucFeeDo.setCreateSource(SystemConstant.DEFAULT_SOURCE_CODE);
-//        ucFeeDo.setCreateTime(DateUtil.getCurrentDateTime());
+        ucFeeDo.setUserCode(agentForm.getAgentId());
+        ucFeeDo.setCategory(SystemConstant.DEFAULT_CATEGORY);
+        ucFeeDo.setCategoryId(SystemConstant.DEFAULT_CATEGORY_ID);
+        
         ucFeeDo.setModifyUser(userBO.getUsrName());
         ucFeeDo.setModifySource(SystemConstant.DEFAULT_SOURCE_CODE);
         ucFeeDo.setModifyTime(DateUtil.getCurrentDateTime());
-//        ucFeeDo.setLockedVersion(String.valueOf(0));
         
         //默认固定单笔
         if (StringUtils.isNotBlank(agentForm.getDefaultFeeFixed()) && !ucFeeBiz.zeroFee(agentForm.getDefaultFeeFixed())) {
             ucFeeDo.setFeeType(Constant.FEE_DEFAULT_FIXED);
             ucFeeDo.setFeeDesc(Constant.FEE_DEFAULT_FIXED_DESC);
             ucFeeDo.setFeeMode(agentForm.getDefaultFeeFixed());
-            int i = ucFeeBiz.updateFee(ucFeeDo);
-            if (i <= 0) {
-                throw new ErrorException("数据更新失败");
+            
+            UcFeeDo ucFeeDo1 = ucFeeBiz.getFee(ucFeeDo);
+            if(ucFeeDo1 !=null){
+                ucFeeDo1.setFeeMode(agentForm.getDefaultFeeFixed());
+                int i = ucFeeBiz.updateFee(ucFeeDo1);
+                if (i <= 0) {
+                    throw new ErrorException("数据更新失败");
+                }
+            } else {
+                ucFeeDo.setStatus(StatusConstant.STATUS_ENABLE);
+                ucFeeDo.setPercentFlag("N");
+                ucFeeDo.setCreateUser(userBO.getUsrName());
+                ucFeeDo.setCreateSource(SystemConstant.DEFAULT_SOURCE_CODE);
+                ucFeeDo.setCreateTime(DateUtil.getCurrentDateTime());
+                ucFeeDo.setLockedVersion(String.valueOf(0));
+                ucFeeDo.setFeeMode(agentForm.getDefaultFeeFixed());
+                int i = ucFeeBiz.insertFee(ucFeeDo);
+                if (i <= 0) {
+                    throw new ErrorException("数据新增失败");
+                }
             }
         }
         //默认固定比例
@@ -845,9 +862,26 @@ public class AgentServiceImpl implements AgentService {
             ucFeeDo.setFeeType(Constant.FEE_DEFAULT_RATE);
             ucFeeDo.setFeeDesc(Constant.FEE_DEFAULT_RATE_DESC);
             ucFeeDo.setFeeMode(agentForm.getDefaultFeeRate());
-            int c = ucFeeBiz.updateFee(ucFeeDo);
-            if (c <= 0) {
-                throw new ErrorException("数据更新失败");
+    
+            UcFeeDo ucFeeDo1 = ucFeeBiz.getFee(ucFeeDo);
+            if(ucFeeDo1 !=null){
+                ucFeeDo1.setFeeMode(agentForm.getDefaultFeeRate());
+                int i = ucFeeBiz.updateFee(ucFeeDo1);
+                if (i <= 0) {
+                    throw new ErrorException("数据更新失败");
+                }
+            } else {
+                ucFeeDo.setStatus(StatusConstant.STATUS_ENABLE);
+                ucFeeDo.setPercentFlag("N");
+                ucFeeDo.setCreateUser(userBO.getUsrName());
+                ucFeeDo.setCreateSource(SystemConstant.DEFAULT_SOURCE_CODE);
+                ucFeeDo.setCreateTime(DateUtil.getCurrentDateTime());
+                ucFeeDo.setLockedVersion(String.valueOf(0));
+                ucFeeDo.setFeeMode(agentForm.getDefaultFeeRate());
+                int i = ucFeeBiz.insertFee(ucFeeDo);
+                if (i <= 0) {
+                    throw new ErrorException("数据新增失败");
+                }
             }
         }
         //实收固定单笔
@@ -855,9 +889,26 @@ public class AgentServiceImpl implements AgentService {
             ucFeeDo.setFeeType(Constant.FEE_EFFECTIVE_FIXED);
             ucFeeDo.setFeeDesc(Constant.FEE_EFFECTIVE_FIXED_DESC);
             ucFeeDo.setFeeMode(agentForm.getEffectiveFeeFixed());
-            int d = ucFeeBiz.updateFee(ucFeeDo);
-            if (d <= 0) {
-                throw new ErrorException("数据更新失败");
+    
+            UcFeeDo ucFeeDo1 = ucFeeBiz.getFee(ucFeeDo);
+            if(ucFeeDo1 !=null){
+                ucFeeDo1.setFeeMode(agentForm.getEffectiveFeeFixed());
+                int i = ucFeeBiz.updateFee(ucFeeDo1);
+                if (i <= 0) {
+                    throw new ErrorException("数据更新失败");
+                }
+            } else {
+                ucFeeDo.setStatus(StatusConstant.STATUS_ENABLE);
+                ucFeeDo.setPercentFlag("N");
+                ucFeeDo.setCreateUser(userBO.getUsrName());
+                ucFeeDo.setCreateSource(SystemConstant.DEFAULT_SOURCE_CODE);
+                ucFeeDo.setCreateTime(DateUtil.getCurrentDateTime());
+                ucFeeDo.setLockedVersion(String.valueOf(0));
+                ucFeeDo.setFeeMode(agentForm.getEffectiveFeeFixed());
+                int i = ucFeeBiz.insertFee(ucFeeDo);
+                if (i <= 0) {
+                    throw new ErrorException("数据新增失败");
+                }
             }
         }
         //实收固定比例
@@ -865,9 +916,26 @@ public class AgentServiceImpl implements AgentService {
             ucFeeDo.setFeeType(Constant.FEE_EFFECTIVE_RATE);
             ucFeeDo.setFeeDesc(Constant.FEE_EFFECTIVE_RATE_DESC);
             ucFeeDo.setFeeMode(agentForm.getEffectiveFeeRate());
-            int f = ucFeeBiz.updateFee(ucFeeDo);
-            if (f <= 0) {
-                throw new ErrorException("数据更新失败");
+    
+            UcFeeDo ucFeeDo1 = ucFeeBiz.getFee(ucFeeDo);
+            if(ucFeeDo1 !=null){
+                ucFeeDo1.setFeeMode(agentForm.getEffectiveFeeRate());
+                int i = ucFeeBiz.updateFee(ucFeeDo1);
+                if (i <= 0) {
+                    throw new ErrorException("数据更新失败");
+                }
+            } else {
+                ucFeeDo.setStatus(StatusConstant.STATUS_ENABLE);
+                ucFeeDo.setPercentFlag("N");
+                ucFeeDo.setCreateUser(userBO.getUsrName());
+                ucFeeDo.setCreateSource(SystemConstant.DEFAULT_SOURCE_CODE);
+                ucFeeDo.setCreateTime(DateUtil.getCurrentDateTime());
+                ucFeeDo.setLockedVersion(String.valueOf(0));
+                ucFeeDo.setFeeMode(agentForm.getEffectiveFeeRate());
+                int i = ucFeeBiz.insertFee(ucFeeDo);
+                if (i <= 0) {
+                    throw new ErrorException("数据新增失败");
+                }
             }
         }
     }
@@ -1024,8 +1092,8 @@ public class AgentServiceImpl implements AgentService {
         if (StringUtils.isBlank(agentForm.getDefaultFeeFixed())) {
             agentForm.setDefaultFeeFixed("0");
         }
-        if (StringUtils.isBlank(agentForm.getEffectiveFeeRate())) {
-            agentForm.setEffectiveFeeRate("0");
+        if (StringUtils.isBlank(agentForm.getDefaultFeeRate())) {
+            agentForm.setDefaultFeeRate("0");
         }
         BigDecimal zero = new BigDecimal("0");
         BigDecimal df = new BigDecimal(agentForm.getDefaultFeeFixed());
@@ -1062,10 +1130,10 @@ public class AgentServiceImpl implements AgentService {
             UcFeeDo instdf = ucFeeBiz.getFee(ucFeeDo);
             ucFeeDo.setFeeType("DR");
             UcFeeDo instdr = ucFeeBiz.getFee(ucFeeDo);
-            if(df != null){
+            if(instdf != null){
                 bdf = new BigDecimal(instdf.getFeeMode());
             }
-            if(dr != null){
+            if(instdr != null){
                 bdr = new BigDecimal(instdr.getFeeMode());
             }
         } else if(UserConstant.USER_AGENT.equals(agentForm.getUserType())) {
@@ -1079,10 +1147,10 @@ public class AgentServiceImpl implements AgentService {
             UcFeeDo agentdf = ucFeeBiz.getFee(ucFeeDo);
             ucFeeDo.setFeeType("DR");
             UcFeeDo agentdr = ucFeeBiz.getFee(ucFeeDo);
-            if (df != null) {
+            if (agentdf != null) {
                 bdf = new BigDecimal(agentdf.getFeeMode());
             }
-            if (dr != null) {
+            if (agentdr != null) {
                 bdr = new BigDecimal(agentdr.getFeeMode());
             }
         }
@@ -1105,27 +1173,32 @@ public class AgentServiceImpl implements AgentService {
         
         UserBO userBo = new UserBO();
         userBo.setUsrId(String.valueOf(sequenceBiz.genUserIdSeq()));
-        userBo.setUsrName("I" + ucAgentDo.getAgentId());  //默认登录号  A0000001
+        userBo.setUsrName("A" + ucAgentDo.getAgentId());  //默认登录号  A0000001
         
         //获取代理详细信息 - 邮箱, 简称等
         String mail = "";
         UcAgentInfoDo ucAgentInfoDo = ucAgentBiz.selectAgentInfo(ucAgentDo.getAgentId());
-        if (ucAgentInfoDo == null || StringUtils.isBlank(ucAgentInfoDo.getContactMail())) {
+        if (ucAgentInfoDo != null && !StringUtils.isBlank(ucAgentInfoDo.getContactMail())) {
             mail = ucAgentInfoDo.getContactMail();
         } else {
             mail = ucAgentDo.getAgentId() + DateUtil.getCurrentDate() + "@163.com";
         }
         userBo.setUsrEmail(mail);
         
+        String phone="";
+        if(ucAgentInfoDo != null && StringUtils.isNotBlank(ucAgentInfoDo.getContactPhone())){
+            phone = ucAgentInfoDo.getContactPhone();
+        }
+        
         //默认密码用手机号的后6位, 如果手机号为空, 或者不足11位, 用机构号替代
-        userBo.setUsrPwd(customCredentialsMatcherBiz.encrypt(getPassword(ucAgentDo.getAgentId(), ucAgentInfoDo.getContactPhone())));
+        userBo.setUsrPwd(customCredentialsMatcherBiz.encrypt(getPassword(ucAgentDo.getAgentId(), phone)));
         userBo.setUsrDisableTag("1");
         userBo.setUsrCreateBy(shiroUserBo.getUsrName());
         userBo.setUsrUpdateBy(shiroUserBo.getUsrName());
         
         userBo.setUsrType(UserConstant.USER_AGENT);
         userBo.setUserCode(ucAgentDo.getAgentId());
-        userBo.setUserCodeName(ucAgentInfoDo.getAgentShortName());
+        userBo.setUserCodeName(ucAgentDo.getAgentName());
         
         userService.addNewUsr(userBo);
         

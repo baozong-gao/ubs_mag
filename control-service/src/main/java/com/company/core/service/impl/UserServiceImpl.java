@@ -156,10 +156,10 @@ public class UserServiceImpl implements UserService {
             tblBtsUsrMapDo.setUserCode(userBO.getUserCode());
             tblBtsUsrMapDo.setUserName(userBO.getUserCodeName());
     
-            tblBtsUsrMapDo.setCreateUser(userBO.getUsrName());
+            tblBtsUsrMapDo.setCreateUser(userBO.getUsrCreateBy());
             tblBtsUsrMapDo.setCreateSource(SystemConstant.DEFAULT_SOURCE_CODE);
             tblBtsUsrMapDo.setCreateTime(DateUtil.getCurrentDateTime());
-            tblBtsUsrMapDo.setModifyUser(userBO.getUsrName());
+            tblBtsUsrMapDo.setModifyUser(userBO.getUsrCreateBy());
             tblBtsUsrMapDo.setModifySource(SystemConstant.DEFAULT_SOURCE_CODE);
             tblBtsUsrMapDo.setModifyTime(DateUtil.getCurrentDateTime());
             tblBtsUsrMapDo.setLockVersion(String.valueOf(0));
