@@ -28,4 +28,12 @@ public class Constant {
     
     
     
+    //机构类型 默认
+    public final static String INST_TYPE_DEFAULT = "0";   //直属机构
+    public final static String INST_TYPE_EXTENDS = "1";   //发展机构
+    
+    //代理类型 默认
+    public final static String AGENT_TYPE_DEFAULT = "0";   //直属代理
+    public final static String AGENT_TYPE_EXTENDS = "1";   //发展代理
+    
 }

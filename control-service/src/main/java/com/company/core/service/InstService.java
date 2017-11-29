@@ -54,6 +54,8 @@ public interface InstService {
     
     public Boolean checkIfDupInstByName(String instName, String instShortName );
     
+    Boolean checkIfDefaultInstCreated();
+    
     String checkFees(InstForm instForm);
     
     void formatInstFormFromInst(InstForm instForm);

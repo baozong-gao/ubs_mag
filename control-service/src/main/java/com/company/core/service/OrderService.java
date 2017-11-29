@@ -19,4 +19,6 @@ public interface OrderService {
     
     
     Pagination getOrderListPage(OrderForm orderForm);
+    
+    void getOrderDetail(OrderForm orderForm);
 }

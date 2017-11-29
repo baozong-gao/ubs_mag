@@ -35,7 +35,7 @@
                             <div class="row-input" style="margin: 20px 0 20px; width: 100%">
                                 <div class="form-group" style="padding-left: 15px">
                                     <label class="control-label labelblock">选择机构：</label>
-                                    <select name="instId" id="instId" data-toggle="selectpicker"    data-live-search="true"
+                                    <select name="instId" id="instId" data-toggle="selectpicker" data-live-search="true"
                                             data-nextselect="#agentIdA"
                                             <%--<!-- status = E 代表enable 激活的状态-->--%>
                                             data-refurl="${pageContext.request.contextPath}/comcon/select_agent_active?instId={value}&level=1&status=E"
@@ -83,7 +83,7 @@
                                 <div class="form-group col-md-6">
                                     <label class="control-label labelblock">类别ID&nbsp;：</label>
                                     <select
-                                            name="categoryId" id="categoryIdA" data-rule="类型ID:required;"
+                                            name="categoryId" id="categoryIdA" data-rule="类型ID:required;" data-live-search="true"
                                             data-toggle="selectpicker">
                                         <option style="width: 60px; display: inline-block" value="">-请选择-</option>
                                     </select>&nbsp;

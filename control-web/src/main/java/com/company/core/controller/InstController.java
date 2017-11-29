@@ -117,11 +117,16 @@ public class InstController extends BaseController {
         log.info("机构开户");
         Boolean dupshortname = instService.checkIfDupInstByName("", instForm.getInstShortName());
         if(dupshortname){
-            return returnSuccess("机构简称重复");
+            return returnError("机构简称重复");
         }
         Boolean dupname = instService.checkIfDupInstByName(instForm.getInstName(), "");
         if(dupname){
-            return returnSuccess("机构全称重复");
+            return returnError("机构全称重复");
+        }
+    
+        Boolean defaultInstCreated = instService.checkIfDefaultInstCreated();
+        if(defaultInstCreated){
+            return returnError("默认机构已经开通, 请选择其他机构类型");
         }
         
         //检查费率
@@ -364,6 +369,50 @@ public class InstController extends BaseController {
             }
             
             instService.updateInstFee(instForm, userBO);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            return returnError("数据更新失败");
+        }
+        
+        return returnSuccess("数据更新成功");
+        
+    }
+    
+    @RequestMapping(value = "/infoPage", method = RequestMethod.GET)
+    public ModelAndView toInfoPage(HttpServletRequest request, HttpServletResponse response, ModelAndView modelAndView) {
+        
+        //从登陆session里获取机构号
+        UserBO userBO = getCurrentUser();
+        if(!UserConstant.USER_INST.equals(userBO.getUserCodeType())){
+            modelAndView.setViewName("/inst/info_inst");
+            return modelAndView;
+        }
+        
+        InstForm instForm = new InstForm();
+        instForm.setInstId(userBO.getUserCode());
+        
+        instService.formatInstFormFromInst(instForm);  // 基本信息
+        instService.formatInstFormFromInstInfo(instForm); //附加信息
+        
+        modelAndView.getModel().put("instDetailForm", instForm);
+        modelAndView.setViewName("/inst/info_inst");
+        return modelAndView;
+    }
+    
+    @RequestMapping(value = "/update_inst_info", method = RequestMethod.POST)
+    @ResponseBody
+    public Map<String, Object> toUpdateInstInfo (HttpServletRequest request, HttpServletResponse response, ModelAndView modelAndView, @ModelAttribute("instUpdateForm") InstForm instForm) {
+        
+        try {
+            UserBO userBO = getCurrentUser();
+    
+            //从登陆session里获取机构号
+            if(!UserConstant.USER_INST.equals(userBO.getUserCodeType())){
+                return returnError("数据更新成功");
+            }
+            
+            instService.updateInstInfo(instForm, userBO);
             
         } catch (Exception e) {
             e.printStackTrace();

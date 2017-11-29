@@ -31,7 +31,7 @@
 
                 <label class="labelblock">代理号:</label>
                 <select name="agentId" id="agentId" data-toggle="selectpicker"  data-live-search="true">
-                    <option value="">--代理--</option>
+                    <option value="">--请选择代理--</option>
                     <c:forEach var="record" items="${agentList}"
                                varStatus="status">
                         <option value="${record.agentId}"

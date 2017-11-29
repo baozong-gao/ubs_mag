@@ -38,7 +38,7 @@
                         data-nextselect="#agentIdL"
                         data-refurl="${pageContext.request.contextPath}/comcon/select_agent_active?instId={value}"
                 >
-                    <option style="width: 60px; display: inline-block" value="">-请选择-</option>
+                    <option style="width: 60px; display: inline-block" value="">-请选择机构-</option>
                     <c:forEach var="record" items="${instList}"
                                varStatus="status">
                         <option value="${record.instId}"

@@ -472,6 +472,8 @@ public class AgentController extends BaseController {
     }
     
     
+    
+    
     @RequestMapping(value = "/update_agent_fee", method = RequestMethod.POST)
     @ResponseBody
     public Map<String, Object> toUpdateAgentFee (HttpServletRequest request, HttpServletResponse response, ModelAndView modelAndView, @ModelAttribute("agentFeeForm") AgentForm agentForm) {
@@ -496,5 +498,109 @@ public class AgentController extends BaseController {
         
     }
     
+    
+    @RequestMapping(value = "/defaultFeePage", method = RequestMethod.GET)
+    public ModelAndView toDefaulFeePage(HttpServletRequest request, HttpServletResponse response, ModelAndView modelAndView) {
+        
+        UserBO userBO = getCurrentUser();
+        if(!UserConstant.USER_AGENT.equals(userBO.getUserCodeType())){
+            modelAndView.getModel().put("statusCode", 300);
+            modelAndView.getModel().put("message", "登录账户类型不允许注销代理");
+            modelAndView.setViewName("/agent/default_agent_fee");
+            return modelAndView;
+        }
+        
+        UcAgentDo ucAgentDo = agentService.getAgent(userBO.getUserCode());
+        if(ucAgentDo == null){
+            modelAndView.getModel().put("statusCode", 300);
+            modelAndView.getModel().put("message", "查看费率的代理不存在");
+            modelAndView.setViewName("/agent/default_agent_fee");
+            return modelAndView;
+        }
+        
+        AgentForm agentForm = new AgentForm();
+        agentForm.setInstId(ucAgentDo.getInstId());
+        agentForm.setAgentId(ucAgentDo.getAgentId());
+        agentForm.setUserType(userBO.getUserCodeType());
+        agentForm.setUserCode(userBO.getUserCode());
+        
+        agentService.formatAgentFormFromFee(agentForm);
+        
+        modelAndView.getModel().put("defaultAgentFeeForm", agentForm);
+        modelAndView.setViewName("/agent/default_agent_fee");
+        return modelAndView;
+    }
+    
+    @RequestMapping(value = "/update_default_agent_fee", method = RequestMethod.POST)
+    @ResponseBody
+    public Map<String, Object> toUpdateDefaultAgentFee (HttpServletRequest request, HttpServletResponse response, ModelAndView modelAndView, @ModelAttribute("defaultAgentFeeForm") AgentForm agentForm) {
+        
+        try {
+            UserBO userBO = getCurrentUser();
+            
+            //检查费率
+            String error = agentService.checkFeesAgentOpen(agentForm);
+            if(StringUtils.isNotBlank(error)){
+                return returnError(error);
+            }
+            
+            agentService.updateAgentFeeInfo(agentForm, userBO);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            return returnError("数据更新失败");
+        }
+        
+        return returnSuccess("数据更新成功");
+        
+    }
+    
+    @RequestMapping(value = "/defaultInfoPage", method = RequestMethod.GET)
+    public ModelAndView toDefaultInfoPage(HttpServletRequest request, HttpServletResponse response, ModelAndView modelAndView) {
+    
+        UserBO userBO = getCurrentUser();
+        if(!UserConstant.USER_AGENT.equals(userBO.getUserCodeType())){
+            modelAndView.getModel().put("statusCode", 300);
+            modelAndView.getModel().put("message", "登录账户类型不是代理");
+            modelAndView.setViewName("/agent/default_agent_info");
+            return modelAndView;
+        }
+    
+        UcAgentDo ucAgentDo = agentService.getAgent(userBO.getUserCode());
+        if(ucAgentDo == null){
+            modelAndView.getModel().put("statusCode", 300);
+            modelAndView.getModel().put("message", "登录代理不存在");
+            modelAndView.setViewName("/agent/default_agent_info");
+            return modelAndView;
+        }
+        
+        AgentForm agentForm = new AgentForm();
+        agentForm.setAgentId(ucAgentDo.getAgentId());
+        
+        agentService.formatAgentFormFromAgent(agentForm);  // 基本信息
+        agentService.formatAgentFormFromAgentInfo(agentForm); //附加信息
+        
+        modelAndView.getModel().put("defaultAgentDetailForm", agentForm);
+        modelAndView.setViewName("/agent/default_agent_info");
+        return modelAndView;
+    }
+    
+//    @RequestMapping(value = "/update_default_agent_info", method = RequestMethod.POST)
+//    @ResponseBody
+//    public Map<String, Object> toUpdateDefaultAgentInfo (HttpServletRequest request, HttpServletResponse response, ModelAndView modelAndView, @ModelAttribute("defaultAgentUpdateForm") AgentForm agentForm) {
+//
+//        try {
+//            UserBO userBO = getCurrentUser();
+//
+//            agentService.updateAgent(agentForm, userBO);
+//
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            return returnError("数据更新失败");
+//        }
+//
+//        return returnSuccess("数据更新成功");
+//
+//    }
     
 }

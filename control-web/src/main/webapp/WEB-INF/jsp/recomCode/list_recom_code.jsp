@@ -100,7 +100,7 @@
         <tbody>
         <c:forEach var="record" items="${recomCodeListForm.pagination.list}" varStatus="status">
             <td align="center">
-                <input type="checkbox" name ='selone' value=" ${record.userCode}&${record.recomCode}" <c:if test="${'1' != record.userType}">disabled="true"</c:if>>
+                <input type="checkbox" name ='selone' value=" ${record.userCode}&${record.recomCode}" <c:if test="${'1' != record.userType || 'N' != record.status}">disabled="true"</c:if>>
             </td>
             <td align="center"><c:out value="${record.batchId}"/></td>
             <td align="center"><c:out value="${record.recomCodeSeq}"/></td>
@@ -118,8 +118,8 @@
             <td align="center"><c:out value="${record.createUser}"/></td>
             <td align="center"><c:out value="${record.createTime}"/></td>
             <td align="center">
-                <a href="${pageContext.request.contextPath}/recomCode/disabled?recomCode=<c:out value="${record.recomCode}"/>&userCode=<c:out value="${record.userCode}"/>&userType=<c:out value="${record.userType}"/>" class="btn btn-blue" data-toggle="doajax" data-confirm-msg="确定？" <c:if test="${record.status=='D' || record.status=='U' }"> disabled=true </c:if>>禁用</a>
-                <a href="${pageContext.request.contextPath}/recomCode/dispatchPage?recomCode=<c:out value="${record.recomCode}"/>&userCode=<c:out value="${record.userCode}"/>&userType=<c:out value="${record.userType}"/>" class="btn btn-primary" data-toggle="dialog" data-width="600" data-height="400" data-id="dialog-normal" data-title="注册码下发" <c:if test="${record.status=='D' || record.status=='M' || record.status=='U' || record.userType != '1'}"> disabled=true </c:if>>下发</a>
+                <a href="${pageContext.request.contextPath}/recomCode/disabled?recomCode=<c:out value="${record.recomCode}"/>&userCode=<c:out value="${record.userCode}"/>&userType=<c:out value="${record.userType}"/>" class="btn btn-blue" data-toggle="doajax" data-confirm-msg="确定？" <c:if test="${record.status=='D' || record.status=='U' || record.status=='C'}"> disabled=true </c:if>>禁用</a>
+                <a href="${pageContext.request.contextPath}/recomCode/dispatchPage?recomCode=<c:out value="${record.recomCode}"/>&userCode=<c:out value="${record.userCode}"/>&userType=<c:out value="${record.userType}"/>" class="btn btn-primary" data-toggle="dialog" data-width="600" data-height="400" data-id="dialog-normal" data-title="注册码下发" <c:if test="${record.status !='N' || record.userType != '1'}"> disabled=true </c:if>>下发</a>
             </td>
             </tr>
         </c:forEach>

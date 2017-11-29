@@ -574,6 +574,7 @@ public class InstServiceImpl implements InstService {
         //ucInstDo.setStatus(StatusConstant.STATUS_NEW); 机构状态不允许修改
         ucInstDo.setCategory(instForm.getCategory());
         ucInstDo.setCategoryId(instForm.getCategoryId());
+        
         ucInstDo.setAgentOk(instForm.getAgentOk());
         BigDecimal bigDecimal = new BigDecimal(instForm.getAgentCountLimit());
         ucInstDo.setAgentCountLimit(bigDecimal);
@@ -745,6 +746,18 @@ public class InstServiceImpl implements InstService {
     }
     
     @Override
+    public Boolean checkIfDefaultInstCreated() {
+    
+        UcInstDoExample ucInstDoExample = new UcInstDoExample();
+        ucInstDoExample.createCriteria().andInstTypeEqualTo(Constant.INST_TYPE_DEFAULT);
+        List<UcInstDo> ucInstDoList = ucInstBiz.selectByExample(ucInstDoExample);
+        if(ucInstDoList != null && ucInstDoList.size() > 0){
+            return true;
+        }
+        return false;
+    }
+    
+    @Override
     public String checkFees(InstForm instForm) {
         
         String error = "";
@@ -819,6 +832,21 @@ public class InstServiceImpl implements InstService {
         instForm.setStatus(ucInstDo.getStatus());
         instForm.setCategory(ucInstDo.getCategory());
         instForm.setCategoryId(ucInstDo.getCategoryId());
+    
+        //获取类别名称
+        if(StringUtils.isNotBlank(ucInstDo.getCategory())){
+            instForm.setCategoryName(ucCategoryBiz.getCatagoryName(ucInstDo.getCategory()));
+        }
+        if(StringUtils.isNotBlank(ucInstDo.getCategoryId())){
+            UcCategoryDoKey ucCategoryDoKey = new UcCategoryDoKey();
+            ucCategoryDoKey.setCategory(ucInstDo.getCategory());
+            ucCategoryDoKey.setCategoryId(ucInstDo.getCategoryId());
+            UcCategoryDo ucCategoryDo = ucCategoryBiz.selectByPrimaryKey(ucCategoryDoKey);
+            if(ucCategoryDo != null){
+                instForm.setCategoryIdName(ucCategoryDo.getCategoryIdName());
+            }
+        }
+        
         instForm.setAgentOk(ucInstDo.getAgentOk());
         instForm.setAgentCountLimit(String.valueOf(ucInstDo.getAgentCountLimit()));
         instForm.setLimitArea(ucInstDo.getLimitArea());

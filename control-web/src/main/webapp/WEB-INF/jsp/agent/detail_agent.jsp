@@ -22,18 +22,19 @@
 <div class="bjui-pageContent tableContent">
 
 
-    <form id="pagerForm" name="agentDetailForm" data-toggle="validate"
-          novalidate="novalidate"
-          action="${pageContext.request.contextPath}/agent/update_agent"
-          method="post">
+    <%--<form id="pagerForm" name="agentDetailForm" data-toggle="validate"--%>
+          <%--novalidate="novalidate"--%>
+          <%--action="${pageContext.request.contextPath}/agent/update_agent"--%>
+          <%--method="post">--%>
 
+        <form id="pagerForm" name="agentDetailForm">
         <div style="margin:15px auto 0; width:96%;">
             <div class="row" style="padding: 0 8px;">
 
                 <!-- 代理属性 -->
                 <div class="col-md-12">
                     <div class="panel panel-default">
-                        <div class="panel-heading"><h3 class="panel-title">代理${agentDetailForm.agentId}信息</h3></div>
+                        <div class="panel-heading"><h3 class="panel-title">代理信息--${agentDetailForm.agentId}</h3></div>
                         <div class="panel-body">
                             <div class="row-input" style="margin: 20px 0 20px; width: 100%">
                                 <div class="form-group col-md-4">
@@ -65,28 +66,41 @@
                                             name="agentType" id="agentType" data-rule="代理类型:required;"
                                             value="${agentDetailForm.agentType}"
                                             data-toggle="selectpicker">
-                                        <option value="1">-请选择-</option>
                                         <option value="1" <c:if test="${agentDetailForm.agentType == '1'}">selected</c:if>>发展代理</option>
                                         <option value="0" <c:if test="${agentDetailForm.agentType == '0'}">selected</c:if>>直属代理</option>
                                     </select>&nbsp;
                                 </div>
 
+                                <%--<div class="form-group col-md-4">--%>
+                                    <%--<label class="control-label labelblock">代理类别：</label>--%>
+                                    <%--<select name="category" id="category" data-rule="代理类型:required;"--%>
+                                            <%--data-toggle="selectpicker" data-live-search="true"--%>
+                                            <%--data-nextselect="#categoryIdM"--%>
+                                            <%--data-refurl="${pageContext.request.contextPath}/comcon/select_catagory_ids?catagory={value}">--%>
+                                        <%--<option value="all">-请选择-</option>--%>
+                                        <%--<option value="0" <c:if test="${agentDetailForm.category == '0'}">selected</c:if>>基础业务</option>--%>
+                                    <%--</select>&nbsp;--%>
+                                <%--</div>--%>
+                                <%--<div class="form-group col-md-4">--%>
+                                    <%--<label class="control-label labelblock">类别ID&nbsp;：</label>--%>
+                                    <%--<select name="categoryId" id="categoryIdM" data-toggle="selectpicker"  data-live-search="true" data-rule="代理类别ID:required;">--%>
+                                        <%--<option style="width: 60px; display: inline-block" value="">-请选择-</option>--%>
+                                    <%--</select>--%>
+                                <%--</div>--%>
+
                                 <div class="form-group col-md-4">
-                                    <label class="control-label labelblock">代理类别：</label>
-                                    <select name="category" id="category" data-rule="代理类型:required;"
-                                            data-toggle="selectpicker" data-live-search="true"
-                                            data-nextselect="#categoryIdM"
-                                            data-refurl="${pageContext.request.contextPath}/comcon/select_catagory_ids?catagory={value}">
-                                        <option value="all">-请选择-</option>
-                                        <option value="0" <c:if test="${agentDetailForm.category == '0'}">selected</c:if>>基础业务</option>
+                                    <label class="control-label labelblock">类别：</label>
+                                    <select name="category" id="category"   data-toggle="selectpicker"  data-live-search="true" data-rule="代理类别:required;">
+                                        <option value="${agentDetailForm.category}">${agentDetailForm.categoryName}</option>
                                     </select>&nbsp;
                                 </div>
                                 <div class="form-group col-md-4">
                                     <label class="control-label labelblock">类别ID&nbsp;：</label>
-                                    <select name="categoryId" id="categoryIdM" data-toggle="selectpicker"  data-live-search="true" data-rule="代理类别ID:required;">
-                                        <option style="width: 60px; display: inline-block" value="">-请选择-</option>
+                                    <select name="categoryId" id="categoryId" data-toggle="selectpicker"  data-live-search="true">
+                                        <option value="${agentDetailForm.categoryId}">${agentDetailForm.categoryIdName}</option>
                                     </select>
                                 </div>
+                                
                             </div>
 
                             <div class="row-input" style="margin: 20px 0 20px;">
@@ -141,9 +155,8 @@
                                             name="legalPersonIdType" id="legalPersonIdType" data-rule="证件类型:required;"
                                             value="${agentDetailForm.legalPersonIdType}"
                                             data-toggle="selectpicker">
-                                        <option value="0">请选择</option>
-                                        <option value="1">身份证</option>
-                                        <option value="2">护照</option>
+                                        <option value="0">身份证</option>
+                                        <option value="1">护照</option>
                                     </select>&nbsp;
                                 </div>
 
@@ -207,9 +220,8 @@
                                                 value="${agentDetailForm.contactIdType}"
                                                 data-rule="证件类型:required;"
                                                 data-toggle="selectpicker">
-                                            <option value="0">请选择</option>
-                                            <option value="1">身份证</option>
-                                            <option value="2">护照</option>
+                                            <option value="0">身份证</option>
+                                            <option value="1">护照</option>
                                         </select>&nbsp;
                                     </div>
 
@@ -278,10 +290,9 @@
                         </div>
                     </div>
                 </div>
-
-                <div class="col-md-12" style="margin: 20px 0 20px; ">
-                    <button type="submit" class="btn-default" data-icon="save" style="float: right">更新</button>&nbsp;
-                </div>
+                <%--<div class="col-md-12" style="margin: 20px 0 20px; ">--%>
+                    <%--<button type="submit" class="btn-default" data-icon="save" style="float: right">更新</button>&nbsp;--%>
+                <%--</div>--%>
             </div>
         </div>
     </form>

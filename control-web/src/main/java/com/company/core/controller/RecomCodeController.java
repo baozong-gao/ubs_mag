@@ -90,7 +90,6 @@ public class RecomCodeController extends BaseController {
     
         //获取-激活状态下的机构列表
         List<UcInstDo> ucInstDoList = instService.getInstListByStatus(StatusConstant.STATUS_ENABLE);
-        modelAndView.getModel().put("instList", ucInstDoList);
     
         //获取-激活状态下的代理列表
         List<UcAgentDo> ucAgentDoList = agentService.getAgentListForDropDown("","", StatusConstant.STATUS_ENABLE);

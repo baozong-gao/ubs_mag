@@ -165,9 +165,8 @@
                                     <select
                                             name="legalPersonIdType" id="legalPersonIdType" data-rule="证件类型:required;"
                                             data-toggle="selectpicker">
-                                        <option value="0">请选择</option>
-                                        <option value="1">身份证</option>
-                                        <option value="2">护照</option>
+                                        <option value="0">身份证</option>
+                                        <option value="1">护照</option>
                                     </select>&nbsp;
                                 </div>
 
@@ -225,9 +224,8 @@
                                                 name="contactIdType" id="contactIdType"
                                                 data-rule="证件类型:required;"
                                                 data-toggle="selectpicker">
-                                            <option value="0">请选择</option>
-                                            <option value="1">身份证</option>
-                                            <option value="2">护照</option>
+                                            <option value="0">身份证</option>
+                                            <option value="1">护照</option>
                                         </select>&nbsp;
                                     </div>
 

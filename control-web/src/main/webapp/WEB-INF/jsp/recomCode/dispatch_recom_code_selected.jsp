@@ -31,7 +31,7 @@
                 <div class=" col-md-6">
                     <label class="labellength8 ">下发代理:</label>
                     <select name="toAgentId" id="toAgentId" data-toggle="selectpicker"  data-live-search="true">
-                        <option style="width: 60px; display: inline-block" value="">-请选择-</option>
+                        <option style="width: 60px; display: inline-block" value="">-请选择下发代理-</option>
                         <c:forEach var="record" items="${toAgentList}"
                                    varStatus="status">
                             <option value="${record.agentId}"
@@ -53,5 +53,18 @@
 </div>
 <div class="bjui-pageFooter">
 </div>
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        var statusCode = "${statusCode}";
+        var message = "${message}";
+        if ('' != statusCode &&  typeof statusCode != 'undefined' && 'null' != statusCode) {
+            $.toast(message, "text");
+        }
+    });
+
+</script>
+
 </body>
 </html>

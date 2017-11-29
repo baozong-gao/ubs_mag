@@ -35,7 +35,7 @@
                 <!-- 机构属性 -->
                 <div class="col-md-12">
                     <div class="panel panel-default">
-                        <div class="panel-heading"><h3 class="panel-title">机构${instDetailForm.instId}信息</h3></div>
+                        <div class="panel-heading"><h3 class="panel-title">机构信息 -- ${instDetailForm.instId}</h3></div>
                         <div class="panel-body">
                             <div class="row-input" style="margin: 20px 0 20px; width: 100%">
                                 <div class="form-group col-md-4">
@@ -75,20 +75,17 @@
 
                                 <div class="form-group col-md-4">
                                     <label class="control-label labelblock">类别：</label>
-                                    <select name="category" id="category" data-rule="机构类型:required;"
-                                            data-toggle="selectpicker" data-live-search="true"
-                                            data-nextselect="#categoryIdQ"
-                                            data-refurl="${pageContext.request.contextPath}/comcon/select_catagory_ids?catagory={value}">
-                                        <option value="all">-请选择-</option>
-                                        <option value="0" <c:if test="${instDetailForm.category == '0'}">selected</c:if>>基础业务</option>
+                                    <select name="category" id="category"   data-toggle="selectpicker"  data-live-search="true" data-rule="机构类型:required;">
+                                        <option value="${instDetailForm.category}">${instDetailForm.categoryName}</option>
                                     </select>&nbsp;
                                 </div>
                                 <div class="form-group col-md-4">
                                     <label class="control-label labelblock">类别ID&nbsp;：</label>
-                                    <select name="categoryId" id="categoryIdQ" data-toggle="selectpicker"  data-live-search="true" data-rule="机构类别ID:required;">
-                                        <option style="width: 60px; display: inline-block" value="">-请选择-</option>
+                                    <select name="categoryId" id="categoryId" data-toggle="selectpicker"  data-live-search="true">
+                                        <option value="${instDetailForm.categoryId}">${instDetailForm.categoryIdName}</option>
                                     </select>
                                 </div>
+
                             </div>
 
                             <div class="row-input" style="margin: 20px 0 20px;">
@@ -143,9 +140,8 @@
                                             name="legalPersonIdType" id="legalPersonIdType" data-rule="证件类型:required;"
                                             value="${instDetailForm.legalPersonIdType}"
                                             data-toggle="selectpicker">
-                                        <option value="0">请选择</option>
-                                        <option value="1">身份证</option>
-                                        <option value="2">护照</option>
+                                        <option value="0">身份证</option>
+                                        <option value="1">护照</option>
                                     </select>&nbsp;
                                 </div>
 
@@ -209,9 +205,8 @@
                                                 value="${instDetailForm.contactIdType}"
                                                 data-rule="证件类型:required;"
                                                 data-toggle="selectpicker">
-                                            <option value="0">请选择</option>
-                                            <option value="1">身份证</option>
-                                            <option value="2">护照</option>
+                                            <option value="0">身份证</option>
+                                            <option value="1">护照</option>
                                         </select>&nbsp;
                                     </div>
 

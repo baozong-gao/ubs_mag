@@ -63,6 +63,8 @@ public interface AgentService {
     
     public Boolean checkIfDupAgentByName(String agentName, String agentShortName);
     
+    Boolean checkIfDefaultAgentCreated();
+    
     public UcAgentDo getAgentOfInstOwn(String instId);
     
     

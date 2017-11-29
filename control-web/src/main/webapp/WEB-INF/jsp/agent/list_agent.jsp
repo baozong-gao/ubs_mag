@@ -32,7 +32,7 @@
                         data-nextselect="#agentIdF"
                         data-refurl="${pageContext.request.contextPath}/comcon/select_agent_active?instId={value}"
                         style="width: 134px">
-                    <option value="">--机构--</option>
+                    <option value="">-请选择机构--</option>
                     <c:forEach var="record" items="${instList}"
                                varStatus="status">
                         <option value="${record.instId}"
@@ -42,7 +42,7 @@
 
                 <label class="labelblock">代理号:</label>
                 <select name="agentId" id="agentIdF" data-toggle="selectpicker"  data-live-search="true">
-                    <option value="">--代理--</option>
+                    <option value="">--请选择代理--</option>
                 <%--<option style="width: 60px; display: inline-block" value="">-请选择-</option>--%>
                     <%--<c:forEach var="record" items="${agentList}"--%>
                                <%--varStatus="status">--%>
@@ -95,10 +95,17 @@
             <td align="center"><c:out value="${record.createUser}"/></td>
             <td align="center"><c:out value="${record.createTime}"/></td>
             <td align="center">
-                <a href="${pageContext.request.contextPath}/agent/activate_agent?agentId=<c:out value="${record.agentId}"/>" class="btn btn-green" data-toggle="doajax" <c:if test="${record.status=='E'}"> disabled=true </c:if>>激活</a>
-                <a href="${pageContext.request.contextPath}/agent/disable_agent?agentId=<c:out value="${record.agentId}"/>" class="btn btn-blue" data-toggle="doajax" data-confirm-msg="确定？" <c:if test="${record.status=='D'}"> disabled=true </c:if>>禁用</a>
-                <a href="${pageContext.request.contextPath}/agent/cancel_agent?agentId=<c:out value="${record.agentId}"/>" class="btn btn-red" data-toggle="doajax" data-confirm-msg="确定？" <c:if test="${record.status=='C'}"> disabled=true </c:if>>注销</a>
-                <a href="${pageContext.request.contextPath}/agent/detailPage?agentId=<c:out value="${record.agentId}"/>" class="btn btn-primary" data-toggle="navtab" data-id="navtab-agent-detail" data-title="代理详细信息">详细</a>
+                    <%--<a href="${pageContext.request.contextPath}/agent/activate_agent?agentId=<c:out value="${record.agentId}"/>" class="btn btn-green" data-toggle="doajax" <c:if test="${record.status=='E'}"> disabled=true </c:if>>激活</a>--%>
+                <a href="${pageContext.request.contextPath}/agent/disable_agent?agentId=<c:out value="${record.agentId}"/>"
+                   class="btn btn-blue" data-toggle="doajax" data-confirm-msg="确定？" <c:if
+                        test="${record.status=='D'}"> disabled=true </c:if>>禁用</a>
+                    <%--<a href="${pageContext.request.contextPath}/agent/cancel_agent?agentId=<c:out value="${record.agentId}"/>" class="btn btn-red" data-toggle="doajax" data-confirm-msg="确定？" <c:if test="${record.status=='C'}"> disabled=true </c:if>>注销</a>--%>
+                <a href="${pageContext.request.contextPath}/agent/detailPage?agentId=<c:out value="${record.agentId}"/>"
+                   class="btn btn-primary" data-toggle="navtab" data-id="navtab-agent-detail" data-title="代理详细信息">详细</a>
+
+                <a href="${pageContext.request.contextPath}/agent/feePage?agentId=<c:out value="${record.agentId}"/>"
+                   class="btn btn-default" data-toggle="navtab" data-id="navtab-agent-fee" data-title="代理费率信息">费率</a>
+
             </td>
             </tr>
         </c:forEach>

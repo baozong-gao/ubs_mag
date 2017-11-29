@@ -1,10 +1,11 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <html>
 <head>
     <script
             src="http://static.runoob.com/assets/jquery-validation-1.14.0/dist/jquery.validate.min.js"></script>
-    <title>机构信息更改</title>
+    <title>机构信息</title>
 </head>
 
 <style>
@@ -23,11 +24,11 @@
 
 
     <%--<form id="pagerForm" name="instDetailForm" data-toggle="validate"--%>
-          <%--novalidate="novalidate"--%>
-          <%--action="${pageContext.request.contextPath}/inst/update_inst_info"--%>
-          <%--method="post">--%>
+    <%--novalidate="novalidate"--%>
+    <%--action="${pageContext.request.contextPath}/inst/update_inst_info"--%>
+    <%--method="post">--%>
 
-        <form id="pagerForm" name="instDetailForm">
+    <form id="pagerForm" name="instDetailForm">
 
         <input type="hidden" id="instId" name="instId" value="${instDetailForm.instId}">
 
@@ -37,7 +38,7 @@
                 <!-- 机构属性 -->
                 <div class="col-md-12">
                     <div class="panel panel-default">
-                        <div class="panel-heading"><h3 class="panel-title">机构${instDetailForm.instId}信息</h3></div>
+                        <div class="panel-heading"><h3 class="panel-title">机构信息--${instDetailForm.instId}</h3></div>
                         <div class="panel-body">
                             <div class="row-input" style="margin: 20px 0 20px; width: 100%">
                                 <div class="form-group col-md-4">
@@ -60,6 +61,7 @@
                                            name="businessLicense" size="15" data-rule="营业执照:required;"
                                            value="${instDetailForm.businessLicense}"/>&nbsp;
                                 </div>
+
                             </div>
 
                             <div class="row-input" style="margin: 20px 0 20px;">
@@ -140,7 +142,6 @@
                                     <select
                                             name="legalPersonIdType" id="legalPersonIdType" data-rule="证件类型:required;"
                                             data-toggle="selectpicker">
-                                        <option value="">请选择</option>
                                         <option value="0" <c:if test="${instDetailForm.legalPersonIdType == '0'}">selected</c:if>>身份证</option>
                                         <option value="1" <c:if test="${instDetailForm.legalPersonIdType == '1'}">selected</c:if>>护照</option>
                                     </select>&nbsp;
@@ -205,7 +206,6 @@
                                                 name="contactIdType" id="contactIdType"
                                                 data-rule="证件类型:required;"
                                                 data-toggle="selectpicker">
-                                            <option value="">请选择</option>
                                             <option value="0" <c:if test="${instDetailForm.contactIdType == '0'}">selected</c:if>>身份证</option>
                                             <option value="1" <c:if test="${instDetailForm.contactIdType == '1'}">selected</c:if>>护照</option>
                                         </select>&nbsp;
@@ -234,14 +234,17 @@
 
 
                 <%--<div class="col-md-12" style="margin: 20px 0 20px; ">--%>
-                    <%--<button type="submit" class="btn-default" data-icon="save" style="float: right">更新</button>&nbsp;--%>
+                <%--<button type="submit" class="btn-default" data-icon="save" style="float: right">更新</button>&nbsp;--%>
                 <%--</div>--%>
             </div>
         </div>
     </form>
 </div>
 <%--<div class="bjui-pageFooter" id="pageFooter">--%>
-    <%--<div class="pages"></div>--%>
+<%--<div class="pages"></div>--%>
 <%--</div>--%>
 </body>
+
+
+
 </html>

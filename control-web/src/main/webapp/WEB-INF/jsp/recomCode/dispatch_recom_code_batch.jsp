@@ -75,7 +75,7 @@
                 <div class=" col-md-6">
                     <label class="labellength8 ">下发代理:</label>
                     <select name="toAgentId" id="toAgentIdD" data-toggle="selectpicker" data-live-search="true" style="width: 134px" data-emptytxt="--下发代理--">
-                        <option value="all">--请选择--</option>
+                        <option value="all">--请选择下发代理--</option>
                     </select>
                 </div>
             </div>
@@ -123,5 +123,18 @@
 
 <div class="bjui-pageFooter">
 </div>
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        var statusCode = "${statusCode}";
+        var message = "${message}";
+        if ('' != statusCode &&  typeof statusCode != 'undefined' && 'null' != statusCode) {
+            $.toast(message, "text");
+        }
+    });
+
+</script>
+
 </body>
 </html>
