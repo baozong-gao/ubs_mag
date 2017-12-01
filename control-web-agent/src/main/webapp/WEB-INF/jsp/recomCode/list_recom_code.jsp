@@ -84,6 +84,7 @@
             <th align="center">序列号</th>
             <th align="center">注册码</th>
             <th align="center">所属</th>
+            <th align="center">密码</th>
             <th align="center">绑定用户</th>
             <th align="center">状态</th>
             <th align="center">过期日期</th>
@@ -101,6 +102,7 @@
             <td align="center"><c:out value="${record.recomCodeSeq}"/></td>
             <td align="center"><c:out value="${record.recomCode}"/></td>
             <td align="center"><c:out value="${record.userCode}"/></td>
+            <td align="center"><c:out value="${record.recomCodePwd}"/></td>
             <td align="center"><c:out value="${record.userId}"/></td>
             <td align="center">
                 <c:if test="${record.status=='N'}">新增</c:if>

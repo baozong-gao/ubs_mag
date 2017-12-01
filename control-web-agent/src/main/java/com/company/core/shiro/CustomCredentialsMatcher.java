@@ -1,5 +1,6 @@
 package com.company.core.shiro;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.UsernamePasswordToken;
@@ -8,6 +9,7 @@ import org.apache.shiro.crypto.hash.Sha384Hash;
 
 import com.company.core.util.EncryptUtils;
 
+@Slf4j
 public class CustomCredentialsMatcher extends SimpleCredentialsMatcher {
 
 	@Override
@@ -24,7 +26,7 @@ public class CustomCredentialsMatcher extends SimpleCredentialsMatcher {
 	public String encrypt(String data) {
 		data = EncryptUtils.encryptMD5(data);
 		String sha384Hex = new Sha384Hash(data).toBase64();
-		System.out.println(data + ":" + sha384Hex);
+		log.info(data + ":" + sha384Hex);
 		return sha384Hex;
 	}
 	public static void main(String[] args) {

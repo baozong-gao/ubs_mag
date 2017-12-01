@@ -58,6 +58,8 @@ public interface InstService {
     
     String checkFees(InstForm instForm);
     
+    String checkFeesInstOpen(InstForm instForm);
+    
     void formatInstFormFromInst(InstForm instForm);
     
     void formatInstFormFromInstInfo(InstForm instForm);

@@ -266,8 +266,8 @@
                                     <div class="form-group col-md-6">
                                         <label class="control-label">成本交易比例费率：</label>
                                         <input type="text"
-                                               name="defaultFeeRate" size="15" data-rule="number;range[0~1] "
-                                               placeholder="如:千5, 请输入0.5"/>%&nbsp;
+                                               name="defaultFeeRate" size="15" data-rule="number;range[0~100] "
+                                               placeholder="如: 百分0.5, 请输入0.5"/>%&nbsp;
                                     </div>
                                 </div>
                                 <div class="row-input" style="margin: 20px 0 20px; width: 100%">
@@ -281,8 +281,8 @@
                                     <div class="form-group col-md-6">
                                         <label class="control-label">实收交易比例费率：</label>
                                         <input type="text"
-                                               name="EffectiveFeeRate" size="15" data-rule="number;range[0~1] "
-                                               placeholder="如:千5, 请输入0.5"/>%&nbsp;
+                                               name="EffectiveFeeRate" size="15" data-rule="number;range[0~100] "
+                                               placeholder="如:百分0.5, 请输入0.5"/>%&nbsp;
                                     </div>
                                 </div>
                             </div>

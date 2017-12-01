@@ -124,13 +124,21 @@ public class InstController extends BaseController {
             return returnError("机构全称重复");
         }
     
-        Boolean defaultInstCreated = instService.checkIfDefaultInstCreated();
-        if(defaultInstCreated){
-            return returnError("默认机构已经开通, 请选择其他机构类型");
+        //当选择默认机构时
+        if(UserConstant.USER_TYPE_DEFAULT.equals(instForm.getInstType())){
+            Boolean defaultInstCreated = instService.checkIfDefaultInstCreated();
+            if(defaultInstCreated){
+                return returnError("默认机构已经开通, 请选择其他机构类型");
+            }
+        }else{
+            Boolean defaultInstCreated = instService.checkIfDefaultInstCreated();
+            if(!defaultInstCreated){
+                return returnError("默认机构未开通, 请先开通默认机构");
+            }
         }
         
         //检查费率
-        String error = instService.checkFees(instForm);
+        String error = instService.checkFeesInstOpen(instForm);
         if(StringUtils.isNotBlank(error)){
             return returnError(error);
         }

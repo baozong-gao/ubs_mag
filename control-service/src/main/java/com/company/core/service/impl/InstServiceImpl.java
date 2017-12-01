@@ -345,7 +345,7 @@ public class InstServiceImpl implements InstService {
         
             ucFeeDo.setFeeType(Constant.FEE_DEFAULT_RATE);
             UcFeeDo dr = ucFeeBiz.getFee(ucFeeDo);
-            if(df != null){
+            if(dr != null){
                 agentForm.setDefaultFeeRate(dr.getFeeMode());
             }
         
@@ -361,6 +361,13 @@ public class InstServiceImpl implements InstService {
                 agentForm.setEffectiveFeeRate(er.getFeeMode());
             }
             agentService.createAgentFeeInfo(agentForm, userBO);
+            
+            agentService.createAgentLevelInfo(agentForm, userBO);
+            
+            UcAgentDo ucAgentDo = agentService.getAgent(agentForm.getAgentId());
+            if(ucAgentDo != null){
+                agentService.createAgentAcct(ucAgentDo, userBO);
+            }
             
         } catch (Exception e) {
             e.printStackTrace();
@@ -762,21 +769,6 @@ public class InstServiceImpl implements InstService {
         
         String error = "";
         
-//        //默认费率 必须配置一个非0费率
-//        if(StringUtils.isBlank(instForm.getDefaultFeeFixed())){
-//            instForm.setDefaultFeeFixed("0");
-//        }
-//        if(StringUtils.isBlank(instForm.getDefaultFeeRate())){
-//            instForm.setDefaultFeeRate("0");
-//        }
-//        BigDecimal zero = new BigDecimal("0");
-//        BigDecimal df = new BigDecimal(instForm.getDefaultFeeFixed());
-//        BigDecimal dr = new BigDecimal(instForm.getDefaultFeeRate());
-//        if(zero.compareTo(df) == 0 && zero.compareTo(dr) == 0){
-//            error = "默认费率不能同时为0和空";
-//            return error;
-//        }
-    
         //获取当前机构默认费率
         UcFeeDo ucFeeDo = new UcFeeDo();
         ucFeeDo.setUserType(UserConstant.USER_INST);
@@ -819,6 +811,48 @@ public class InstServiceImpl implements InstService {
         return null;
     }
     
+    
+    @Override
+    public String checkFeesInstOpen(InstForm instForm) {
+        
+        String error = "";
+
+        //默认费率 必须配置一个非0费率
+        if(StringUtils.isBlank(instForm.getDefaultFeeFixed())){
+            instForm.setDefaultFeeFixed("0");
+        }
+        if(StringUtils.isBlank(instForm.getDefaultFeeRate())){
+            instForm.setDefaultFeeRate("0");
+        }
+        BigDecimal zero = new BigDecimal("0");
+        BigDecimal df = new BigDecimal(instForm.getDefaultFeeFixed());
+        BigDecimal dr = new BigDecimal(instForm.getDefaultFeeRate());
+        if(zero.compareTo(df) == 0 && zero.compareTo(dr) == 0){
+            error = "默认费率不能同时为0和空";
+            return error;
+        }
+        
+        //实行费率 必须配置一个非0费率
+        if(StringUtils.isBlank(instForm.getEffectiveFeeFixed())){
+            instForm.setEffectiveFeeFixed("0");
+        }
+        if(StringUtils.isBlank(instForm.getEffectiveFeeRate())){
+            instForm.setEffectiveFeeRate("0");
+        }
+        BigDecimal ef = new BigDecimal(instForm.getEffectiveFeeFixed());
+        BigDecimal er = new BigDecimal(instForm.getEffectiveFeeRate());
+        if(zero.compareTo(ef) == 0 && zero.compareTo(er) == 0){
+            error = "实行费率不能同时为0和空";
+            return error;
+        }
+        
+        if(dr.compareTo(er) == 1){
+            error = "实行费率不能低于成本费率";
+            return error;
+        }
+        
+        return null;
+    }
     
     @Override
     public void formatInstFormFromInst(InstForm instForm) {
@@ -964,7 +998,7 @@ public class InstServiceImpl implements InstService {
     
     }
     
-    private String getPassword(String instId, String phone){
+    private static String getPassword(String instId, String phone){
         
         if(StringUtils.isBlank(phone) || phone.length() < 11){
             if(instId.length() >=6){
@@ -977,9 +1011,9 @@ public class InstServiceImpl implements InstService {
         }
     }
 
-//    public static void main(String arg[]){
-//        String pd = getPassword("000082", "1838731");
-//        System.out.println("pd=" + pd);
-//    }
-//
+    public static void main(String arg[]){
+        String pd = getPassword("00000085", "18621115220");
+        System.out.println("pd=" + pd);
+    }
+
 }

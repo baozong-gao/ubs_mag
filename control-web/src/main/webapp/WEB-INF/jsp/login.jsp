@@ -113,9 +113,9 @@
 <div class="main_box">
   <div class="setting"><a href="javascript:;" onclick="choose_bg();" title="更换背景"><span class="glyphicon glyphicon-th-large"></span></a></div>
   <div class="login_box">
-    <div class="login_logo">
-      <img src="${pageContext.request.contextPath}/resources/image/logo.png" >
-    </div>
+    <%--<div class="login_logo">--%>
+      <%--<img src="${pageContext.request.contextPath}/resources/image/logo.png" >--%>
+    <%--</div>--%>
 
 		<c:if test="${!empty message}">
 			<div class="login_msg">
@@ -152,7 +152,7 @@
       </form>
     </div>
   </div>
-  <div class="bottom">Copyright &copy; 2012 - 2016　<a href="http://www.77pay.com.cn" target="_blank">上海申鑫电子支付股份有限公司</a></div>
+  <div class="bottom">Copyright &copy; 2012 - 2016　<a href="http://www.77pay.com.cn" target="_blank">壹佰支付</a></div>
 </div>
 </body>
 </html>

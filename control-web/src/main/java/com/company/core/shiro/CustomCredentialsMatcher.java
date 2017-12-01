@@ -24,7 +24,7 @@ public class CustomCredentialsMatcher extends SimpleCredentialsMatcher {
 	public String encrypt(String data) {
 		data = EncryptUtils.encryptMD5(data);
 		String sha384Hex = new Sha384Hash(data).toBase64();
-		System.out.println(data + ":" + sha384Hex);
+		//System.out.println(data + ":" + sha384Hex);
 		return sha384Hex;
 	}
 	public static void main(String[] args) {

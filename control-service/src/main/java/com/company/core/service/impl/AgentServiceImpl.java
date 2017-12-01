@@ -682,6 +682,8 @@ public class AgentServiceImpl implements AgentService {
         if (ucAgentDos != null) {
             return ucAgentDos;
         }
+        
+        
         return null;
     }
     
@@ -1226,9 +1228,7 @@ public class AgentServiceImpl implements AgentService {
                 return instId;
             }
         } else {
-            return instId.substring(phone.length() - 6);
+            return phone.substring(phone.length() - 6);
         }
     }
-    
-    
 }

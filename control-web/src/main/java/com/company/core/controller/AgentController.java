@@ -84,9 +84,17 @@ public class AgentController extends BaseController {
             return returnError("代理全称重复");
         }
     
-        Boolean defaultAgentCreated = agentService.checkIfDefaultAgentCreated();
-        if(defaultAgentCreated){
-            return returnError("默认代理已经开通, 请选择其他代理类型");
+        //当选择默认代理时
+        if(UserConstant.USER_TYPE_DEFAULT.equals(agentForm.getAgentType())){
+            Boolean defaultAgentCreated = agentService.checkIfDefaultAgentCreated();
+            if(defaultAgentCreated){
+                return returnError("默认代理已经开通, 请选择其他代理类型");
+            }
+        }else{
+            Boolean defaultAgentCreated = agentService.checkIfDefaultAgentCreated();
+            if(!defaultAgentCreated){
+                return returnError("默认代理未开通, 请先开通默认代理");
+            }
         }
     
         //检查费率

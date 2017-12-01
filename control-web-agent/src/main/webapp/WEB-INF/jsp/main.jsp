@@ -328,7 +328,7 @@ $(function(){
             </div>
         </div>
     </div>
-    <footer id="bjui-footer">沪ICP备06024975号 Copyringht © 2012-2016  <a href="http://www.77pay.com.cn" target="_blank">上海申鑫电子支付股份有限公司</a>　
+    <footer id="bjui-footer">沪ICP备06024975号 Copyringht © 2012-2016  <a href="http://www.77pay.com.cn" target="_blank">壹佰支付</a>　
 
     </footer>
     </div>
