@@ -361,7 +361,9 @@ public class InstServiceImpl implements InstService {
                 agentForm.setEffectiveFeeRate(er.getFeeMode());
             }
             agentService.createAgentFeeInfo(agentForm, userBO);
-            
+    
+            agentForm.setUserType(UserConstant.USER_INST);
+            agentForm.setUserCode(ucInstDo.getInstId());
             agentService.createAgentLevelInfo(agentForm, userBO);
             
             UcAgentDo ucAgentDo = agentService.getAgent(agentForm.getAgentId());

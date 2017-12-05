@@ -27,15 +27,15 @@
         <div class="bjui-searchBar">
             <div class="row-inut">
 
-                <label class="labelblock">机构号:</label>
-                <select name="instId" id="instId" data-toggle="selectpicker"  data-live-search="true">
-                    <option style="width: 60px; display: inline-block" value="">-请选择-</option>
-                    <c:forEach var="record" items="${instList}"
-                               varStatus="status">
-                        <option value="${record.instId}"
-                                <c:if test="${record.instId == accountUserListForm.instId}">selected</c:if> >${record.instName}</option>
-                    </c:forEach>
-                </select>
+                <%--<label class="labelblock">机构号:</label>--%>
+                <%--<select name="instId" id="instId" data-toggle="selectpicker"  data-live-search="true">--%>
+                    <%--<option style="width: 60px; display: inline-block" value="">-请选择-</option>--%>
+                    <%--<c:forEach var="record" items="${instList}"--%>
+                               <%--varStatus="status">--%>
+                        <%--<option value="${record.instId}"--%>
+                                <%--<c:if test="${record.instId == accountUserListForm.instId}">selected</c:if> >${record.instName}</option>--%>
+                    <%--</c:forEach>--%>
+                <%--</select>--%>
                 <label class="labelblock">代理号:</label>
                 <select name="agentId" id="agentId" data-toggle="selectpicker" data-live-search="true">
                     <option style="width: 60px; display: inline-block" value="">-请选择-</option>

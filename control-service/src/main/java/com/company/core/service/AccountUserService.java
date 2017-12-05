@@ -15,4 +15,6 @@ public interface AccountUserService {
     
     
     Pagination getAccountUserListPage(AccountUserForm accountUserForm);
+    
+    void formatAccountUserFormFromFee(AccountUserForm accountUserForm);
 }

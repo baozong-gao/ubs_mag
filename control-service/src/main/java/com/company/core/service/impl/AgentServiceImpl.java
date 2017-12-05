@@ -493,6 +493,9 @@ public class AgentServiceImpl implements AgentService {
             level = LEVEL_1;
             upAgent = agentForm.getInstId();
         }
+    
+        ucAgentLevelDo.setAgentLevel(level);
+        ucAgentLevelDo.setUpAgentId(upAgent);
         
         ucAgentLevelDo.setCreateUser(userBO.getUsrName());
         ucAgentLevelDo.setCreateSource(SystemConstant.DEFAULT_SOURCE_CODE);

@@ -1,14 +1,16 @@
 package com.company.core.controller;
 
 import com.company.core.constant.StatusConstant;
+import com.company.core.constant.UserConstant;
+import com.company.core.domain.UserBO;
 import com.company.core.entity.UcAgentDo;
 import com.company.core.entity.UcInstDo;
-import com.company.core.entity.WzInfoDo;
 import com.company.core.form.AccountUserForm;
-import com.company.core.form.InstForm;
 import com.company.core.form.OrderForm;
 import com.company.core.form.Pagination;
-import com.company.core.service.*;
+import com.company.core.service.AccountUserService;
+import com.company.core.service.AgentService;
+import com.company.core.service.InstService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,19 +44,31 @@ public class AccountUserController extends BaseController {
     @RequestMapping(value = "/listPage", method = RequestMethod.GET)
     public ModelAndView toListPage(HttpServletRequest request, HttpServletResponse response, ModelAndView modelAndView) {
     
+        UserBO userBO = getCurrentUser();
+        OrderForm orderForm = new OrderForm();
+        if(!UserConstant.USER_INST.equals(userBO.getUserCodeType()) && !UserConstant.USER_AGENT.equals(userBO.getUserCodeType())){
+            //登录账户类型错误
+            modelAndView.setViewName("/accountUser/list_accountUser");
+            return modelAndView;
+        }
+    
         AccountUserForm accountUserForm = new AccountUserForm();
         accountUserForm.setPageCurrent("0");
         accountUserForm.setPageNo("0");
         accountUserForm.setPageSize("10");
-    
-        //获取-激活状态下的机构列表
-        List<UcInstDo> ucInstDoList = instService.getInstListByStatus(StatusConstant.STATUS_ENABLE);
-        modelAndView.getModel().put("instList", ucInstDoList);
-    
+        
         //获取-激活状态下的代理列表
-        List<UcAgentDo> ucAgentDoList = agentService.getAgentListForDropDown("","", StatusConstant.STATUS_ENABLE);
-        modelAndView.getModel().put("agentList", ucAgentDoList);
-    
+        orderForm.setUserType(userBO.getUserCodeType());
+        if(UserConstant.USER_INST.equals(userBO.getUserCodeType())){
+            List<UcAgentDo> ucAgentDoList = agentService.getAgentListForDropDown(userBO.getUserCode(),"", StatusConstant.STATUS_ENABLE);
+            modelAndView.getModel().put("agentList", ucAgentDoList);
+            accountUserForm.setInstId(userBO.getUserCode());
+        } else if(UserConstant.USER_AGENT.equals(userBO.getUserCodeType())){
+            List<UcAgentDo> ucAgentDoList = agentService.getAgentListOfAgentOwn(userBO.getUserCode(), StatusConstant.STATUS_ENABLE);
+            modelAndView.getModel().put("agentList", ucAgentDoList);
+            accountUserForm.setAgentId(userBO.getUserCode());
+        }
+        
         //获取-所有用户
         Pagination pagination = accountUserService.getAccountUserListPage(accountUserForm);
         accountUserForm.setPagination(pagination);
@@ -66,14 +80,24 @@ public class AccountUserController extends BaseController {
     @RequestMapping(value = "/query_accountUser_list", method = RequestMethod.GET)
     @ResponseBody
     public ModelAndView toQueryAccountUserList (HttpServletRequest request, HttpServletResponse response, ModelAndView modelAndView, @ModelAttribute("accountUserListForm") AccountUserForm accountUserForm) {
-
-        //获取-激活状态下的机构列表
-        List<UcInstDo> ucInstDoList = instService.getInstListByStatus(StatusConstant.STATUS_ENABLE);
-        modelAndView.getModel().put("instList", ucInstDoList);
     
+        UserBO userBO = getCurrentUser();
+        if(!UserConstant.USER_INST.equals(userBO.getUserCodeType()) && !UserConstant.USER_AGENT.equals(userBO.getUserCodeType())){
+            //登录账户类型错误
+            modelAndView.setViewName("/accountUser/list_accountUser");
+            return modelAndView;
+        }
+        accountUserForm.setUserType(userBO.getUserCodeType());
+        accountUserForm.setUserCode(userBO.getUserCode());
+
         //获取-激活状态下的代理列表
-        List<UcAgentDo> ucAgentDoList = agentService.getAgentListForDropDown("","", StatusConstant.STATUS_ENABLE);
-        modelAndView.getModel().put("agentList", ucAgentDoList);
+        if(UserConstant.USER_INST.equals(userBO.getUserCodeType())){
+            List<UcAgentDo> ucAgentDoList = agentService.getAgentListForDropDown(userBO.getUserCode(),"", StatusConstant.STATUS_ENABLE);
+            modelAndView.getModel().put("agentList", ucAgentDoList);
+        } else if(UserConstant.USER_AGENT.equals(userBO.getUserCodeType())){
+            List<UcAgentDo> ucAgentDoList = agentService.getAgentListOfAgentOwn(userBO.getUserCode(), StatusConstant.STATUS_ENABLE);
+            modelAndView.getModel().put("agentList", ucAgentDoList);
+        }
     
         //获取-所有用户
         Pagination pagination = accountUserService.getAccountUserListPage(accountUserForm);

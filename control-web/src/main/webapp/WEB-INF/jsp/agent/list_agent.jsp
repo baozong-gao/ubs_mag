@@ -74,6 +74,7 @@
     <table  class="table table-bordered table-hover table-striped table-top" data-toggle="tablefixed" data-width="100%" data-nowrap="true">
         <thead>
         <tr>
+            <th align="center">机构号</th>
             <th align="center">代理号</th>
             <th align="center">代理名称</th>
             <th align="center">状态</th>
@@ -84,6 +85,7 @@
         </thead>
         <tbody>
         <c:forEach var="record" items="${agentListForm.pagination.list}" varStatus="status">
+            <td align="center"><c:out value="${record.instId}"/></td>
             <td align="center"><c:out value="${record.agentId}"/></td>
             <td align="center"><c:out value="${record.agentName}"/></td>
             <td align="center">
