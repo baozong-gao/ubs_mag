@@ -6,12 +6,17 @@ import lombok.Data;
 public class AccountUserDo {
     
     //UC_USER_AGENT
-    private String agentId;
-    private String createSource;
-    private String lockVersion;
-    private String modifyBy;
-    private String status;
     private String userId;
+    private String agentId;
+    private String status;
+    private String createSource;
+    private String modifySource;
+    private String modifyBy;
+    private String createTime;
+    private String updateTime;
+    private String lockVersion;
+    
+    private UcUserInfoDo ucUserInfoDo;
     
     //UC_USER_INFO
     private String id;
@@ -28,13 +33,16 @@ public class AccountUserDo {
     private String userRegSource;
     private String userRegDeviceId;
     private String userPromoteSource;
-    private String modifySource;
-    private String modifyUser;
     private String userResv1;
     private String userResv2;
     private String userResv3;
-    private String lockVerison;
-    private String createTime;
-    private String updateTime;
+    
+    private void setId(){
+        if(ucUserInfoDo != null){
+        
+        }
+    
+    }
+
     
 }

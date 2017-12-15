@@ -1,9 +1,13 @@
 package com.company.core.constant;
 
-public class Constant {
+import java.util.Arrays;
+import java.util.List;
 
+public class Constant {
+    
     
     public final static int RECOM_CODE_LENGTH_6 = 6;
+    public final static List<String> EMPTY_LIST = Arrays.asList("BBBBBBBB");
     
     //手续费类型
     public final static String FEE_DEFAULT_FIXED = "DF";
@@ -25,7 +29,6 @@ public class Constant {
     
     //类别category 默认
     public final static String CATEGORY_DEFAULT = "0";
-    
     
     
     //机构类型 默认

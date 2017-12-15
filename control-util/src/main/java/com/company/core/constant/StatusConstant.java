@@ -16,4 +16,8 @@ public class StatusConstant {
     public final static String RECOMCODE_STATUS_ENABLE = "E";
     public final static String RECOMCODE_STATUS_MATURED = "M";
     
+    public final static String ORDER_NOT_PAY = "0";
+    public final static String ORDER_PAIED = "1";
+    
+    
 }

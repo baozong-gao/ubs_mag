@@ -1,6 +1,7 @@
 package com.company.core.biz;
 
 import com.company.core.entity.AccountUserDo;
+import com.company.core.entity.UcUserAgentDo;
 import com.company.core.entity.WzInfoDo;
 import com.company.core.entity.WzInfoDoExample;
 import com.company.core.mapper.AccountUserSelfDefineMapper;
@@ -22,11 +23,16 @@ public class AccountUserSelfDefineBiz {
 
     @Autowired
     AccountUserSelfDefineMapper accountUserSelfDefineMapper;
+    @Autowired
+    UCUserAgentBiz ucUserAgentBiz;
     
     
     public List<AccountUserDo> getAccountUser(){
     
         AccountUserDo accountUserDo = new AccountUserDo();
+        accountUserDo.setAgentId("000082");
+    
+        ucUserAgentBiz.selectByPrimaryKey("12121211");
         
         List<AccountUserDo> accountUserDoList = accountUserSelfDefineMapper.selectUsersByAgent(accountUserDo);
         
@@ -34,13 +40,5 @@ public class AccountUserSelfDefineBiz {
         
     }
 
-    public static void main(String args[]){
     
-        AccountUserSelfDefineBiz accountUserSelfDefineBiz = new AccountUserSelfDefineBiz();
-    
-        List<AccountUserDo> accountUserDoList = accountUserSelfDefineBiz.getAccountUser();
-        
-    }
-    
-
 }

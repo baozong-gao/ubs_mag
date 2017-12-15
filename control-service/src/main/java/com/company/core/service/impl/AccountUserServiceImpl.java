@@ -8,7 +8,6 @@ import com.company.core.constant.StatusConstant;
 import com.company.core.constant.UserConstant;
 import com.company.core.entity.*;
 import com.company.core.form.AccountUserForm;
-import com.company.core.form.InstForm;
 import com.company.core.form.Pagination;
 import com.company.core.service.AccountUserService;
 import com.company.core.service.AgentService;
@@ -227,6 +226,28 @@ public class AccountUserServiceImpl implements AccountUserService {
             accountUserForm.setEffectiveFeeRate(er.getFeeMode());
         }
         
+    }
+    
+    @Override
+    public List<String> getAccountUserIdList(String userType, String userCode) {
+        
+        UcUserAgentDoExample ucUserAgentDoExample = new UcUserAgentDoExample();
+        UcUserAgentDoExample.Criteria criteria = ucUserAgentDoExample.createCriteria();
+        
+        //如果机构账户登录的
+        if (UserConstant.USER_INST.equals(userType)) {
+            List<String> agentIdList = agentService.getAgentIdList(userCode, StatusConstant.STATUS_ENABLE);
+            if (agentIdList != null && agentIdList.size()>0) {
+                criteria.andAgentIdIn(agentIdList);
+            } else {
+                criteria.andAgentIdIn(Constant.EMPTY_LIST);
+            }
+            
+        } else if (UserConstant.USER_AGENT.equals(userType)) { //如果代理账户登录的
+            criteria.andAgentIdEqualTo(userCode);
+        }
+        
+        return ucUserAgentBiz.selectUserIdByExample(ucUserAgentDoExample);
     }
     
 }

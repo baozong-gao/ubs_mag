@@ -2,6 +2,7 @@ package com.company.core.biz;
 
 import com.company.core.entity.UcUserAgentDo;
 import com.company.core.entity.UcUserAgentDoExample;
+import com.company.core.mapper.UcUserAgentDoCUSTOMMapper;
 import com.company.core.mapper.UcUserAgentDoMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,8 @@ public class UCUserAgentBiz {
 
     @Autowired
     UcUserAgentDoMapper ucUserAgentDoMapper;
+    @Autowired
+    UcUserAgentDoCUSTOMMapper ucUserAgentDoCUSTOMMapper;
     
     public long countByExample(UcUserAgentDoExample ucUserAgentDoExample){
         return ucUserAgentDoMapper.countByExample(ucUserAgentDoExample);
@@ -32,5 +35,9 @@ public class UCUserAgentBiz {
     public UcUserAgentDo selectByPrimaryKey(String id){
         
         return ucUserAgentDoMapper.selectByPrimaryKey(id);
+    }
+    
+    public List<String> selectUserIdByExample(UcUserAgentDoExample ucUserAgentDoExample){
+        return ucUserAgentDoCUSTOMMapper.selectOnlyIdByExample(ucUserAgentDoExample);
     }
 }

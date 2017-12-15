@@ -16,6 +16,7 @@
     <result column="UPDATE_TIME" jdbcType="CHAR" property="updateTime" />
     <result column="LOCK_VERSION" jdbcType="VARCHAR" property="lockVersion" />
   </resultMap>
+
   <sql id="Example_Where_Clause">
     <!--
       WARNING - @mbggenerated
@@ -333,4 +334,6 @@
       LOCK_VERSION = #{lockVersion,jdbcType=VARCHAR}
     where USER_ID = #{userId,jdbcType=VARCHAR}
   </update>
+
+
 </mapper>

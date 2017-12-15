@@ -2,57 +2,52 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.company.core.mapper.AccountUserSelfDefineMapper">
 
-  <resultMap id="UserAgent" type="com.company.core.entity.UcUserAgentDo">
-    <id column="USER_ID" jdbcType="VARCHAR" property="userId" />
-    <result column="AGENT_ID" jdbcType="VARCHAR" property="agentId" />
-    <result column="STATUS" jdbcType="CHAR" property="status" />
-    <result column="CREATE_SOURCE" jdbcType="VARCHAR" property="createSource" />
-    <result column="MODIFY_SOURCE" jdbcType="VARCHAR" property="modifySource" />
-    <result column="MODIFY_BY" jdbcType="VARCHAR" property="modifyBy" />
-    <result column="CREATE_TIME" jdbcType="CHAR" property="createTime" />
-    <result column="UPDATE_TIME" jdbcType="CHAR" property="updateTime" />
-    <result column="LOCK_VERSION" jdbcType="VARCHAR" property="lockVersion" />
+    <resultMap id="UserAgent" type="com.company.core.entity.AccountUserDo">
+        <id column="USER_ID" jdbcType="VARCHAR" property="userId"/>
+        <result column="AGENT_ID" jdbcType="VARCHAR" property="agentId"/>
+        <result column="STATUS" jdbcType="CHAR" property="status"/>
+        <result column="CREATE_SOURCE" jdbcType="VARCHAR" property="createSource"/>
+        <result column="MODIFY_SOURCE" jdbcType="VARCHAR" property="modifySource"/>
+        <result column="MODIFY_BY" jdbcType="VARCHAR" property="modifyBy"/>
+        <result column="CREATE_TIME" jdbcType="CHAR" property="createTime"/>
+        <result column="UPDATE_TIME" jdbcType="CHAR" property="updateTime"/>
+        <result column="LOCK_VERSION" jdbcType="VARCHAR" property="lockVersion"/>
 
-    <association property="UC_USER_INFO" column="ID" javaType="com.company.core.entity.UcUserInfoDo" resultMap="UserInfo">
-    </association>
+        <association property="ucUserInfoDo" column="ID" javaType="com.company.core.entity.UcUserInfoDo"
+                     resultMap="UserInfo">
+        </association>
 
-  </resultMap>
+    </resultMap>
 
+    <resultMap id="UserInfo" type="com.company.core.entity.UcUserInfoDo">
 
-  <resultMap id="UserInfo" type="com.company.core.entity.UcUserInfoDo">
+        <id column="ID" jdbcType="VARCHAR" property="id"/>
+        <result column="MOBILE" jdbcType="VARCHAR" property="mobile"/>
+        <result column="LOGIN_ID" jdbcType="VARCHAR" property="loginId"/>
+        <result column="USER_NAME" jdbcType="VARCHAR" property="userName"/>
+        <result column="NICK_NAME" jdbcType="VARCHAR" property="nickName"/>
+        <result column="LOGIN_PASSWORD" jdbcType="VARCHAR" property="loginPassword"/>
+        <result column="PAY_PASSWORD" jdbcType="VARCHAR" property="payPassword"/>
+        <result column="HAND_PASSWORD" jdbcType="VARCHAR" property="handPassword"/>
+        <result column="SALT" jdbcType="VARCHAR" property="salt"/>
+        <result column="USER_TYPE" jdbcType="VARCHAR" property="userType"/>
+        <result column="USER_STATUS" jdbcType="VARCHAR" property="userStatus"/>
+        <result column="USER_REG_SOURCE" jdbcType="VARCHAR" property="userRegSource"/>
+        <result column="USER_REG_DEVICE_ID" jdbcType="VARCHAR" property="userRegDeviceId"/>
+        <result column="USER_PROMOTE_SOURCE" jdbcType="VARCHAR" property="userPromoteSource"/>
+        <result column="USER_RESV1" jdbcType="VARCHAR" property="userResv1"/>
+        <result column="USER_RESV2" jdbcType="VARCHAR" property="userResv2"/>
+        <result column="USER_RESV3" jdbcType="VARCHAR" property="userResv3"/>
+    </resultMap>
 
-    <id column="ID" jdbcType="VARCHAR" property="id" />
-    <result column="MOBILE" jdbcType="VARCHAR" property="mobile" />
-    <result column="LOGIN_ID" jdbcType="VARCHAR" property="loginId" />
-    <result column="USER_NAME" jdbcType="VARCHAR" property="userName" />
-    <result column="NICK_NAME" jdbcType="VARCHAR" property="nickName" />
-    <result column="LOGIN_PASSWORD" jdbcType="VARCHAR" property="loginPassword" />
-    <result column="PAY_PASSWORD" jdbcType="VARCHAR" property="payPassword" />
-    <result column="HAND_PASSWORD" jdbcType="VARCHAR" property="handPassword" />
-    <result column="SALT" jdbcType="VARCHAR" property="salt" />
-    <result column="USER_TYPE" jdbcType="VARCHAR" property="userType" />
-    <result column="USER_STATUS" jdbcType="VARCHAR" property="userStatus" />
-    <result column="USER_REG_SOURCE" jdbcType="VARCHAR" property="userRegSource" />
-    <result column="USER_REG_DEVICE_ID" jdbcType="VARCHAR" property="userRegDeviceId" />
-    <result column="USER_PROMOTE_SOURCE" jdbcType="VARCHAR" property="userPromoteSource" />
-    <result column="MODIFY_SOURCE" jdbcType="VARCHAR" property="modifySource" />
-    <result column="MODIFY_USER" jdbcType="VARCHAR" property="modifyUser" />
-    <result column="USER_RESV1" jdbcType="VARCHAR" property="userResv1" />
-    <result column="USER_RESV2" jdbcType="VARCHAR" property="userResv2" />
-    <result column="USER_RESV3" jdbcType="VARCHAR" property="userResv3" />
-    <result column="LOCK_VERISON" jdbcType="VARCHAR" property="lockVerison" />
-    <result column="CREATE_TIME" jdbcType="CHAR" property="createTime" />
-    <result column="UPDATE_TIME" jdbcType="CHAR" property="updateTime" />
-  </resultMap>
+    <sql id="Base_Column_List">
+      USER_ID, AGENT_ID, STATUS, MOBILE, LOGIN_ID, USER_NAME, NICK_NAME, USER_TYPE, USER_STATUS, USER_REG_SOURCE, USER_REG_DEVICE_ID
+    </sql>
 
-  <sql id="Base_Column_List">
-    USER_ID, AGENT_ID, STATUS, MOBILE, LOGIN_ID, USER_NAME, NICK_NAME, USER_TYPE, USER_STATUS, USER_REG_SOURCE, USER_REG_DEVICE_ID
-  </sql>
-
-  <select id="selectUsersByAgent" resultMap="UserAgent" parameterType="map">
-    select
-    <include refid="Base_Column_List"/>
-    from UC_USER_AGENT ua LEFT JOIN UC_USER_INFO ui on ua.USER_ID = ui.ID
-    where ua.USER_ID IS NOT NULL AND ua.AGENT_ID = #{record.agentId, jdbcType=VARCHAR}
-  </select>
+    <select id="selectUsersByAgent" resultMap="UserAgent" parameterType="map">
+        select
+        <include refid="Base_Column_List"/>
+        from UC_USER_AGENT ua LEFT JOIN UC_USER_INFO ui on ua.USER_ID = ui.ID
+        where ua.USER_ID IS NOT NULL AND ua.AGENT_ID = #{record.agentId, jdbcType=VARCHAR}
+    </select>
 </mapper>

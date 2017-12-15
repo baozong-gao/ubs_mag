@@ -17,34 +17,31 @@
         width: 60px;
     }
 
+    .labelOrderStatus {
+        background-color: #A8BDCF!important;
+        color: #FFFFFF;
+        display: inline-block;
+        font-family: Open Sans;
+        font-size: 11px;
+        font-weight: normal;
+        line-height: 14px;
+        padding: 2px 4px;
+        vertical-align: baseline;
+        white-space: nowrap;
+        border-radius: .25em;
+    }
+
+    .order-success {
+        background-color: #45B6B0!important;
+    }
+    .order-warning {
+        background-color: #FBB44C!important;
+    }
+    .order-important {
+        background-color: #FF6B6B!important;
+    }
+
 </style>
-<%--<style>--%>
-
-    <%--div.item {--%>
-        <%--width: 100px;--%>
-        <%--height: 50px;--%>
-        <%--background-color: maroon;--%>
-        <%--text-align: center;--%>
-        <%--padding-top: 25px;--%>
-    <%--}--%>
-
-    <%--div#item_1 {--%>
-        <%--position: absolute;--%>
-        <%--top: 50px;--%>
-        <%--left: 50px;--%>
-    <%--}--%>
-<%--</style>--%>
-
-<%--<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/other/jquery.tooltip/jquery.tooltip.css" type="text/css" />--%>
-<%--<script type="text/javascript" src="${pageContext.request.contextPath}/resources/other/javascripts/jquery.min.js"></script>--%>
-<%--<script type="text/javascript" src="${pageContext.request.contextPath}/resources/other/javascripts/jquery.tooltip.js"></script>--%>
-<%--<script type="text/javascript">--%>
-    <%--$j = jQuery.noConflict();--%>
-    <%--$j(document).ready(function(){--%>
-        <%--$j("div.item").tooltip();--%>
-    <%--});--%>
-<%--</script>--%>
-
 <body>
 <div class="bjui-pageHeader">
     <form id="pagerForm" name="orderListForm" data-toggle="ajaxsearch" action="${pageContext.request.contextPath}/order/query_order_list" method="get" modelAttribute="orderListForm">
@@ -52,16 +49,15 @@
         <input type="hidden" id="pageCurrent" name="pageCurrent" value="${orderListForm.pageCurrent}">
         <div class="bjui-searchBar">
             <div class="row-inut">
-
-                <label class="labelblock">机构号:</label>
-                <select name="instId" id="instId" data-toggle="selectpicker"  data-live-search="true">
-                    <option style="width: 60px; display: inline-block" value="">-请选择-</option>
-                    <c:forEach var="record" items="${instList}"
-                               varStatus="status">
-                        <option value="${record.instId}"
-                                <c:if test="${record.instId == orderListForm.instId}">selected</c:if> >${record.instName}</option>
-                    </c:forEach>
-                </select>
+                <%--<label class="labelblock">机构号:</label>--%>
+                <%--<select name="instId" id="instId" data-toggle="selectpicker"  data-live-search="true">--%>
+                    <%--<option style="width: 60px; display: inline-block" value="">-请选择-</option>--%>
+                    <%--<c:forEach var="record" items="${instList}"--%>
+                               <%--varStatus="status">--%>
+                        <%--<option value="${record.instId}"--%>
+                                <%--<c:if test="${record.instId == orderListForm.instId}">selected</c:if> >${record.instName}</option>--%>
+                    <%--</c:forEach>--%>
+                <%--</select>--%>
                 <label class="labelblock">代理号:</label>
                 <select name="agentId" id="agentId" data-toggle="selectpicker" data-live-search="true">
                     <option style="width: 60px; display: inline-block" value="">-请选择-</option>
@@ -73,15 +69,13 @@
                 </select>
 
                 <label class="labelblock">用户号:</label>
-                <input type="text" name="userId" id="userId" placeholder="输入用户号" size="19" value="${orderListForm.userId}">&nbsp;
+                <input type="text" name="userId" id="userId" placeholder="输入用户号" size="19" value="${orderListForm.userId}">
 
                 <label class="labelblock">状态:</label>
                 <select name="status" id="status" data-toggle="selectpicker">
                     <option value=""  <c:if test="${'' == orderListForm.status}"> selected</c:if>>请选择</option>
-                    <option value="I" <c:if test="${'I' == orderListForm.status}"> selected</c:if>>初始</option>
-                    <option value="P" <c:if test="${'P' == orderListForm.status}"> selected</c:if>>处理中</option>
-                    <option value="S" <c:if test="${'S' == orderListForm.status}"> selected</c:if>>成功</option>
-                    <option value="F" <c:if test="${'F' == orderListForm.status}"> selected</c:if>>失败</option>
+                    <option value="0" <c:if test="${'0' == orderListForm.status}"> selected</c:if>>未支付</option>
+                    <option value="1" <c:if test="${'1' == orderListForm.status}"> selected</c:if>>已支付</option>
                 </select>&nbsp;
             </div>
 
@@ -97,14 +91,6 @@
             <div class="row-input">
                 <button type="submit" class="btn-default" data-icon="search" style="width: 91px">查询</button>
             </div>
-
-            <%--<div id="item_1" class="item">--%>
-                <%--Item 1--%>
-                <%--<div class="tooltip_description" style="display:none" title="Item 1 Description">--%>
-                    <%--Lorem Ipsum--%>
-                <%--</div>--%>
-            <%--</div>--%>
-
         </div>
     </form>
 </div>
@@ -137,10 +123,8 @@
             <td align="center"><c:out value="${record.payOrder}"/></td>
             <td align="center"><c:out value="${record.userId}"/></td>
             <td align="center">
-                <c:if test="${record.status=='I'}">初始</c:if>
-                <c:if test="${record.status=='P'}">处理中</c:if>
-                <c:if test="${record.status=='S'}">成功</c:if>
-                <c:if test="${record.status=='F'}">失败</c:if>
+                <c:if test="${record.status=='0'}"><span class="labelOrderStatus order-important">未支付</span></c:if>
+                <c:if test="${record.status=='1'}"><span class="labelOrderStatus order-success">已支付</span></c:if>
             </td>
             <td align="center"><c:out value="${record.totAmount}"/></td>
             <td align="center"><c:out value="${record.totDegree}"/></td>

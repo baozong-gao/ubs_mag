@@ -23,14 +23,14 @@ public class WZInfoBiz {
 
     @Autowired
     WzInfoDoMapper wzInfoDoMapper;
-
     
     public List<WzInfoDo> selectByExample(WzInfoDoExample wzInfoDoExample){
         return wzInfoDoMapper.selectByExample(wzInfoDoExample);
     }
     
     public WzInfoDo selectByPrimaryKey(String id){
-        
-        return wzInfoDoMapper.selectByPrimaryKey(id);
+    
+        WzInfoDo wzInfoDo = wzInfoDoMapper.selectByPrimaryKey(id);
+        return wzInfoDo;
     }
 }

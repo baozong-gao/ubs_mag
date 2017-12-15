@@ -1,6 +1,7 @@
 package com.company.core.mapper;
 
 import com.company.core.entity.AccountUserDo;
+import com.company.core.entity.UcUserAgentDo;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;

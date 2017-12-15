@@ -54,6 +54,7 @@ public class OrderController extends BaseController {
         }
         //获取-激活状态下的代理列表
         orderForm.setUserType(userBO.getUserCodeType());
+        orderForm.setUserCode(userBO.getUserCode());
         if(UserConstant.USER_INST.equals(userBO.getUserCodeType())){
             List<UcAgentDo> ucAgentDoList = agentService.getAgentListForDropDown(userBO.getUserCode(),"", StatusConstant.STATUS_ENABLE);
             modelAndView.getModel().put("agentList", ucAgentDoList);
@@ -80,6 +81,26 @@ public class OrderController extends BaseController {
     @ResponseBody
     public ModelAndView toQueryOrderList (HttpServletRequest request, HttpServletResponse response, ModelAndView modelAndView, @ModelAttribute("orderListForm") OrderForm orderForm) {
     
+        UserBO userBO = getCurrentUser();
+        if(!UserConstant.USER_INST.equals(userBO.getUserCodeType()) && !UserConstant.USER_AGENT.equals(userBO.getUserCodeType())){
+            //登录账户类型错误
+            modelAndView.getModel().put("orderListForm", orderForm);
+            modelAndView.setViewName("/recomCode/list_recom_code");
+            return modelAndView;
+        }
+        //获取-激活状态下的代理列表
+        orderForm.setUserType(userBO.getUserCodeType());
+        orderForm.setUserCode(userBO.getUserCode());
+        if(UserConstant.USER_INST.equals(userBO.getUserCodeType())){
+            List<UcAgentDo> ucAgentDoList = agentService.getAgentListForDropDown(userBO.getUserCode(),"", StatusConstant.STATUS_ENABLE);
+            modelAndView.getModel().put("agentList", ucAgentDoList);
+            orderForm.setInstId(userBO.getUserCode());
+        } else if(UserConstant.USER_AGENT.equals(userBO.getUserCodeType())){
+            List<UcAgentDo> ucAgentDoList = agentService.getAgentListOfAgentOwn(userBO.getUserCode(), StatusConstant.STATUS_ENABLE);
+            modelAndView.getModel().put("agentList", ucAgentDoList);
+            orderForm.setAgentId(userBO.getUserCode());
+        }
+        
         //获取-所有交易
         Pagination pagination = orderService.getOrderListPage(orderForm);
         orderForm.setPagination(pagination);

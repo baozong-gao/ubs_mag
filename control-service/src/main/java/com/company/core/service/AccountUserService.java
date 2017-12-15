@@ -17,4 +17,6 @@ public interface AccountUserService {
     Pagination getAccountUserListPage(AccountUserForm accountUserForm);
     
     void formatAccountUserFormFromFee(AccountUserForm accountUserForm);
+    
+    List<String> getAccountUserIdList(String userType, String userCode);
 }
