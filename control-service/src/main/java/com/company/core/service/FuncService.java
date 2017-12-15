@@ -1,9 +1,10 @@
 package com.company.core.service;
 
-import java.util.Map;
-
 import com.company.core.domain.FuncBO;
 import com.company.core.form.Pagination;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by fireWorks on 2016/2/3.
@@ -11,6 +12,8 @@ import com.company.core.form.Pagination;
 public interface FuncService {
 
     Pagination<FuncBO> getFuncList(String rid);
+    
+    List<FuncBO> getFuncBoList(String rid);
 
     Map setFuncEnable(String funcId) throws Exception;
 

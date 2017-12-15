@@ -1,5 +1,9 @@
 package com.company.core.form;
 
+import com.company.core.domain.FuncBO;
+
+import java.util.List;
+
 /**
  * Created by fireWorks on 2016/2/3.
  */
@@ -14,7 +18,27 @@ public class RoleFuncForm extends BaseForm{
     private String roleRemark;
 
     private String roleChecked;
-
+    
+    private  String oldRoleChecked;//存储 现有权限ids
+    
+    private List<FuncBO> allFuncBOList;
+    
+    public List<FuncBO> getAllFuncBOList() {
+        return allFuncBOList;
+    }
+    
+    public void setAllFuncBOList(List<FuncBO> allFuncBOList) {
+        this.allFuncBOList = allFuncBOList;
+    }
+    
+    public String getOldRoleChecked() {
+        return oldRoleChecked;
+    }
+    
+    public void setOldRoleChecked(String oldRoleChecked) {
+        this.oldRoleChecked = oldRoleChecked == null ? null : oldRoleChecked.trim();
+    }
+    
     public String getRoleId() {
         return roleId;
     }

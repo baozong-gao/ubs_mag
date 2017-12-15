@@ -25,7 +25,9 @@ public interface RoleService {
     Map setRoleDisable(String roleId) throws Exception;
 
     Map setRoleEnable(String roleId) throws Exception;
-
+    
+    Map addRoleResouce(String sid, String rid) throws Exception;
+    
     Map cancelRoleResouce(String sid, String rid) throws Exception;
 
     Map setAuthory(String roleId, List<String> list);

@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.company.core.entity.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,10 +14,6 @@ import org.springframework.stereotype.Service;
 import com.github.pagehelper.PageHelper;
 import com.company.core.domain.FuncBO;
 import com.company.core.domain.RoleBO;
-import com.company.core.entity.TblBTSSysFunctionDO;
-import com.company.core.entity.TblBTSSysFunctionDOExample;
-import com.company.core.entity.TblBTSSysRoleFuncDO;
-import com.company.core.entity.TblBTSSysRoleFuncDOKey;
 import com.company.core.form.Pagination;
 import com.company.core.mapper.TblBTSSysFunctionDOMapper;
 import com.company.core.mapper.TblBTSSysRoleFuncDOMapper;
@@ -72,7 +69,41 @@ public class FuncServiceImpl implements FuncService {
         return pagination;
 
     }
-
+    
+    public List<FuncBO> getFuncBoList(String rid){
+        
+        TblBTSSysFunctionDOExample tblBTSSysFunctionDOExample = new TblBTSSysFunctionDOExample();
+        tblBTSSysFunctionDOExample.createCriteria().andFuncDisableTagEqualTo("1");
+        
+        List<TblBTSSysFunctionDO> funcDOList = functionDOMapper.selectByExample(tblBTSSysFunctionDOExample);
+        TblBTSSysRoleFuncDOExample tblBTSSysRoleFuncDOExample= new TblBTSSysRoleFuncDOExample();
+        tblBTSSysRoleFuncDOExample.createCriteria().andRoleIdEqualTo(rid);
+        List<TblBTSSysRoleFuncDO> roleFuncDOList=roleFuncDOMapper.selectByExample(tblBTSSysRoleFuncDOExample);
+        List<FuncBO> funcBOList = new ArrayList<>();
+        for(TblBTSSysFunctionDO functionDO: funcDOList) {
+            FuncBO funcBO = new FuncBO();
+            funcBO.setFuncId(functionDO.getFuncId());
+            funcBO.setFuncName(functionDO.getFuncName());
+            funcBO.setFuncDesc(functionDO.getFuncDesc());
+            funcBO.setFuncRemark(functionDO.getFuncRemark());
+            funcBO.setFuncDisableTag(functionDO.getFuncDisableTag());
+            
+            funcBO.setFuncFatherId(functionDO.getFuncFatherId());
+            funcBO.setFuncLevel(functionDO.getFuncLevel());
+            
+            funcBO.setChecked("未授权");
+            for(TblBTSSysRoleFuncDO roleFuncDo :roleFuncDOList){
+                if(roleFuncDo.getFuncId().equals(functionDO.getFuncId())){
+                    funcBO.setChecked("已授权");
+                    break;
+                }
+            }
+            funcBOList.add(funcBO);
+        }
+        return funcBOList;
+        
+    }
+    
     public Map setFuncEnable(String funcId) throws Exception {
         Map resultMap = new HashMap();
         TblBTSSysFunctionDOExample functionDOExample = new TblBTSSysFunctionDOExample();

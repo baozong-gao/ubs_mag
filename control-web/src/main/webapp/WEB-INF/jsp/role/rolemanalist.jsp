@@ -48,7 +48,7 @@
       <td align="center"><c:out value="${record.roleRemark}"/></td>
       <td align="center"><c:out value="${record.roleDisableTag}"/></td>
       <td align="center">
-        <a href="${pageContext.request.contextPath}/roleManagement/edit?rid=<c:out value="${record.roleId}"/>" class="btn btn-green" data-toggle="dialog" data-width="400" data-height="400" data-id="dialog-normal" data-title="角色资源组信息">授权</a>
+        <a href="${pageContext.request.contextPath}/roleManagement/edit?rid=<c:out value="${record.roleId}"/>" class="btn btn-green" data-toggle="dialog" data-width="500" data-height="600" data-id="dialog-normal" data-title="角色资源组信息">授权</a>
       </td>
     </tr>
   </c:forEach>
