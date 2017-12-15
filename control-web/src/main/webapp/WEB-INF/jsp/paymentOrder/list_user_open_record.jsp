@@ -2,7 +2,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
-    <title>交易管理</title>
+    <title>用户开通记录</title>
 </head>
 
 <style>
@@ -44,7 +44,7 @@
 </style>
 <body>
 <div class="bjui-pageHeader">
-    <form id="pagerForm" name="paymentOrderListForm" data-toggle="ajaxsearch" action="${pageContext.request.contextPath}/paymentOrder/query_order_list" method="get" modelAttribute="paymentOrderListForm">
+    <form id="pagerForm" name="paymentOrderListForm" data-toggle="ajaxsearch" action="${pageContext.request.contextPath}/paymentOrder/query_user_open_list" method="get" modelAttribute="paymentOrderListForm">
         <input type="hidden" id="pageSize" name="pageSize" value="${paymentOrderListForm.pageSize}">
         <input type="hidden" id="pageCurrent" name="pageCurrent" value="${paymentOrderListForm.pageCurrent}">
         <div class="bjui-searchBar">
@@ -56,18 +56,18 @@
                 <label class="labelblock">订单类型:</label>
                 <select name="orderType" id="orderType" data-toggle="selectpicker">
                     <option value=""  <c:if test="${'' == paymentOrderListForm.orderType}"> selected</c:if>>请选择</option>
-                    <option value="KT" <c:if test="${'KT' == paymentOrderListForm.orderType}"> selected</c:if>>开通支付
+                    <option value="KT" <c:if test="${'KT' == paymentOrderListForm.orderType}"> selected</c:if>>付费开通
                     </option>
                 </select>
 
-                <label class="labelblock">状态:</label>
+                <label>状态:</label>
                 <select name="orderStatus" id="orderStatus" data-toggle="selectpicker">
                     <option value=""  <c:if test="${'' == paymentOrderListForm.orderStatus}"> selected</c:if>>请选择</option>
                     <option value="S" <c:if test="${'S' == paymentOrderListForm.orderStatus}"> selected</c:if>>支付成功</option>
                     <option value="F" <c:if test="${'F' == paymentOrderListForm.orderStatus}"> selected</c:if>>支付失败</option>
                     <option value="P" <c:if test="${'P' == paymentOrderListForm.orderStatus}"> selected</c:if>>支付中</option>
                     <option value="I" <c:if test="${'I' == paymentOrderListForm.orderStatus}"> selected</c:if>>未支付</option>
-                </select>
+                </select>&nbsp;
 
                 <label>订单日期从</label>
                 <input id="startOrderDate" name="startOrderDate" type="text" data-toggle="datepicker"

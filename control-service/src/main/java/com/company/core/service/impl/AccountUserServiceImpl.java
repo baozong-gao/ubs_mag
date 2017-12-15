@@ -3,6 +3,7 @@ package com.company.core.service.impl;
 import com.company.core.biz.UCFeeBiz;
 import com.company.core.biz.UCUserAgentBiz;
 import com.company.core.biz.UCUserInfoBiz;
+import com.company.core.biz.UCUserProdBiz;
 import com.company.core.constant.Constant;
 import com.company.core.constant.StatusConstant;
 import com.company.core.constant.UserConstant;
@@ -40,6 +41,8 @@ public class AccountUserServiceImpl implements AccountUserService {
     UCUserInfoBiz ucUserInfoBiz;
     @Autowired
     UCFeeBiz ucFeeBiz;
+    @Autowired
+    UCUserProdBiz ucUserProdBiz;
     
     @Override
     public Pagination getAccountUserListPage(AccountUserForm accountUserForm) {
@@ -62,6 +65,7 @@ public class AccountUserServiceImpl implements AccountUserService {
     
         AccountUserDo accountUserDo = new AccountUserDo();
         UcUserInfoDo ucUserInfoDo = new UcUserInfoDo();
+        UcUserProdDo ucUserProdDo = new UcUserProdDo();
         List<AccountUserDo> accountUserDoList = new ArrayList<>();
     
         UcUserAgentDoExample ucUserAgentDoExample = formatUserAgentSearchCriteria(accountUserForm);
@@ -72,10 +76,17 @@ public class AccountUserServiceImpl implements AccountUserService {
         List<UcUserAgentDo> ucUserAgentDoList = ucUserAgentBiz.selectByExample(ucUserAgentDoExample);
         for (UcUserAgentDo ucUserAgentDo : ucUserAgentDoList) {
             accountUserDo = new AccountUserDo();
+            ucUserProdDo = new UcUserProdDo();
             convertToTarget(accountUserDo, ucUserAgentDo);  // userAgentInfo
+            //获取用户信息
             ucUserInfoDo = ucUserInfoBiz.selectByPrimaryKey(ucUserAgentDo.getUserId());
             if (ucUserInfoDo != null) {
                 convertToTarget(accountUserDo, ucUserInfoDo); //userInfo
+            }
+            //获取开通服务
+            ucUserProdDo = ucUserProdBiz.selectByUserId(ucUserAgentDo.getUserId());
+            if (ucUserInfoDo != null) {
+                convertToTarget(accountUserDo, ucUserProdDo); //ucUserProd
             }
             accountUserDoList.add(accountUserDo);
         }
@@ -98,6 +109,7 @@ public class AccountUserServiceImpl implements AccountUserService {
     
         AccountUserDo accountUserDo = new AccountUserDo();
         UcUserAgentDo ucUserAgentDo = new UcUserAgentDo();
+        UcUserProdDo ucUserProdDo = new UcUserProdDo();
         List<AccountUserDo> accountUserDoList = new ArrayList<>();
         for(UcUserInfoDo ucUserInfoDo : ucUserInfoDoList){
             accountUserDo = new AccountUserDo();
@@ -105,6 +117,11 @@ public class AccountUserServiceImpl implements AccountUserService {
             ucUserAgentDo = ucUserAgentBiz.selectByPrimaryKey(ucUserInfoDo.getId());
             if(ucUserAgentDo != null){
                 convertToTarget(accountUserDo, ucUserAgentDo); //userAgent
+            }
+            //获取开通服务
+            ucUserProdDo = ucUserProdBiz.selectByUserId(ucUserAgentDo.getUserId());
+            if (ucUserInfoDo != null) {
+                convertToTarget(accountUserDo, ucUserProdDo); //ucUserProd
             }
             accountUserDoList.add(accountUserDo);
         }
@@ -189,7 +206,23 @@ public class AccountUserServiceImpl implements AccountUserService {
         if(StringUtils.isNotBlank(ucUserInfoDo.getNickName())){
             accountUserDo.setNickName(ucUserInfoDo.getNickName());
         }
+    }
+    public void convertToTarget(AccountUserDo accountUserDo, UcUserProdDo ucUserProdDo){
         
+        accountUserDo.setProdId(ucUserProdDo.getProdId());
+    
+        if(StringUtils.isNotBlank(ucUserProdDo.getProdId())){
+            accountUserDo.setProdId(ucUserProdDo.getProdId());
+        }
+        if(StringUtils.isNotBlank(ucUserProdDo.getProdName())){
+            accountUserDo.setProdName(ucUserProdDo.getProdName());
+        }
+        if(StringUtils.isNotBlank(ucUserProdDo.getOpenStatus())){
+            accountUserDo.setStatus(ucUserProdDo.getOpenStatus());
+        }
+        if(StringUtils.isNotBlank(ucUserProdDo.getOpenMethod())){
+            accountUserDo.setOpenMethod(ucUserProdDo.getOpenMethod());
+        }
     }
     
     @Override

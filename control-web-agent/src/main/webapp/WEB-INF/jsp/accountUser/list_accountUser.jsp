@@ -82,7 +82,8 @@
             <th align="center">代理号</th>
             <th align="center">用户名</th>
             <th align="center">手机号</th>
-            <th align="center">状态</th>
+            <th align="center">用户状态</th>
+            <th align="center">开通方式</th>
             <th align="center">操作</th>
         </tr>
         </thead>
@@ -100,6 +101,10 @@
                 <c:if test="${record.status=='E'}">激活</c:if>
                 <c:if test="${record.status=='D'}">禁用</c:if>
                 <c:if test="${record.status=='C'}">注销</c:if>
+            </td>
+            <td align="center">
+                <c:if test="${record.openMethod=='00'}">付费开通</c:if>
+                <c:if test="${record.openMethod=='01'}">注册开通</c:if>
             </td>
             <td align="center">
                 <a href="${pageContext.request.contextPath}/accountUser/detailPage?userId=<c:out value="${record.userId}"/>" class="btn btn-primary" data-toggle="navtab" data-id="tab-detail-accountUser" data-title="用户详细信息">详细</a>

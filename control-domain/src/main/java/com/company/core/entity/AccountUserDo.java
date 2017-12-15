@@ -37,12 +37,9 @@ public class AccountUserDo {
     private String userResv2;
     private String userResv3;
     
-    private void setId(){
-        if(ucUserInfoDo != null){
-        
-        }
-    
-    }
-
-    
+    //UC_USER_PROD
+    private String prodId;
+    private String prodName;
+    private String openStatus;
+    private String openMethod;
 }

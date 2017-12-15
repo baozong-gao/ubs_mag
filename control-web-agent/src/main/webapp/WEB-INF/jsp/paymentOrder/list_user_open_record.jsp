@@ -44,7 +44,7 @@
 </style>
 <body>
 <div class="bjui-pageHeader">
-    <form id="pagerForm" name="paymentOrderListForm" data-toggle="ajaxsearch" action="${pageContext.request.contextPath}/paymentOrder/query_order_list" method="get" modelAttribute="paymentOrderListForm">
+    <form id="pagerForm" name="paymentOrderListForm" data-toggle="ajaxsearch" action="${pageContext.request.contextPath}/paymentOrder/query_user_open_list" method="get" modelAttribute="paymentOrderListForm">
         <input type="hidden" id="pageSize" name="pageSize" value="${paymentOrderListForm.pageSize}">
         <input type="hidden" id="pageCurrent" name="pageCurrent" value="${paymentOrderListForm.pageCurrent}">
         <div class="bjui-searchBar">
@@ -56,7 +56,7 @@
                 <label class="labelblock">订单类型:</label>
                 <select name="orderType" id="orderType" data-toggle="selectpicker">
                     <option value=""  <c:if test="${'' == paymentOrderListForm.orderType}"> selected</c:if>>请选择</option>
-                    <option value="KT" <c:if test="${'KT' == paymentOrderListForm.orderType}"> selected</c:if>>开通支付
+                    <option value="KT" <c:if test="${'KT' == paymentOrderListForm.orderType}"> selected</c:if>>付费开通
                     </option>
                 </select>
 

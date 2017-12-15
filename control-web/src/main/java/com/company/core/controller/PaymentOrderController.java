@@ -3,8 +3,6 @@ package com.company.core.controller;
 import com.company.core.constant.StatusConstant;
 import com.company.core.entity.UcAgentDo;
 import com.company.core.entity.UcInstDo;
-import com.company.core.entity.WzInfoDo;
-import com.company.core.form.OrderForm;
 import com.company.core.form.Pagination;
 import com.company.core.form.PaymentOrderInfoForm;
 import com.company.core.service.*;
@@ -41,8 +39,11 @@ public class PaymentOrderController extends BaseController {
     @Autowired
     WZService wzService;
     
-    @RequestMapping(value = "/listPage", method = RequestMethod.GET)
-    public ModelAndView toListPage(HttpServletRequest request, HttpServletResponse response, ModelAndView modelAndView) {
+    /**
+     * 用户开通记录
+     */
+    @RequestMapping(value = "/listUserOpenPage", method = RequestMethod.GET)
+    public ModelAndView toListUserOpenPage(HttpServletRequest request, HttpServletResponse response, ModelAndView modelAndView) {
     
         PaymentOrderInfoForm paymentOrderInfoForm = new PaymentOrderInfoForm();
         paymentOrderInfoForm.setPageCurrent("0");
@@ -59,20 +60,22 @@ public class PaymentOrderController extends BaseController {
         
         paymentOrderInfoForm.setStartOrderDate(DateUtil.date2String(new Date(), "yyyyMMdd"));
         paymentOrderInfoForm.setEndOrderDate(DateUtil.date2String(new Date(), "yyyyMMdd"));
+    
+        paymentOrderInfoForm.setOrderType("KT"); //默认付费开通模式
         
         //获取-所有交易
         Pagination pagination = paymentOrderService.getOrderListPage(paymentOrderInfoForm);
         paymentOrderInfoForm.setPagination(pagination);
         modelAndView.getModel().put("paymentOrderListForm", paymentOrderInfoForm);
-        modelAndView.setViewName("/paymentOrder/list_order");
+        modelAndView.setViewName("paymentOrder/list_user_open_record");
         modelAndView.getModel().put("errorCode", "S");
         modelAndView.getModel().put("errorMessage", "");
         return modelAndView;
     }
     
-    @RequestMapping(value = "/query_order_list", method = RequestMethod.GET)
+    @RequestMapping(value = "/query_user_open_list", method = RequestMethod.GET)
     @ResponseBody
-    public ModelAndView toQueryOrderList (HttpServletRequest request, HttpServletResponse response, ModelAndView modelAndView, @ModelAttribute("paymentOrderInfoForm") PaymentOrderInfoForm paymentOrderInfoForm) {
+    public ModelAndView toQueryUserOpenList (HttpServletRequest request, HttpServletResponse response, ModelAndView modelAndView, @ModelAttribute("paymentOrderInfoForm") PaymentOrderInfoForm paymentOrderInfoForm) {
     
         //获取-激活状态下的机构列表
         List<UcInstDo> ucInstDoList = instService.getInstListByStatus(StatusConstant.STATUS_ENABLE);
@@ -94,7 +97,7 @@ public class PaymentOrderController extends BaseController {
             modelAndView.getModel().put("errorCode", "F");
             modelAndView.getModel().put("errorMessage", "开始日期不能大于结束日期");
             modelAndView.getModel().put("paymentOrderListForm", paymentOrderInfoForm);
-            modelAndView.setViewName("/paymentOrder/list_order");
+            modelAndView.setViewName("paymentOrder/list_user_open_record");
             return modelAndView;
         }
         
@@ -102,7 +105,7 @@ public class PaymentOrderController extends BaseController {
         Pagination pagination = paymentOrderService.getOrderListPage(paymentOrderInfoForm);
         paymentOrderInfoForm.setPagination(pagination);
         modelAndView.getModel().put("paymentOrderListForm", paymentOrderInfoForm);
-        modelAndView.setViewName("/paymentOrder/list_order");
+        modelAndView.setViewName("paymentOrder/list_user_open_record");
         return modelAndView;
         
     }
