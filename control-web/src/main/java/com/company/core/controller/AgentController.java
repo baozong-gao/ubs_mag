@@ -106,13 +106,9 @@ public class AgentController extends BaseController {
         //新增代理
         String agent = "";
         try {
-//            //检查一些代理信息, 比如费率问题 - 后续添加
-//           Map<String, String> result = agentService.checkAgentBefore(agentForm, userBO);
-//           if(result.containsKey("error")){
-//               return returnError(result.get("error"));
-//           }
             
-           agent = agentService.createNewAgent(agentForm, userBO);
+            agent = agentService.createNewAgent(agentForm, userBO);
+            
         } catch (Exception e) {
             e.printStackTrace();
             if(e instanceof ErrorException){

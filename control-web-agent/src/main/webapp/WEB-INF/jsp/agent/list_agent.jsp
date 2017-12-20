@@ -28,6 +28,8 @@
             <div class="row-inut">
 
                 <input type="hidden" id="instId" name="instId" value="${agentListForm.instId}">
+                <input type="hidden" id="userCode" name="userCode" value="${agentListForm.userCode}">
+                <input type="hidden" id="userType" name="userType" value="${agentListForm.userType}">
 
                 <label class="labelblock">代理号:</label>
                 <select name="agentId" id="agentId" data-toggle="selectpicker"  data-live-search="true">

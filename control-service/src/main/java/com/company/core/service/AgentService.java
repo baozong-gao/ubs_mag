@@ -76,6 +76,8 @@ public interface AgentService {
     
     public Map<String , String> checkAgentBefore(AgentForm agentForm, UserBO userBO);
     
+    Pagination getAgentListPageForAgentWeb(AgentForm agentForm);
+    
     void updateAgent(AgentForm agentForm, UserBO userBO);
     
     void updateAgentBaseInfo(AgentForm agentForm, UserBO userBO);

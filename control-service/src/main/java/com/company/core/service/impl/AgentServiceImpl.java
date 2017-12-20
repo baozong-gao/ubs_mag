@@ -303,6 +303,7 @@ public class AgentServiceImpl implements AgentService {
     }
     
     @Override
+    @Transactional
     public void createAgentBaseInfo(AgentForm agentForm, UserBO userBO) {
         
         //创建代理
@@ -347,6 +348,7 @@ public class AgentServiceImpl implements AgentService {
     }
     
     @Override
+    @Transactional
     public void createAgentDetailInfo(AgentForm agentForm, UserBO userBO) {
         
         //存入代理详细信息
@@ -383,6 +385,7 @@ public class AgentServiceImpl implements AgentService {
     }
     
     @Override
+    @Transactional
     public void createAgentFeeInfo(AgentForm agentForm, UserBO userBO) {
         
         //存入机构费率
@@ -455,6 +458,7 @@ public class AgentServiceImpl implements AgentService {
     
     
     @Override
+    @Transactional
     public void createAgentLevelInfo(AgentForm agentForm, UserBO userBO) {
     
         UcAgentLevelDo ucAgentLevelDo = new UcAgentLevelDo();
@@ -740,6 +744,87 @@ public class AgentServiceImpl implements AgentService {
         return ucAgentDoExample;
     }
     
+    
+    /**
+     * agent web
+     * @param agentForm
+     * @return
+     */
+    @Override
+    public Pagination getAgentListPageForAgentWeb(AgentForm agentForm) {
+        
+        int pageCurrent = Integer.parseInt(agentForm.getPageCurrent());
+        int pageSize = Integer.parseInt(agentForm.getPageSize());
+        UcAgentDoExample ucagentDoExample = formatAgentSearchCriteriaAgentWeb(agentForm);
+        
+        //获取满足的记录条数
+        int tranSize = ucAgentBiz.countByExample(ucagentDoExample);
+        Pagination<AgentBO> page = new Pagination<AgentBO>(tranSize, pageCurrent, pageSize);
+        PageHelper.startPage(pageCurrent, pageSize);
+        List<UcAgentDo> ucagentDos = ucAgentBiz.selectByExample(ucagentDoExample);
+        List<AgentBO> list = new ArrayList<>();
+        AgentBO agentBO = null;
+        if (ucagentDos != null && ucagentDos.size() > 0) {
+            for (UcAgentDo ur : ucagentDos) {
+                agentBO = new AgentBO();
+                agentBO.setInstId(ur.getInstId());
+                agentBO.setAgentId(ur.getAgentId());
+                agentBO.setAgentName(ur.getAgentName());
+                agentBO.setStatus(ur.getStatus());
+                agentBO.setCreateUser(ur.getCreateUser());
+                agentBO.setCreateTime(ur.getCreateTime());
+                list.add(agentBO);
+            }
+        }
+        page.addResult(list);
+        return page;
+    }
+    
+    public UcAgentDoExample formatAgentSearchCriteriaAgentWeb(AgentForm agentForm) {
+        
+        UcAgentDoExample ucAgentDoExample = new UcAgentDoExample();
+        UcAgentDoExample.Criteria criteria = ucAgentDoExample.createCriteria();
+        if(StringUtils.isBlank(agentForm.getAgentId()) && StringUtils.isBlank(agentForm.getAgentName()) && StringUtils.isBlank(agentForm.getStatus())){
+            //没有查询条件就默认查询
+           //如果是机构用户
+            if(UserConstant.USER_INST.equals(agentForm.getUserType())){
+                criteria.andInstIdEqualTo(agentForm.getUserCode());
+            } else if(UserConstant.USER_AGENT.equals(agentForm.getUserType())){
+                List<String> agentIdlist = getAgentIdListOfAgentOwn(agentForm.getUserCode());
+                if(agentIdlist != null && agentIdlist.size() > 0){
+                    if(!agentIdlist.contains(agentForm.getUserCode())){
+                        agentIdlist.add(agentForm.getUserCode());
+                    }
+                    criteria.andAgentIdIn(agentIdlist);
+                } else {
+                    criteria.andAgentIdEqualTo(agentForm.getUserCode());
+                }
+            }
+            return ucAgentDoExample;
+        }
+        
+        if (StringUtils.isNotBlank(agentForm.getInstId())) {
+            criteria.andInstIdEqualTo(agentForm.getInstId());
+        }
+        if (StringUtils.isNotBlank(agentForm.getAgentId())) {
+            List<String> agentIdlist = getAgentIdListOfAgentOwn(agentForm.getUserCode());
+            if(agentIdlist != null && agentIdlist.size() > 0){
+                if(!agentIdlist.contains(agentForm.getUserCode())){
+                    agentIdlist.add(agentForm.getUserCode());
+                }
+                criteria.andAgentIdIn(agentIdlist);
+            } else {
+                criteria.andAgentIdEqualTo(agentForm.getAgentId());
+            }
+        }
+        if (StringUtils.isNotBlank(agentForm.getAgentName())) {
+            criteria.andAgentNameLike("%" + agentForm.getAgentName() + "%");
+        }
+        if (StringUtils.isNotBlank(agentForm.getStatus())) {
+            criteria.andStatusEqualTo(agentForm.getStatus());
+        }
+        return ucAgentDoExample;
+    }
     
     @Override
     @Transactional

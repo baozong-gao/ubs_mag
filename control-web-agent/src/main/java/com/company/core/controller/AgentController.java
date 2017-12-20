@@ -10,7 +10,6 @@ import com.company.core.entity.UcAgentLevelDo;
 import com.company.core.entity.UcInstDo;
 import com.company.core.entity.UcProdDo;
 import com.company.core.form.AgentForm;
-import com.company.core.form.InstForm;
 import com.company.core.form.Pagination;
 import com.company.core.service.AgentService;
 import com.company.core.service.InstService;
@@ -91,20 +90,12 @@ public class AgentController extends BaseController {
             if(!"Y".equals(ucInstDo.getAgentOk())){
                 return returnError("机构不允许开代理");
             }
-        } else if (UserConstant.USER_AGENT.equals(userBO.getUserCodeType())){
-    
-//            UcInstDo ucInstDo = instService.getInst(agentForm.getUserCode());
-//            if(ucInstDo == null){
-//                return returnError("机构号不存在");
-//            }
-//            if(!"Y".equals(ucInstDo.getAgentOk())){
-//                return returnError("机构不允许开代理");
-//            }
+        } else if (UserConstant.USER_AGENT.equals(userBO.getUserCodeType())) {
             UcAgentDo ucAgentDo = agentService.getAgent(agentForm.getUserCode());
-            if(ucAgentDo == null){
+            if (ucAgentDo == null) {
                 return returnError("请核实登录代理是否正确");
             }
-            if(!"Y".equals(ucAgentDo.getAgentOk())){
+            if (!"Y".equals(ucAgentDo.getAgentOk())) {
                 return returnError("代理不允许开下级代理");
             }
         }
@@ -147,12 +138,7 @@ public class AgentController extends BaseController {
         //新增代理
         String agent = "";
         try {
-//            //检查一些代理信息, 比如费率问题 - 后续添加
-//           Map<String, String> result = agentService.checkAgentBefore(agentForm, userBO);
-//           if(result.containsKey("error")){
-//               return returnError(result.get("error"));
-//           }
-            
+
            agent = agentService.createNewAgent(agentForm, userBO);
            
         } catch (Exception e) {
@@ -168,11 +154,11 @@ public class AgentController extends BaseController {
         
     }
     
-    
     @RequestMapping(value = "/listPage", method = RequestMethod.GET)
     public ModelAndView toListPage(HttpServletRequest request, HttpServletResponse response, ModelAndView modelAndView) {
     
         UserBO userBO = getCurrentUser();
+        AgentForm agentForm = new AgentForm();
         if(!UserConstant.USER_INST.equals(userBO.getUserCodeType()) && !UserConstant.USER_AGENT.equals(userBO.getUserCodeType())){
             modelAndView.setViewName("/agent/list_agent");
             return modelAndView;
@@ -180,23 +166,23 @@ public class AgentController extends BaseController {
         if(UserConstant.USER_INST.equals(userBO.getUserCodeType())){
             List<UcAgentDo> ucAgentDoList = agentService.getAgentListForDropDown(userBO.getUserCode(),"", "");
             modelAndView.getModel().put("agentList", ucAgentDoList);
+//            agentForm.setInstId(userBO.getUserCode());
         } else if(UserConstant.USER_AGENT.equals(userBO.getUserCodeType())){
             List<UcAgentDo> ucAgentDoList = agentService.getAgentListOfAgentOwn(userBO.getUserCode(), "");
             modelAndView.getModel().put("agentList", ucAgentDoList);
+//            agentForm.setAgentId(userBO.getUserCode());
         }
+        agentForm.setUserType(userBO.getUserCodeType());
+        agentForm.setUserCode(userBO.getUserCode());
         
-        AgentForm agentForm = new AgentForm();
         agentForm.setPageCurrent("0");
         agentForm.setPageNo("0");
         agentForm.setPageSize("10");
         
-        //获取-所以机构列表
-        List<UcInstDo> allInstList = instService.getInstList();
-        Pagination pagination = agentService.getAgentListPage(agentForm);
+        Pagination pagination = agentService.getAgentListPageForAgentWeb(agentForm);
         
         agentForm.setPagination(pagination);
         modelAndView.getModel().put("agentListForm", agentForm);
-        modelAndView.getModel().put("instList", allInstList);
         modelAndView.setViewName("/agent/list_agent");
         return modelAndView;
     }
@@ -205,11 +191,18 @@ public class AgentController extends BaseController {
     @ResponseBody
     public ModelAndView toQueryAgentList (HttpServletRequest request, HttpServletResponse response, ModelAndView modelAndView, @ModelAttribute("agentListForm") AgentForm agentForm) {
     
-        //获取-所以机构列表
-        List<UcInstDo> allInstList = instService.getInstList();
-        modelAndView.getModel().put("instList", allInstList);
-    
-        Pagination pagination = agentService.getAgentListPage(agentForm);
+        UserBO userBO = getCurrentUser();
+        if(UserConstant.USER_INST.equals(userBO.getUserCodeType())){
+            List<UcAgentDo> ucAgentDoList = agentService.getAgentListForDropDown(userBO.getUserCode(),"", "");
+            modelAndView.getModel().put("agentList", ucAgentDoList);
+//            agentForm.setInstId(userBO.getUserCode());
+        } else if(UserConstant.USER_AGENT.equals(userBO.getUserCodeType())){
+            List<UcAgentDo> ucAgentDoList = agentService.getAgentListOfAgentOwn(userBO.getUserCode(), "");
+            modelAndView.getModel().put("agentList", ucAgentDoList);
+//            agentForm.setAgentId(userBO.getUserCode());
+        }
+        
+        Pagination pagination = agentService.getAgentListPageForAgentWeb(agentForm);
         
         agentForm.setPagination(pagination);
         modelAndView.getModel().put("agentForm", agentForm);
