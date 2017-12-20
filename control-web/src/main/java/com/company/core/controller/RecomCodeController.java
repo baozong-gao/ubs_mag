@@ -271,7 +271,7 @@ public class RecomCodeController extends BaseController {
             if(!toUcAgentDo.getInstId().equals(recomCodeForm.getInstId())){
                 return returnError("目标代理不属于下发机构");
             }
-        } else if(LEVEL_1.equals(toAgentLevel.getAgentLevel())){
+        } else if(!LEVEL_1.equals(toAgentLevel.getAgentLevel())){
             return returnError("只能下发给1级代理");
         }
         

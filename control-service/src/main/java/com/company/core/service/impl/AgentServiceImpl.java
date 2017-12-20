@@ -283,6 +283,7 @@ public class AgentServiceImpl implements AgentService {
     
     
     @Override
+    @Transactional
     public String createNewAgent(AgentForm agentForm, UserBO userBO) {
         
         //创建代理基础信息
@@ -741,6 +742,7 @@ public class AgentServiceImpl implements AgentService {
     
     
     @Override
+    @Transactional
     public void updateAgent(AgentForm agentForm, UserBO userBO) {
         
         //更新代理基础信息
@@ -755,6 +757,7 @@ public class AgentServiceImpl implements AgentService {
     }
     
     @Override
+    @Transactional
     public void updateAgentBaseInfo(AgentForm agentForm, UserBO userBO) {
         
         //代理信息
@@ -798,6 +801,7 @@ public class AgentServiceImpl implements AgentService {
     }
     
     @Override
+    @Transactional
     public void updateAgentDetailInfo(AgentForm agentForm, UserBO userBO) {
         
         //更新代理详细信息
@@ -834,6 +838,7 @@ public class AgentServiceImpl implements AgentService {
     }
     
     @Override
+    @Transactional
     public void updateAgentFeeInfo(AgentForm agentForm, UserBO userBO) {
         
         //存入机构费率
@@ -1134,13 +1139,25 @@ public class AgentServiceImpl implements AgentService {
             return error;
         }
         
-        BigDecimal bdf = new BigDecimal("0");;
-        BigDecimal bdr = new BigDecimal("0");;
-        //如果是机构开下级
+        BigDecimal bdf = new BigDecimal("0");
+        BigDecimal bdr = new BigDecimal("0");
+        Boolean isInstCreater = false;
+        Boolean isAgentCreater = false;
         if(UserConstant.USER_INST.equals(agentForm.getUserType())){
+            isInstCreater = true;
+        } else if(UserConstant.USER_AGENT.equals(agentForm.getUserType())){
+            isAgentCreater = true;
+        } else if(StringUtils.isNotBlank(agentForm.getInstId())){
+            isInstCreater = true;
+        } else if(StringUtils.isNotBlank(agentForm.getAgentId())){
+            isAgentCreater = true;
+        }
+        
+        //如果是机构开下级
+        if(isInstCreater){
             UcFeeDo ucFeeDo = new UcFeeDo();
             ucFeeDo.setUserType(UserConstant.USER_INST);
-            ucFeeDo.setUserCode(agentForm.getUserCode());
+            ucFeeDo.setUserCode(agentForm.getInstId());
             ucFeeDo.setCategory(Constant.CATEGORY_DEFAULT);
             ucFeeDo.setCategoryId("P001");
             ucFeeDo.setFeeType("DF");
@@ -1153,11 +1170,16 @@ public class AgentServiceImpl implements AgentService {
             if(instdr != null){
                 bdr = new BigDecimal(instdr.getFeeMode());
             }
-        } else if(UserConstant.USER_AGENT.equals(agentForm.getUserType())) {
-            //如果代理开下级
+        } else if(isAgentCreater) {
+            //如果代理开下级 - 代理只能给自己的下级开
             UcFeeDo ucFeeDo = new UcFeeDo();
             ucFeeDo.setUserType(UserConstant.USER_AGENT);
-            ucFeeDo.setUserCode(agentForm.getUserCode());
+            if(StringUtils.isNotBlank(agentForm.getAgentId())){
+                ucFeeDo.setUserCode(agentForm.getAgentId());
+            } else {
+                ucFeeDo.setUserCode(agentForm.getUserCode());
+            }
+//            ucFeeDo.setUserCode(agentForm.getAgentId());
             ucFeeDo.setCategory(Constant.CATEGORY_DEFAULT);
             ucFeeDo.setCategoryId("P001");
             ucFeeDo.setFeeType("DF");
@@ -1173,7 +1195,7 @@ public class AgentServiceImpl implements AgentService {
         }
         
         //开户的成本费率不能低于上级的实行费率
-        if(dr.compareTo(bdr) == 1){
+        if(dr.compareTo(bdr) == -1){
             error = "成本费率低于上级代理/机构";
             return error;
         }

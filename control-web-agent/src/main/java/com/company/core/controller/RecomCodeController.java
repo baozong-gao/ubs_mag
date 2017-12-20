@@ -139,9 +139,17 @@ public class RecomCodeController extends BaseController {
         if(UserConstant.USER_INST.equals(userBO.getUserCodeType())){
             List<UcAgentDo> ucAgentDoList = agentService.getAgentListForDropDown(userBO.getUserCode(),"", StatusConstant.STATUS_ENABLE);
             modelAndView.getModel().put("agentList", ucAgentDoList);
+            //如果页面回传的机构号为空, 用登录账号
+            if(StringUtils.isBlank(recomCodeForm.getInstId())){
+                recomCodeForm.setInstId(userBO.getUserCode());
+            }
         } else if(UserConstant.USER_AGENT.equals(userBO.getUserCodeType())){
             List<UcAgentDo> ucAgentDoList = agentService.getAgentListOfAgentOwn(userBO.getUserCode(), StatusConstant.STATUS_ENABLE);
             modelAndView.getModel().put("agentList", ucAgentDoList);
+            //如果页面回传的代理号为空(未选择), 用登录账号
+            if(StringUtils.isBlank(recomCodeForm.getAgentId())){
+                recomCodeForm.setAgentId(userBO.getUserCode());
+            }
         }
     
         if(UserConstant.USER_INST.equals(userBO.getUserCodeType())){
@@ -178,9 +186,17 @@ public class RecomCodeController extends BaseController {
         if(UserConstant.USER_INST.equals(userBO.getUserCodeType())){
             List<UcAgentDo> ucAgentDoList = agentService.getAgentListForDropDown(userBO.getUserCode(),"", StatusConstant.STATUS_ENABLE);
             modelAndView.getModel().put("agentList", ucAgentDoList);
+            //如果页面回传的机构号为空, 用登录账号
+            if(StringUtils.isBlank(recomCodeForm.getInstId())){
+                recomCodeForm.setInstId(userBO.getUserCode());
+            }
         } else if(UserConstant.USER_AGENT.equals(userBO.getUserCodeType())){
             List<UcAgentDo> ucAgentDoList = agentService.getAgentListOfAgentOwn(userBO.getUserCode(), StatusConstant.STATUS_ENABLE);
             modelAndView.getModel().put("agentList", ucAgentDoList);
+            //如果页面回传的代理号为空(未选择), 用登录账号
+            if(StringUtils.isBlank(recomCodeForm.getAgentId())){
+                recomCodeForm.setAgentId(userBO.getUserCode());
+            }
         }
     
         if(UserConstant.USER_INST.equals(userBO.getUserCodeType())){

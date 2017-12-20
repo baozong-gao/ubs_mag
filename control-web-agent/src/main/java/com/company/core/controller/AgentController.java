@@ -93,14 +93,13 @@ public class AgentController extends BaseController {
             }
         } else if (UserConstant.USER_AGENT.equals(userBO.getUserCodeType())){
     
-            UcInstDo ucInstDo = instService.getInst(agentForm.getUserCode());
-            if(ucInstDo == null){
-                return returnError("机构号不存在");
-            }
-            if(!"Y".equals(ucInstDo.getAgentOk())){
-                return returnError("机构不允许开代理");
-            }
-            
+//            UcInstDo ucInstDo = instService.getInst(agentForm.getUserCode());
+//            if(ucInstDo == null){
+//                return returnError("机构号不存在");
+//            }
+//            if(!"Y".equals(ucInstDo.getAgentOk())){
+//                return returnError("机构不允许开代理");
+//            }
             UcAgentDo ucAgentDo = agentService.getAgent(agentForm.getUserCode());
             if(ucAgentDo == null){
                 return returnError("请核实登录代理是否正确");
@@ -291,10 +290,14 @@ public class AgentController extends BaseController {
                     return returnError("代理等级未知");
                 }
             }else {
-                UcAgentLevelDo ucAgentLevelDo1 = agentService.getAgentLevel(userBO.getUserCode());
-                if(ucAgentLevelDo1.getAgentLevel() != ucAgentLevelDo.getAgentLevel()){
+                //只有明确的上级可以激活
+                if(!ucAgentLevelDo.getUpAgentId().equals(userBO.getUserCode())){
                     return returnError("等级关系不正确,无法激活");
                 }
+//                UcAgentLevelDo ucAgentLevelDo1 = agentService.getAgentLevel(userBO.getUserCode());
+//                if(ucAgentLevelDo1.getAgentLevel() != ucAgentLevelDo.getAgentLevel()){
+//                    return returnError("等级关系不正确,无法激活");
+//                }
             }
             
             //激活

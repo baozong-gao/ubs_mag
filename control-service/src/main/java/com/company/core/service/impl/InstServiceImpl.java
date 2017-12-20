@@ -434,7 +434,7 @@ public class InstServiceImpl implements InstService {
         
     }
     
-    
+    @Transactional
     public void createInstBaseInfo(InstForm instForm, UserBO userBO){
         
         //创建机构
@@ -467,6 +467,7 @@ public class InstServiceImpl implements InstService {
         
     }
     
+    @Transactional
     public void createInstDetailInfo(InstForm instForm, UserBO userBO){
         
         //存入机构详细信息
@@ -502,6 +503,7 @@ public class InstServiceImpl implements InstService {
         }
     }
     
+    @Transactional
     public void createInstFeeInfo(InstForm instForm, UserBO userBO){
         
         //存入机构费率
@@ -573,6 +575,7 @@ public class InstServiceImpl implements InstService {
     }
     
     
+    @Transactional
     public void updateInstBaseInfo(InstForm instForm, UserBO userBO){
         
         //创建机构
@@ -603,6 +606,7 @@ public class InstServiceImpl implements InstService {
         }
     }
     
+    @Transactional
     public void updateInstDetailInfo(InstForm instForm, UserBO userBO){
         
         //存入机构详细信息
@@ -639,6 +643,7 @@ public class InstServiceImpl implements InstService {
         }
     }
     
+    @Transactional
     public void updateInstFeeInfo(InstForm instForm, UserBO userBO){
         
         //存入机构费率

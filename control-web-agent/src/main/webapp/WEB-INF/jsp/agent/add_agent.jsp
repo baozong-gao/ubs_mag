@@ -29,6 +29,7 @@
         <input type="hidden" id="instId" name="instId" value="${agentForm.instId}">
         <input type="hidden" id="upAgentId" name="upAgentId" value="${agentForm.upAgentId}">
         <input type="hidden" id="userType" name="userType" value="${agentForm.userType}">
+        <input type="hidden" id="userCode" name="userCode" value="${agentForm.userCode}">
 
         <div style="margin:15px auto 0; width:96%;">
             <div class="row" style="padding: 0 8px;">
@@ -147,21 +148,21 @@
                                 <div class="form-group col-md-4">
                                     <label class="control-label labelblock">姓名：</label>
                                     <input type="text"
-                                           name="legalPersonName" size="15" data-rule="法人姓名:required;"
+                                           name="legalPersonName" id="legalPersonName" size="15" data-rule="法人姓名:required;"
                                            placeholder="请输入法人姓名"/>&nbsp;
                                 </div>
 
                                 <div class="form-group col-md-4">
                                     <label class="control-label labelblock">手机号：</label>
                                     <input type="text"
-                                           name="legalPersonPhone" size="15" data-rule="法人手机号:required; mobile"
+                                           name="legalPersonPhone"  id="legalPersonPhone" size="15" data-rule="法人手机号:required; mobile"
                                            placeholder="请输入法人手机号"/>&nbsp;
                                 </div>
 
                                 <div class="form-group col-md-4">
                                     <label class="control-label labelblock">邮件：</label>
                                     <input type="text"
-                                           name="legalPersonMail" size="20" data-rule="邮箱:required; email"
+                                           name="legalPersonMail" id="legalPersonMail" size="20" data-rule="邮箱:required; email"
                                            placeholder="请输入法人邮件"/>&nbsp;
                                 </div>
                             </div>
@@ -180,14 +181,14 @@
                                 <div class="form-group col-md-4">
                                     <label class="control-label labelblock">证件ID：</label>
                                     <input type="text"
-                                           name="legalPersonId" size="20" data-rule="法人证件ID:required;"
+                                           name="legalPersonId" id="legalPersonId" size="20" data-rule="法人证件ID:required;"
                                            placeholder="请输入法人证件号"/>&nbsp;
                                 </div>
 
                                 <div class="form-group col-md-4">
                                     <label class="control-label labelblock">地址：</label>
                                     <input type="text"
-                                           name="legalPersonAddress" size="20"
+                                           name="legalPersonAddress" id="legalPersonAddress" size="20"
                                            placeholder="请输入法人地址"/>&nbsp;
                                 </div>
                             </div>
@@ -198,28 +199,32 @@
                 <!-- 联系人信息 -->
                 <div class="col-md-12">
                     <div class="panel panel-default">
-                        <div class="panel-heading"><h3 class="panel-title">联系人信息</h3></div>
-                        <div class="panel-body">
+                        <div class="panel-heading">
+                            <h3 class="panel-title" style="size: 15px; display: inline">联系人信息</h3>
+                            <div style="float: right">
+                                <input type="checkbox" id="syncInfo" name="syncInfo" onclick="syncMerInfo()">同步法人信息
+                            </div>
+                        </div>                        <div class="panel-body">
                             <div class="row-input" style="margin: 20px 0 20px; width: 100%">
                                 <div class="row-input" style="margin: 20px 0 20px; width: 100%">
                                     <div class="form-group col-md-4">
                                         <label class="control-label labelblock">姓名：</label>
                                         <input type="text"
-                                               name="contactName" size="15"
+                                               name="contactName" id="contactName" size="15"
                                                placeholder="请输入联系人姓名"/>&nbsp;
                                     </div>
 
                                     <div class="form-group col-md-4">
                                         <label class="control-label labelblock">手机号：</label>
                                         <input type="text"
-                                               name="contactPhone" size="15" data-rule="手机号:required;"
+                                               name="contactPhone" id="contactPhone" size="15" data-rule="手机号:required;"
                                                placeholder="请输入联系人手机号"/>&nbsp;
                                     </div>
 
                                     <div class="form-group col-md-4">
                                         <label class="control-label labelblock">邮件：</label>
                                         <input type="text"
-                                               name="contactMail" size="20" data-rule="邮箱:required; email"
+                                               name="contactMail" id="contactMail" size="20" data-rule="邮箱:required; email"
                                                placeholder="请输入联系人邮件"/>&nbsp;
                                     </div>
                                 </div>
@@ -239,14 +244,14 @@
                                     <div class="form-group col-md-4">
                                         <label class="control-label labelblock">证件ID：</label>
                                         <input type="text"
-                                               name="contactCertId" size="20"
+                                               name="contactCertId" id="contactCertId" size="20"
                                                placeholder="请输入联系人证件号"/>&nbsp;
                                     </div>
 
                                     <div class="form-group col-md-4">
                                         <label class="control-label labelblock">地址：</label>
                                         <input type="text"
-                                               name="contactAddress" size="20"
+                                               name="contactAddress" id="contactAddress" size="20"
                                                placeholder="请输入联系人地址"/>&nbsp;
                                     </div>
                                 </div>
@@ -275,7 +280,7 @@
                                         <label class="control-label">成本交易比例费率：</label>
                                         <input type="text"
                                                <%--name="defaultFeeRate" size="15" data-rule="成本固定费用:required;"--%>
-                                               name="defaultFeeRate" size="15" data-rule="number;range[0~1] "
+                                               name="defaultFeeRate" size="15" data-rule="number;range[1~200] "
                                                placeholder="如:千5, 请输入0.5"/>%&nbsp;
                                     </div>
                                 </div>
@@ -292,7 +297,7 @@
                                         <label class="control-label">实收交易比例费率：</label>
                                         <input type="text"
                                                <%--name="EffectiveFeeRate" size="15" data-rule="成本固定费用:required;"--%>
-                                               name="EffectiveFeeRate" size="15" data-rule="number;range[0~1] "
+                                               name="EffectiveFeeRate" size="15" data-rule="number;range[1~200] "
                                                placeholder="如:千5, 请输入0.5"/>%&nbsp;
                                     </div>
                                 </div>
@@ -320,8 +325,8 @@
         </div>
     </form>
 </div>
-<%--<div class="bjui-pageFooter" id="pageFooter">--%>
-<%--<div class="pages"></div>--%>
-<%--</div>--%>
 </body>
+
+<script src="${pageContext.request.contextPath}/resources/ubsJS/commonJS.js"></script>
+
 </html>

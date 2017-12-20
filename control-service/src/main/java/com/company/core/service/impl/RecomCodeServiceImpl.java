@@ -13,6 +13,7 @@ import com.company.core.service.AgentService;
 import com.company.core.service.RecomCodeService;
 import com.company.core.util.*;
 import com.github.pagehelper.PageHelper;
+import jdk.net.SocketFlow;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -47,6 +48,7 @@ public class RecomCodeServiceImpl implements RecomCodeService {
     }
     
     @Override
+    @Transactional
     public void createRecomCodes(RecomCodeForm recomCodeForm, UserBO userBO) {
         
         UcReccomCodeCntlDo ucReccomCodeCntlDo = null;
@@ -112,11 +114,11 @@ public class RecomCodeServiceImpl implements RecomCodeService {
             ucReccomCodeCntlDo.setPrice(recomCodeForm.getPrice());
     
             ucReccomCodeCntlDo.setCreateUser(userBO.getUsrName());
-            ucReccomCodeCntlDo.setCreateSource(ComcomUtils.getSourceName(Thread.currentThread()));
+            ucReccomCodeCntlDo.setCreateSource(SystemConstant.DEFAULT_SOURCE_CODE);
             ucReccomCodeCntlDo.setCreateTime(DateUtil.getCurrentDateTime());
             ucReccomCodeCntlDo.setLockVersion(String.valueOf(0));
             ucReccomCodeCntlDo.setModifyUser(userBO.getUsrName());
-            ucReccomCodeCntlDo.setModifySource(ComcomUtils.getSourceName(Thread.currentThread()));
+            ucReccomCodeCntlDo.setModifySource(SystemConstant.DEFAULT_SOURCE_CODE);
             ucReccomCodeCntlDo.setModifyTime(DateUtil.getCurrentDateTime());
     
             int c = ucRecomCodeControlBiz.insertSelective(ucReccomCodeCntlDo);
@@ -263,7 +265,6 @@ public class RecomCodeServiceImpl implements RecomCodeService {
         return ucRecomCodeControlBiz.countByExample(ucReccomCodeCntlDoExample);
     }
     
-    
     /**
      * 从机构下发指定个数的推荐码到指定下级代理
      */
@@ -272,7 +273,7 @@ public class RecomCodeServiceImpl implements RecomCodeService {
     public void dispatchRecomCodeBatchFromInst(String instId, String toAgentId, int dispatchCount, String user) {
     
         UcReccomCodeCntlDoExample ucReccomCodeCntlDoExample = new UcReccomCodeCntlDoExample();
-        ucReccomCodeCntlDoExample.createCriteria().andUserTypeEqualTo(UserConstant.USER_INST).andUserCodeEqualTo(instId);
+        ucReccomCodeCntlDoExample.createCriteria().andUserTypeEqualTo(UserConstant.USER_INST).andUserCodeEqualTo(instId).andStatusEqualTo(StatusConstant.RECOMCODE_STATUS_NEW); //只能下发新增
         List<UcReccomCodeCntlDo> ucReccomCodeCntlDoList = ucRecomCodeControlBiz.selectByExample(ucReccomCodeCntlDoExample);
         int i = 0;
         for (UcReccomCodeCntlDo uc : ucReccomCodeCntlDoList) {
@@ -282,6 +283,7 @@ public class RecomCodeServiceImpl implements RecomCodeService {
             uc.setModifySource(SystemConstant.DEFAULT_SOURCE_CODE);
             uc.setModifyTime(DateUtil.getCurrentDateTime());
             uc.setModifyUser(user);
+            uc.setUserType(UserConstant.USER_AGENT);
             uc.setUserCode(toAgentId);
             int d = ucRecomCodeControlBiz.updateSelective(uc);
             if (d <= 0) {
@@ -302,7 +304,7 @@ public class RecomCodeServiceImpl implements RecomCodeService {
     public void dispatchRecomCodeBatchFromAgent(String agentId, String toAgentId, int dispatchCount, String user) {
         
         UcReccomCodeCntlDoExample ucReccomCodeCntlDoExample = new UcReccomCodeCntlDoExample();
-        ucReccomCodeCntlDoExample.createCriteria().andUserTypeEqualTo(UserConstant.USER_AGENT).andUserCodeEqualTo(agentId);
+        ucReccomCodeCntlDoExample.createCriteria().andUserTypeEqualTo(UserConstant.USER_AGENT).andUserCodeEqualTo(agentId).andStatusEqualTo(StatusConstant.RECOMCODE_STATUS_NEW); //只能下发新增;
         List<UcReccomCodeCntlDo> ucReccomCodeCntlDoList = ucRecomCodeControlBiz.selectByExample(ucReccomCodeCntlDoExample);
         int i = 0;
         for (UcReccomCodeCntlDo uc : ucReccomCodeCntlDoList) {

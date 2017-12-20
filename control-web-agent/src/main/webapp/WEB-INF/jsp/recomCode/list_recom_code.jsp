@@ -63,11 +63,11 @@
 
             <div class="row-input">
 
-                <a data-icon="save" class="btn btn-default" id="dispatch_selected" name='dispatch_selected' data-toggle="dialog" data-width="300" data-height="200" data-id="dialog-normal" data-title="下拨注册码">下拨选中</a>
+                <a data-icon="save" class="btn btn-default" id="dispatch_sel" name='dispatch_sel' data-toggle="dialog" data-width="300" data-height="200" data-id="dialog-normal" data-title="下拨注册码">下拨选中</a>
 
-                <a data-icon="save" class="btn btn-default" id="activate_selected" name='activate_selected'>激活选中</a>
+                <a data-icon="save" class="btn btn-default" id="activate_sel" name='activate_sel'>激活选中</a>
 
-                <a data-icon="save" class="btn btn-default" id="disable_selected" name='disable_selected'>禁用选中</a>
+                <a data-icon="save" class="btn btn-default" id="disable_sel" name='disable_sel'>禁用选中</a>
 
                 <a href="${pageContext.request.contextPath}/recomCode/dispatchBatchPage" data-icon="home" class="btn btn-default" data-id="navtab-recomCode-dispatch-batch" data-toggle="dialog" data-width="600" data-height="400" data-id="dialog-normal" data-title="批量下拨注册码">批量下拨</a>
             </div>
@@ -116,8 +116,8 @@
             <td align="center"><c:out value="${record.createTime}"/></td>
             <td align="center">
                 <a href="${pageContext.request.contextPath}/recomCode/activate?recomCode=<c:out value="${record.recomCode}"/>&userCode=<c:out value="${record.userCode}"/>&userType=<c:out value="${record.userType}"/>" class="btn btn-green" data-toggle="doajax" data-confirm-msg="确定？" <c:if test="${record.status=='C' || record.status=='U' || record.status=='E'}"> disabled=true </c:if>>激活</a>
-                <a href="${pageContext.request.contextPath}/recomCode/disable?recomCode=<c:out value="${record.recomCode}"/>&userCode=<c:out value="${record.userCode}"/>&userType=<c:out value="${record.userType}"/>" class="btn btn-blue" data-toggle="doajax" data-confirm-msg="确定？" <c:if test="${record.status=='D' || record.status=='U' }"> disabled=true </c:if>>禁用</a>
-                <a href="${pageContext.request.contextPath}/recomCode/dispatchPage?recomCode=<c:out value="${record.recomCode}"/>&userCode=<c:out value="${record.userCode}"/>&userType=<c:out value="${record.userType}"/>" class="btn btn-primary" data-toggle="dialog" data-width="600" data-height="400" data-id="dialog-normal" data-title="注册码下发" <c:if test="${'E' != record.status}"> disabled=true </c:if>>下发</a>
+                <a href="${pageContext.request.contextPath}/recomCode/disable?recomCode=<c:out value="${record.recomCode}"/>&userCode=<c:out value="${record.userCode}"/>&userType=<c:out value="${record.userType}"/>" class="btn btn-blue" data-toggle="doajax" data-confirm-msg="确定？" <c:if test="${record.status=='D' || record.status=='U'}"> disabled=true </c:if>>禁用</a>
+                <a href="${pageContext.request.contextPath}/recomCode/dispatchPage?recomCode=<c:out value="${record.recomCode}"/>&userCode=<c:out value="${record.userCode}"/>&userType=<c:out value="${record.userType}"/>" class="btn btn-primary" data-toggle="dialog" data-width="600" data-height="400" data-id="dialog-normal" data-title="注册码下发" <c:if test="${'N' != record.status}"> disabled=true </c:if>>下发</a>
             </td>
             </tr>
         </c:forEach>
@@ -158,7 +158,7 @@
     /**
      * 批量下发操作
      */
-    $(document.body).on("click", "#dispatch_selected", function () {
+    $(document.body).on("click", "#dispatch_sel", function () {
 
         var array= new Array();
         var eflag = false;
@@ -188,19 +188,22 @@
             return;
         }
         if (array.length == "") {
-            $(this).alertmsg("warn", "未选中任何记录!");
+            alert("未选中任何记录!");
             return;
         }
 
-        $("#dispatch_selected").attr("href", ("${pageContext.request.contextPath}/recomCode/dispatchSelectedPage" + "?recomCode=" +
-            array.join(" ") + "&instId=" +  recAgent));
+        $("#dispatch_sel").attr("href", ("${pageContext.request.contextPath}/recomCode/dispatchSelectedPage" + "?recomCode=" +
+            array.join(" ") + "&agentId=" +  recAgent));
     });
 
 
     /**
      * 批量激活操作
      */
-    $(document.body).on("click", "#activate_selected", function () {
+    $(document.body).on("click", "#activate_sel", function (e) {
+
+//        事件点击的标签如果不是a, 则忽略.用来去除点击的重复响应
+        if(e.target.tagName!="A") return;
 
         var array= new Array();
         var eflag = false;
@@ -246,10 +249,67 @@
             success: function (result) {
                 var message = result.message;
                 alert(message);
+                return;
             }
         });
     });
 
+    /**
+     * 批量禁用操作
+     */
+    $(document.body).on("click", "#disable_sel", function (e) {
+
+        //        事件点击的标签如果不是a, 则忽略.用来去除点击的重复响应
+        if(e.target.tagName!="A") return;
+
+        var array= new Array();
+        var eflag = false;
+        var c = 1;
+        var oagent = "";
+        var recAgent = "";
+        var compareAgent = "";
+        $('input[type="checkbox"][name="selone"]:checked').each(
+            function() {
+                var str = $(this).val();
+                var sa = str.split("&");
+                oagent = $("#agentId").val().trim();
+                recAgent = sa[0].trim();
+                if("" == compareAgent){
+                    compareAgent = recAgent;
+                }
+                if(compareAgent != recAgent){
+                    alert("注册码不属于同一机构无法批量禁用选中");
+                    eflag = true;
+                    return;
+                }
+                sa[1].replace("[", "").replace("]", "");
+                array.push(sa[1]);  //推荐码
+            }
+        );
+        if(eflag){
+            return;
+        }
+        if (array.length == "") {
+            alert("未选中任何记录!");
+            return;
+        }
+
+        var data = {};
+        data["recomCode"] = array.join(" ");
+        data["userCode"] = recAgent;
+        $.ajax({
+            async: false,
+            cache: false,
+            type: 'POST',
+            url: "<%=request.getContextPath() %>/recomCode/disable_selected",
+            data: data,
+            success: function (result) {
+                var message = result.message;
+                alert(message);
+                return;
+            }
+        });
+    });
 
 </script>
 
