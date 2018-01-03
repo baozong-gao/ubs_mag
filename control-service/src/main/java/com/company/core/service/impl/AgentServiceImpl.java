@@ -672,6 +672,17 @@ public class AgentServiceImpl implements AgentService {
         return false;
     }
     
+    @Override
+    public Boolean checkIfInstDefaultAgentCreated(String instId) {
+        
+        UcAgentDoExample ucAgentDoExample = new UcAgentDoExample();
+        ucAgentDoExample.createCriteria().andAgentTypeEqualTo(Constant.AGENT_TYPE_DEFAULT).andInstIdEqualTo(instId);
+        List<UcAgentDo> ucAgentDoList = ucAgentBiz.selectByExample(ucAgentDoExample);
+        if(ucAgentDoList != null && ucAgentDoList.size() > 0){
+            return true;
+        }
+        return false;
+    }
     
     @Override
     public UcAgentDo getAgentOfInstOwn(String instId) {

@@ -54,11 +54,14 @@ public class AgentController extends BaseController {
         agentForm.setUserCodeName(userBO.getUserCodeName());
         if(UserConstant.USER_INST.equals(userBO.getUserCodeType())){
             agentForm.setInstId(userBO.getUserCode());
-            List<UcAgentDo> ucAgentDoList = agentService.getAgentListForDropDown(userBO.getUserCode(),"", StatusConstant.STATUS_ENABLE);
-            modelAndView.getModel().put("agentList", ucAgentDoList);
+            UcAgentDo ucAgentDo = agentService.getDefautlAgentOfInst(userBO.getUserCode());
+            agentForm.setAgentId(ucAgentDo.getAgentId());
+//            List<UcAgentDo> ucAgentDoList = agentService.getAgentListForDropDown(userBO.getUserCode(),"", StatusConstant.STATUS_ENABLE);
+//            modelAndView.getModel().put("agentList", ucAgentDoList);
         } else if(UserConstant.USER_AGENT.equals(userBO.getUserCodeType())){
             UcAgentDo ucAgentDo = agentService.getAgent(userBO.getUserCode());
             agentForm.setInstId(ucAgentDo.getInstId());
+            agentForm.setAgentId(userBO.getUserCode());
         }
     
         modelAndView.getModel().put("agentForm", agentForm);
@@ -98,25 +101,29 @@ public class AgentController extends BaseController {
             if (!"Y".equals(ucAgentDo.getAgentOk())) {
                 return returnError("代理不允许开下级代理");
             }
+            UcAgentLevelDo ucAgentLevelDo = agentService.getAgentLevel(agentForm.getUserCode());
+            if("3".equals(ucAgentLevelDo.getAgentLevel())){
+                return returnError("当前代理等级不允许开下级代理");
+            }
         }
         
         Boolean dupshortname = agentService.checkIfDupAgentByName("", agentForm.getAgentShortName());
         if(dupshortname){
-            return returnSuccess("代理简称重复");
+            return returnError("代理简称重复");
         }
         Boolean dupname = agentService.checkIfDupAgentByName(agentForm.getAgentName(), "");
         if(dupname){
-            return returnSuccess("代理全称重复");
+            return returnError("代理全称重复");
         }
     
         //当选择默认代理时
         if(UserConstant.USER_TYPE_DEFAULT.equals(agentForm.getAgentType())){
-            Boolean defaultAgentCreated = agentService.checkIfDefaultAgentCreated();
+            Boolean defaultAgentCreated = agentService.checkIfInstDefaultAgentCreated(agentForm.getInstId());
             if(defaultAgentCreated){
                 return returnError("默认代理已经开通, 请选择其他代理类型");
             }
         }else{
-            Boolean defaultAgentCreated = agentService.checkIfDefaultAgentCreated();
+            Boolean defaultAgentCreated = agentService.checkIfInstDefaultAgentCreated(agentForm.getInstId());
             if(!defaultAgentCreated){
                 return returnError("默认代理未开通, 请先开通默认代理");
             }
@@ -128,7 +135,7 @@ public class AgentController extends BaseController {
             return returnError(error);
         }
     
-        //保存下发的代理
+        //保存代理
         if(StringUtils.isNotBlank(agentForm.getAgentId())){
             agentForm.setUpAgentId(agentForm.getAgentId());
         } else {

@@ -65,6 +65,8 @@ public interface AgentService {
     
     Boolean checkIfDefaultAgentCreated();
     
+    Boolean checkIfInstDefaultAgentCreated(String instId);
+    
     public UcAgentDo getAgentOfInstOwn(String instId);
     
     
