@@ -215,7 +215,7 @@ public class AgentServiceImpl implements AgentService {
         List<UcAgentLevelDo> list = ucAgentLevelBiz.getAllDownAgentLevelList(agentId);
         if (list != null && list.size() > 0) {
             for (UcAgentLevelDo s : list) {
-                ucAgentDo = ucAgentBiz.selectAgent(agentId);
+                ucAgentDo = ucAgentBiz.selectAgent(s.getAgentId());
                 if (StringUtils.isNotBlank(status)) {
                     if (status.equals(ucAgentDo.getStatus())) {
                         agentIdList.add(ucAgentDo);
