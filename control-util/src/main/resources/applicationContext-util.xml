@@ -19,7 +19,6 @@
 			<list>
 				<value>classpath:system.properties</value>
 				<value>classpath:jdbc.properties</value>
-				<value>classpath:log4j.properties</value>
 			</list>
 		</property>
 	</bean>
